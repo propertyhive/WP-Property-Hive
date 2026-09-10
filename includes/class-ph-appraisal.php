@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Appraisal; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Appraisal {
 
     /** @public int Appraisal (post) ID */
@@ -210,7 +211,7 @@ class PH_Appraisal {
                     }
                 }
 
-                return ( ( $price != '' ) ? $prefix . ph_display_price_field($price) . $suffix . ' ' . __( $this->_rent_frequency, 'propertyhive' ) : '-' );
+                return ( ( $price != '' ) ? $prefix . ph_display_price_field($price) . $suffix . ' ' . propertyhive_get_rent_frequency_label( $this->_rent_frequency ) : '-' );
                 break;
             }
         }

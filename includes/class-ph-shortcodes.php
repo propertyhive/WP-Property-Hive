@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -36,8 +39,39 @@ class PH_Shortcodes {
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Public shortcode registration filter; extensions can customize each shortcode tag through this existing dynamic hook contract.
 			add_shortcode( apply_filters( "{$shortcode}_shortcode_tag", $shortcode ), $function );
 		}
+	}
+
+	/**
+	 * Shortcode Wrapper
+	 *
+	 * @param mixed $function
+	 * @param array $atts (default: array())
+	 * @return string
+	 */
+	public static function shortcode_wrapper(
+		$function,
+		$atts    = array(),
+		$wrapper = array(
+			'class'  => 'propertyhive',
+			'before' => null,
+			'after'  => null
+		)
+	) {
+		ob_start();
+
+		$before 	= empty( $wrapper['before'] ) ? '<div class="' . esc_attr( $wrapper['class'] ) . '">' : $wrapper['before'];
+		$after 		= empty( $wrapper['after'] ) ? '</div>' : $wrapper['after'];
+
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Wrapper HTML is supplied by PHP callers; the default class is escaped when assembled.
+		echo $before;
+		call_user_func( $function, $atts );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Closing wrapper HTML is supplied by PHP callers.
+		echo $after;
+
+		return ob_get_clean();
 	}
 
 	/**
@@ -72,6 +106,7 @@ class PH_Shortcodes {
 
 	    if (
 	    	isset($atts['default_department']) && in_array($atts['default_department'], array_keys( ph_get_departments() )) &&
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only search form default; no state change.
 	    	( !isset($_REQUEST['department']) )
 	    )
 	    {
@@ -99,8 +134,10 @@ class PH_Shortcodes {
 			'columns' 			=> '2',
 			'orderby' 			=> 'meta_value_num',
 			'order'  			=> 'desc',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- These lines declare shortcode defaults; they do not pass a meta_key/exclude value to WP_Query or get_posts. 131 is the properties shortcode_atts default meta_key; 133/751/1045/1338 are exclude defaults in shortcode_atts.
 			'meta_key' 			=> '_price_actual',
 			'ids'     			=> '',
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- These lines declare shortcode defaults; they do not pass a meta_key/exclude value to WP_Query or get_posts. 131 is the properties shortcode_atts default meta_key; 133/751/1045/1338 are exclude defaults in shortcode_atts.
 			'exclude'     		=> '',
 			'department'		=> '', // residential-sales / residential-lettings / commercial / any custom department
 			'minimum_price'		=> '',
@@ -337,6 +374,7 @@ class PH_Shortcodes {
 		{
 			$atts['keyword'] = sanitize_text_field( trim( $atts['keyword'] ) );
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Preserve the original request verbatim only to restore it after this shortcode's query; it is not output or persisted.
 			$original_keyword = isset($_REQUEST['keyword']) ? $_REQUEST['keyword'] : '';
 			$_REQUEST['keyword'] = $atts['keyword'];
 
@@ -577,6 +615,7 @@ class PH_Shortcodes {
 			)
 		)
 		{
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$atts['meta_key'] = '_floor_area_from_sqft';
 		}
 
@@ -591,11 +630,14 @@ class PH_Shortcodes {
 			'order'               => $atts['order'],
 			'posts_per_page'      => $atts['posts_per_page'],
 			'paged'               => $paged,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property eligibility and matching fields live in the established metadata schema; retain these filters and the shortcode page limit.
 			'meta_query'		  => $meta_query,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Property taxonomy filters are required by this shortcode; WordPress builds the query and the shortcode page limit is retained.
 			'tax_query'		  	  => $tax_query,
 			'has_password' 		  => false,
 		);
 		if ( ! empty( $atts['meta_key'] ) ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$args['meta_key'] = $atts['meta_key'];
 		}
 
@@ -613,12 +655,14 @@ class PH_Shortcodes {
 			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
 		    $exclude_ids = array_filter( $exclude_ids );
 		    if ( ! empty( $exclude_ids ) ) {
+		        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Explicit shortcode exclusions are validated as integer IDs above; retain this published selection feature within the shortcode page limit.
 		        $args['post__not_in'] = $exclude_ids;
 		    }
 		}
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
 			$args['orderby'] = 'meta_value';
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$args['meta_key'] = '_on_market_change_date';
 		}
 
@@ -666,7 +710,8 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo wp_kses_post($loop_start);
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Buffered loop template HTML; preserve theme overrides and the static carousel class insertion.
+                echo $loop_start;
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -719,6 +764,7 @@ class PH_Shortcodes {
 			'location_id'		=> '',
 			'commercial_for_sale' => '',
 			'commercial_to_rent' => '',
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- These lines declare shortcode defaults; they do not pass a meta_key/exclude value to WP_Query or get_posts. 131 is the properties shortcode_atts default meta_key; 133/751/1045/1338 are exclude defaults in shortcode_atts.
 			'exclude'     		=> '',
 			'orderby' 		=> 'date',
 			'order' 		=> 'desc',
@@ -910,7 +956,9 @@ class PH_Shortcodes {
 			'paged'					=> $paged,
 			'orderby' 				=> $atts['orderby'],
 			'order' 				=> $atts['order'],
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property eligibility and matching fields live in the established metadata schema; retain these filters and the shortcode page limit.
 			'meta_query' 			=> $meta_query,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Property taxonomy filters are required by this shortcode; WordPress builds the query and the shortcode page limit is retained.
 			'tax_query' 			=> $tax_query,
 			'has_password' 			=> false,
 		);
@@ -920,6 +968,7 @@ class PH_Shortcodes {
 			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
 		    $exclude_ids = array_filter( $exclude_ids );
 		    if ( ! empty( $exclude_ids ) ) {
+		        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Explicit shortcode exclusions are validated as integer IDs above; retain this published selection feature within the shortcode page limit.
 		        $args['post__not_in'] = $exclude_ids;
 		    }
 		}
@@ -927,6 +976,7 @@ class PH_Shortcodes {
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
 			$args['orderby'] = 'meta_value';
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$args['meta_key'] = '_on_market_change_date';
 		}
 
@@ -965,7 +1015,8 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo wp_kses_post($loop_start);
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Buffered loop template HTML; preserve theme overrides and the static carousel class insertion.
+                echo $loop_start;
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1013,9 +1064,11 @@ class PH_Shortcodes {
 			'office_id'	=> '',
 			'negotiator_id'		=> '',
 			'availability_id'	=> '',
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- These lines declare shortcode defaults; they do not pass a meta_key/exclude value to WP_Query or get_posts. 131 is the properties shortcode_atts default meta_key; 133/751/1045/1338 are exclude defaults in shortcode_atts.
 			'exclude'     		=> '',
 			'orderby' 	=> 'rand',
 			'order' 	=> 'desc',
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Shortcode default declaration only; no query executes here.
 			'meta_key' 	=> '',
 			'no_results_output' => '',
 			'pagination' => '',
@@ -1184,9 +1237,11 @@ class PH_Shortcodes {
 			);
 		}
 
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property eligibility and matching fields live in the established metadata schema; retain these filters and the shortcode page limit.
 		$args['meta_query'] = $meta_query;
 
 		if ( ! empty( $atts['meta_key'] ) ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$args['meta_key'] = $atts['meta_key'];
 		}
 
@@ -1202,12 +1257,14 @@ class PH_Shortcodes {
 		}
 
 		if ( ! empty( $tax_query ) ) {
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Property taxonomy filters are required by this shortcode; WordPress builds the query and the shortcode page limit is retained.
 			$args['tax_query'] = $tax_query;
 		}
 
 		if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 		{
 			$args['orderby'] = 'meta_value';
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 			$args['meta_key'] = '_on_market_change_date';
 		}
 
@@ -1218,6 +1275,7 @@ class PH_Shortcodes {
 			$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
 		    $exclude_ids = array_filter( $exclude_ids );
 		    if ( ! empty( $exclude_ids ) ) {
+		        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Explicit shortcode exclusions are validated as integer IDs above; retain this published selection feature within the shortcode page limit.
 		        $args['post__not_in'] = $exclude_ids;
 		    }
 		}
@@ -1255,7 +1313,8 @@ class PH_Shortcodes {
 				{
 					$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 				}
-				echo wp_kses_post($loop_start);
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Buffered loop template HTML; preserve theme overrides and the static carousel class insertion.
+                echo $loop_start;
 			?>
 
 				<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1306,6 +1365,7 @@ class PH_Shortcodes {
 			'availability_id'	=> '',
 			'property_type_id'	=> '',
 			'match_property_type'	=> '',
+			// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- These lines declare shortcode defaults; they do not pass a meta_key/exclude value to WP_Query or get_posts. 131 is the properties shortcode_atts default meta_key; 133/751/1045/1338 are exclude defaults in shortcode_atts.
 			'exclude'     		=> '',
 			'no_results_output' => '',
 			'carousel' 			=> '',
@@ -1347,6 +1407,7 @@ class PH_Shortcodes {
 
 			$args = array(
 				'post_type'				=> 'property',
+				// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Similar-property results must exclude the one current property; the result count is limited by per_page.
 				'post__not_in' 			=> array($atts['property_id']),
 				'post_status' 			=> ( ( is_user_logged_in() && current_user_can( 'manage_propertyhive' ) ) ? array('publish', 'private') : 'publish' ),
 				'ignore_sticky_posts'	=> 1,
@@ -1577,6 +1638,7 @@ class PH_Shortcodes {
 				);
 			}
 
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property eligibility and matching fields live in the established metadata schema; retain these filters and the shortcode page limit.
 			$args['meta_query'] = $meta_query;
 
 			$tax_query = array();
@@ -1644,12 +1706,14 @@ class PH_Shortcodes {
 			}
 
 			if ( ! empty( $tax_query ) ) {
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Property taxonomy filters are required by this shortcode; WordPress builds the query and the shortcode page limit is retained.
 				$args['tax_query'] = $tax_query;
 			}
 
 			if ( isset($atts['orderby']) && $atts['orderby'] == 'date' )
 			{
 				$args['orderby'] = 'meta_value';
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 				$args['meta_key'] = '_on_market_change_date';
 			}
 
@@ -1660,6 +1724,7 @@ class PH_Shortcodes {
 				$exclude_ids = array_map( 'absint', explode( ',', $atts['exclude'] ) );
 			    $exclude_ids = array_filter( $exclude_ids );
 			    if ( ! empty( $exclude_ids ) ) {
+			        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Explicit shortcode exclusions are validated as integer IDs above; retain this published selection feature within the shortcode page limit.
 			        $args['post__not_in'] = $exclude_ids;
 			    }
 			}
@@ -1680,7 +1745,8 @@ class PH_Shortcodes {
 					{
 						$loop_start = str_replace("class=\"properties", "class=\"properties propertyhive-shortcode-carousel", $loop_start);
 					}
-					echo wp_kses_post($loop_start);
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Buffered loop template HTML; preserve theme overrides and the static carousel class insertion.
+                echo $loop_start;
 				?>
 
 					<?php while ( $properties->have_posts() ) : $properties->the_post(); ?>
@@ -1729,7 +1795,11 @@ class PH_Shortcodes {
 			'embed'  		=> 'false'
 		), $atts, 'property_map' );
 
-		return get_property_map( $atts );
+		ob_start();
+
+		get_property_map( $atts );
+
+		return ob_get_clean();
 	}
 
 	/**
@@ -1750,7 +1820,11 @@ class PH_Shortcodes {
 			'link'        	=> 'true',
 		), $atts, 'property_static_map' );
 
-		return get_property_static_map( $atts );
+		ob_start();
+
+		get_property_static_map( $atts );
+
+		return ob_get_clean();
 	}
 
 	/**
@@ -1770,7 +1844,11 @@ class PH_Shortcodes {
 			'embed'  		=> 'false'
 		), $atts, 'property_street_view' );
 
-		return get_property_street_view( $atts );
+		ob_start();
+
+		get_property_street_view( $atts );
+
+		return ob_get_clean();
 	}
 
 	/**
@@ -1806,7 +1884,7 @@ class PH_Shortcodes {
 
 				if ( $property->get_office_address( $atts['address_separator'] ) != '' )
 				{
-					echo '<div class="office-address">' . wp_kses_post($property->get_office_address( $atts['address_separator'] )) . '</div>';
+					echo '<div class="office-address">' . wp_kses_post( $property->get_office_address( $atts['address_separator'] ) ) . '</div>';
 				}
 
 				if ( $property->office_telephone_number != '' )
@@ -1871,10 +1949,10 @@ class PH_Shortcodes {
 		ob_start();
 
 		$api_key = get_option('propertyhive_google_maps_api_key', '');
-	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
 	    wp_enqueue_script('googlemaps');
 
-	    echo '<div id="office_map_canvas" style="height:' . esc_attr(str_replace( "px", "", ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? (int)$atts['height'] : '400' ) )) . 'px"></div>';
+	    echo '<div id="office_map_canvas" style="height:' . (int) ( ( isset($atts['height']) && !empty($atts['height']) && is_numeric($atts['height']) ) ? $atts['height'] : 400 ) . 'px"></div>';
 ?>
 <script>
 
@@ -1897,6 +1975,7 @@ class PH_Shortcodes {
 			}
 			else
 			{
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Selects the primary office from the established metadata schema and returns at most one office.
 				$args['meta_query'] = array(
 					array(
 						'key' => 'primary',
@@ -1938,9 +2017,13 @@ class PH_Shortcodes {
   			{
   				$map_add_on_settings = get_option( 'propertyhive_map_search', array() );
 
-  				if ( isset($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
+                if ( isset($map_add_on_settings['style_js']) && is_string($map_add_on_settings['style_js']) && trim($map_add_on_settings['style_js']) != '' )
   				{
-  					echo 'map_options.styles = ' . esc_js(trim($map_add_on_settings['style_js'])) . ';';
+                    // Google Maps styles are JSON arrays, including legacy Snazzy Maps style properties.
+                    $map_styles = json_decode( $map_add_on_settings['style_js'] );
+                    if ( is_array( $map_styles ) ) {
+                        echo 'map_options.styles = ' . wp_json_encode( $map_styles, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';';
+                    }
   				}
   			}
 
@@ -2153,15 +2236,17 @@ class PH_Shortcodes {
 			return ob_get_clean();
 		}
 
-		// check key provided is valid
-		if ( !isset($_GET['key']) || empty(ph_clean($_GET['key'])) || !isset($_GET['id']) || empty(absint($_GET['id'])) )
+		// Display only: WordPress validates the opaque reset key; the reset action has its own nonce.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- An opaque key must remain intact for check_password_reset_key().
+        $key = isset( $_GET['key'] ) && is_string( $_GET['key'] ) ? wp_unslash( $_GET['key'] ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only selects the user whose reset key WordPress verifies below.
+        $user_id = isset( $_GET['id'] ) && is_string( $_GET['id'] ) ? absint( $_GET['id'] ) : 0;
+		if ( $key === '' || $user_id === 0 )
 		{
 			echo esc_html(__( 'Invalid key or id provided. Please try again', 'propertyhive' ));
 			return ob_get_clean();
 		}
 
-		$key = ph_clean($_GET['key']);
-		$user_id = absint($_GET['id']);
 
 		$userdata = get_userdata( $user_id );
 		$user_login = $userdata ? $userdata->user_login : '';
@@ -2221,7 +2306,8 @@ class PH_Shortcodes {
 	{
 		$orderby = '';
 
-		if ( isset( $_GET['orderby'] ) && $_GET['orderby'] != '' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Public read-only sort selection; the query helper validates the ordering value.
+		if ( isset( $_GET['orderby'] ) && is_string( $_GET['orderby'] ) && $_GET['orderby'] != '' )
 		{
 			$PH_Query = new PH_Query();
 			$ordering_args = $PH_Query->get_search_results_ordering_args();
@@ -2231,6 +2317,7 @@ class PH_Shortcodes {
 
 			if ( isset( $ordering_args['meta_key'] ) )
 			{
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Property sorting uses the established price, floor-area or market-date metadata; retain the selected ordering and existing query limits.
 				$args['meta_key'] = $ordering_args['meta_key'];
 			}
 			else

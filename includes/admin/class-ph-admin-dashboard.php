@@ -15,6 +15,7 @@ if ( ! class_exists( 'PH_Admin_Dashboard' ) ) :
 /**
  * PH_Admin_Dashboard Class.
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Dashboard; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Dashboard {
 
 	/**

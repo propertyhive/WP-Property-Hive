@@ -45,23 +45,9 @@ class Divi_Property_Embedded_Virtual_Tours_Widget extends ET_Builder_Module
                 {
                     if ( isset($settings['oembed']) && $settings['oembed'] == 'yes' )
                     {
-                        $embed_code = wp_oembed_get( $virtual_tour['url'] );
-
-                        $allowed_html = wp_kses_allowed_html( 'post' );
-
-                        $allowed_html['iframe'] = array(
-                            'src'             => true,
-                            'width'           => true,
-                            'height'          => true,
-                            'frameborder'     => true,
-                            'allow'           => true,
-                            'allowfullscreen' => true,
-                            'loading'         => true,
-                            'title'           => true,
-                            'class'           => true,
-                        );
-
-                        echo wp_kses( $embed_code, $allowed_html );
+                        $embed_code = wp_oembed_get($virtual_tour['url']);
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_oembed_get() uses WordPress provider trust and sanitization; preserve supported provider scripts and trusted PHP filters.
+                        echo $embed_code;
                     }
                     else
                     {

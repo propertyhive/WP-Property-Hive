@@ -21,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Sale' ) ) :
 /**
  * PH_Admin_CPT_Sale Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Sale; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 
 	/**
@@ -55,18 +56,15 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 	 * Check if we're editing or adding a sale
 	 * @return boolean
 	 */
-	private function is_editing_sale() {
-		if ( ! empty( $_GET['post_type'] ) && 'sale' == $_GET['post_type'] ) {
-			return true;
-		}
-		if ( ! empty( $_GET['post'] ) && 'sale' == get_post_type( (int)$_GET['post'] ) ) {
-			return true;
-		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'sale' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
-			return true;
-		}
-		return false;
-	}
+    private function is_editing_sale() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'sale' === $post_type || ( $post_id > 0 && 'sale' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'sale' === get_post_type( $request_id ) );
+    }
 
 	/**
 	 * @param int $post_id
@@ -115,8 +113,9 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 	public function custom_columns( $column ) {
 		global $post, $propertyhive, $the_sale;
 
-		if ( empty( $the_sale ) || $the_sale->ID != $post->ID ) 
+		if ( empty( $the_sale ) || $the_sale->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_sale = new PH_Sale( $post->ID );
 		}
 
@@ -125,7 +124,7 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 				
 				$edit_link        = get_edit_post_link( $post->ID );
 				//$title            = _draft_or_post_title();
-                $title            = date("jS F Y", strtotime($the_sale->sale_date_time));
+                $title            = gmdate("jS F Y", strtotime($the_sale->sale_date_time));
                 
 				$post_type_object = get_post_type_object( $post->post_type );
 				$can_edit_post    = current_user_can( $post_type_object->cap->edit_post, $post->ID );
@@ -180,17 +179,18 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
                 break;
             case 'applicant' :
                 
-                echo wp_kses_post($the_sale->get_applicants( false, true, false ));
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- get_applicants escapes stored names/contact details and link URLs before its trusted PHP contact-details extension filter.
+                echo $the_sale->get_applicants( false, true, false );
                 
                 break;
             case 'amount' :
                 
-                echo wp_kses_post($the_sale->get_formatted_amount());
+                echo wp_kses_post( $the_sale->get_formatted_amount() );
                 
                 break;
             case 'status' :
                 
-                echo esc_html(__( ucwords(str_replace("_", " ", $the_sale->status)), 'propertyhive' ));
+                echo esc_html(propertyhive_get_status_label( $the_sale->status ));
                 
                 break;
 			default :
@@ -255,12 +255,14 @@ class PH_Admin_CPT_Sale extends PH_Admin_CPT {
 		if ( isset( $vars['orderby'] ) ) {
 			if ( '_sale_date_time' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_sale_date_time',
 					'orderby' 	=> 'meta_value'
 				) );
 			}
 			elseif ( '_status' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_status',
 					'orderby' 	=> 'meta_value'
 				) );

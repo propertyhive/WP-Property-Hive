@@ -23,6 +23,7 @@ if ( isset($atts['show_title']) && $atts['show_title'] != 'yes' )
 
 if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
 {
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
     $epc_urls = $property->_epc_urls;
     if ( is_array($epc_urls) && !empty( $epc_urls ) )
     {
@@ -30,6 +31,7 @@ if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
 
             echo '<h4>' . esc_html(__( 'EPCs', 'propertyhive' )) . '</h4>';
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
             foreach ($epc_urls as $epc)
             {
             	echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
@@ -40,6 +42,7 @@ if ( get_option('propertyhive_epcs_stored_as', '') == 'urls' )
 }
 else
 {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 	$epc_attachment_ids = $property->get_epc_attachment_ids();
 
 	if ( !empty($epc_attachment_ids) )
@@ -48,6 +51,7 @@ else
 
 			echo '<h4>' . esc_html(__( 'EPCs', 'propertyhive' )) . '</h4>';
 
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 			foreach ( $epc_attachment_ids as $attachment_id )
 			{
 				if ( wp_attachment_is_image($attachment_id) )

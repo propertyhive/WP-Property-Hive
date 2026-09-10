@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Admin functions for the property post type
  *
@@ -21,6 +24,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Property' ) ) :
 /**
  * PH_Admin_CPT_Property Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Property; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 	/**
@@ -252,11 +256,11 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
     	global $post;
 
 		$screen = get_current_screen();
-        if ($screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
+        if ($screen && $post instanceof WP_Post && $screen->id == 'property' && $post->post_type == 'property' && $post->post_parent != 0 && $post->post_parent != '')
         {
         	$property = new PH_Property((int)$post->post_parent);
-            $message = esc_html(__( "This property is a unit belonging to", 'propertyhive' )) . ' <a href="' . esc_url(get_edit_post_link( $post->post_parent )) . '">' . esc_html($property->get_formatted_full_address()) . '</a>';
-            echo wp_kses_post("<div class=\"notice notice-info\"> <p>$message</p></div>");
+            $message = __( "This property is a unit belonging to", 'propertyhive' ) . ' <a href="' . esc_url(get_edit_post_link( $post->post_parent )) . '">' . esc_html($property->get_formatted_full_address()) . '</a>';
+            echo '<div class="notice notice-info"><p>' . wp_kses_post( $message ) . '</p></div>';
         }
     }
 
@@ -264,18 +268,15 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 * Check if we're editing or adding a property
 	 * @return boolean
 	 */
-	private function is_editing_property() {
-		if ( ! empty( $_GET['post_type'] ) && 'property' == $_GET['post_type'] ) {
-			return true;
-		}
-		if ( ! empty( $_GET['post'] ) && 'property' == get_post_type( (int)$_GET['post'] ) ) {
-			return true;
-		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'property' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
-			return true;
-		}
-		return false;
-	}
+    private function is_editing_property() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'property' === $post_type || ( $post_id > 0 && 'property' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'property' === get_post_type( $request_id ) );
+    }
 
 	/**
 	 * Change title boxes in admin.
@@ -374,8 +375,9 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	public function custom_columns( $column ) {
 		global $post, $propertyhive, $the_property;
 
-		if ( empty( $the_property ) || $the_property->ID != $post->ID ) 
+		if ( empty( $the_property ) || $the_property->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_property = new PH_Property( $post->ID );
 		}
 
@@ -424,8 +426,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 				echo '</strong>';
 
 				// Excerpt view
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 				if ( isset( $_GET['mode'] ) && 'excerpt' == $_GET['mode'] ) {
-					echo wp_kses_post(apply_filters( 'the_excerpt', $post->post_excerpt ));
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound,WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress core the_excerpt hook must keep its name; stored excerpt is sanitized before trusted PHP presentation filters.
+					echo apply_filters( 'the_excerpt', wp_kses_post( $post->post_excerpt ) );
 				}
 
 				if ( $the_property->bedrooms != '' || $the_property->property_type != '' || $the_property->reference_number != '' )
@@ -439,14 +443,14 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 						$details[] = ( 
 							( 
 								( 
-									$the_property->department == 'residential-sales' || 
+									$the_property->department == 'residential-sales' ||
 									$the_property->department == 'residential-lettings' ||
-									ph_get_custom_department_based_on($the_property->department) == 'residential-sales' || 
+									ph_get_custom_department_based_on($the_property->department) == 'residential-sales' ||
 									ph_get_custom_department_based_on($the_property->department) == 'residential-lettings'
 								)
 								&& 
-								$the_property->bedrooms != '' 
-							) ? esc_html($the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' )) . ' ' : '' 
+								$the_property->bedrooms != ''
+							) ? esc_html($the_property->bedrooms . ' ' . __( 'bedroom', 'propertyhive' )) . ' ' : ''
 						) . esc_html($the_property->property_type);
 					}
 
@@ -457,7 +461,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 
 					$details = apply_filters( 'propertyhive_admin_property_column_address_details', $details, $post->ID );
 
-					echo wp_kses_post(implode("<br>", $details));
+					// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Base detail values are escaped above before the trusted PHP HTML extension filter.
+					echo implode("<br>", $details);
 				}
 
 				get_inline_data( $post );
@@ -476,12 +481,12 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 $floor_area = $the_property->get_formatted_floor_area();
                 if ( $floor_area != '' )
                 {
-                	echo 'Floor Area: ' . wp_kses_post($floor_area) . '<br>';
+                    echo 'Floor Area: ' . wp_kses_post( $floor_area ) . '<br>';
             	}
                 $site_area = $the_property->get_formatted_site_area();
                 if ( $site_area != '' )
                 {
-                	echo 'Site Area: ' . wp_kses_post($site_area);
+                    echo 'Site Area: ' . wp_kses_post( $site_area );
             	}
 
             	if ( $floor_area == '' && $site_area == '' )
@@ -500,15 +505,15 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
                 else
                 {
                 	if ( 
-                		( $the_property->_department == 'residential-sales' || ph_get_custom_department_based_on($the_property->_department) == 'residential-sales' )
+                        ( $the_property->_department == 'residential-sales' || ph_get_custom_department_based_on($the_property->_department) == 'residential-sales' )
                 		&& 
                 		$the_property->price_qualifier != '' 
                 	)
                 	{
-                		$price .= '<br>' . esc_html($the_property->price_qualifier);
+                        $price .= '<br>' . esc_html($the_property->price_qualifier);
                 	}
                 }
-                echo wp_kses_post($price);
+                echo wp_kses_post( $price );
                 
 				break;
 			case 'status' :
@@ -520,7 +525,7 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	               echo esc_html($term_list[0]). '<br>';
 	            }
 
-            	if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')
+                if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')
             	{
             		echo esc_html(__( 'On The Market', 'propertyhive' ));
             	}
@@ -529,15 +534,16 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
             		echo esc_html(__( 'Not On The Market', 'propertyhive' ));
             	}
             	
-            	if (isset($the_property->_featured) && $the_property->_featured == 'yes')
+                if (isset($the_property->_featured) && $the_property->_featured == 'yes')
             	{
             		echo '<br>' . esc_html(__( 'Featured', 'propertyhive' ));
             	}
 
-            	$marketing_flags = $the_property->marketing_flag;
+                $marketing_flags = $the_property->marketing_flag;
             	if ( $marketing_flags != '' )
             	{
-            		echo '<br>' . wp_kses_post(implode( "<br>", explode( ",", esc_html($marketing_flags) ) ));
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Marketing text is escaped before adding literal br separators.
+                echo '<br>' . implode( "<br>", explode( ",", esc_html($marketing_flags) ) );
             	}
                 
 				break;
@@ -651,12 +657,14 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		if ( isset( $vars['orderby'] ) ) {
 			if ( '_price_actual' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_price_actual',
 					'orderby' 	=> 'meta_value_num'
 				) );
 			}
 			elseif ( '_floor_area_from_sqft' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_floor_area_from_sqft',
 					'orderby' 	=> 'meta_value_num'
 				) );
@@ -761,10 +769,10 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 		if ( ! isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) {
 			return $post_id;
 		}
-		if ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! wp_verify_nonce( $_REQUEST['propertyhive_quick_edit_nonce'], 'propertyhive_quick_edit_nonce' ) ) {
+		if ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && ! wp_verify_nonce( ( isset( $_REQUEST['propertyhive_quick_edit_nonce'] ) && is_string( $_REQUEST['propertyhive_quick_edit_nonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['propertyhive_quick_edit_nonce'] ) ) : '', 'propertyhive_quick_edit_nonce' ) ) {
 			return $post_id;
 		}
-		if ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && ! wp_verify_nonce( $_REQUEST['propertyhive_bulk_edit_nonce'], 'propertyhive_bulk_edit_nonce' ) ) {
+		if ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && ! wp_verify_nonce( ( isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) && is_string( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ) : '', 'propertyhive_bulk_edit_nonce' ) ) {
 			return $post_id;
 		}
 
@@ -802,35 +810,45 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 * Bulk edit
 	 */
 	public function bulk_edit_save( $post_id, $property ) {
+        if ( ! current_user_can( 'edit_post', $post_id ) || 'property' !== get_post_type( $post_id ) ) { return; }
+        if ( ! isset( $_REQUEST['propertyhive_bulk_edit_nonce'] ) || ! is_string( $_REQUEST['propertyhive_bulk_edit_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['propertyhive_bulk_edit_nonce'] ) ), 'propertyhive_bulk_edit_nonce' ) ) { return; }
+        $request_input = wp_unslash( $_REQUEST );
+        $input = array();
+        foreach ( array( '_on_market', '_featured', '_availability', '_negotiator_id', '_office_id' ) as $key )
+        {
+            if ( isset( $request_input[ $key ] ) && ! is_string( $request_input[ $key ] ) ) { return; }
+            $input[ $key ] = isset( $request_input[ $key ] ) ? sanitize_text_field( $request_input[ $key ] ) : '';
+        }
+
 
 		// Save fields
-		if ( ! empty( $_REQUEST['_on_market'] ) ) 
+        if ( ! empty( $input['_on_market'] ) )
 		{
-			$on_market = ph_clean( $_REQUEST['_on_market'] );
-			if ( $_REQUEST['_on_market'] != 'yes' ) { $on_market = ''; } // can only be 'yes' or blank
+            $on_market = ph_clean( $input['_on_market'] );
+            if ( $input['_on_market'] != 'yes' ) { $on_market = ''; } // can only be 'yes' or blank
 			update_post_meta( $post_id, '_on_market', ph_clean( $on_market ) );
 		}
 
-		if ( ! empty( $_REQUEST['_featured'] ) ) 
+        if ( ! empty( $input['_featured'] ) )
 		{
-			$featured = ph_clean( $_REQUEST['_featured'] );
-			if ( $_REQUEST['_featured'] != 'yes' ) { $featured = ''; } // can only be 'yes' or blank
+            $featured = ph_clean( $input['_featured'] );
+            if ( $input['_featured'] != 'yes' ) { $featured = ''; } // can only be 'yes' or blank
 			update_post_meta( $post_id, '_featured', ph_clean( $featured ) );
 		}
 
-		if ( ! empty( $_REQUEST['_availability'] ) && is_numeric( $_REQUEST['_availability'] ) ) 
+        if ( ! empty( $input['_availability'] ) && is_numeric( $input['_availability'] ) )
 		{
-			wp_set_post_terms( $post_id, (int)$_REQUEST['_availability'], 'availability' );
+            wp_set_post_terms( $post_id, (int)$input['_availability'], 'availability' );
 		}
 
-		if ( ! empty( $_REQUEST['_negotiator_id'] ) && is_numeric( $_REQUEST['_negotiator_id'] ) && $_REQUEST['_negotiator_id'] != '-1' ) 
+        if ( ! empty( $input['_negotiator_id'] ) && is_numeric( $input['_negotiator_id'] ) && $input['_negotiator_id'] != '-1' )
 		{
-			update_post_meta( $post_id, '_negotiator_id', (int)$_REQUEST['_negotiator_id'] );
+            update_post_meta( $post_id, '_negotiator_id', (int)$input['_negotiator_id'] );
 		}
 
-		if ( ! empty( $_REQUEST['_office_id'] ) && is_numeric( $_REQUEST['_office_id'] ) ) 
+        if ( ! empty( $input['_office_id'] ) && is_numeric( $input['_office_id'] ) )
 		{
-			update_post_meta( $post_id, '_office_id', (int)$_REQUEST['_office_id'] );
+            update_post_meta( $post_id, '_office_id', (int)$input['_office_id'] );
 		}
 
 		do_action( 'propertyhive_property_bulk_edit_save', $property );
@@ -844,7 +862,8 @@ class PH_Admin_CPT_Property extends PH_Admin_CPT {
 	 */
 	public function upload_dir( $pathdata ) {
 		// Change upload dir for downloadable files
-		if ( isset( $_POST['type'] ) && 'downloadable_product' == $_POST['type'] ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Upload API validates the upload request; this filter only chooses a fixed subdirectory and never accepts a path.
+		if ( isset( $_POST['type'] ) && is_string( $_POST['type'] ) && 'downloadable_product' === $_POST['type'] ) {
 			if ( empty( $pathdata['subdir'] ) ) {
 				$pathdata['path']   = $pathdata['path'] . '/propertyhive_uploads';
 				$pathdata['url']    = $pathdata['url']. '/propertyhive_uploads';

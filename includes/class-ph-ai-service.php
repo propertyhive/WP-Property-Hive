@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_AI_Service; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_AI_Service {
 
 	public function make_request( $action, $payload = array() ) {

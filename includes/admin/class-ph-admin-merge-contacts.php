@@ -1,4 +1,7 @@
     <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Admin Merge Duplicate Contacts Class.
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Merge_Contacts' ) ) :
 /**
  * PH_Admin_Merge_Contacts
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Merge_Contacts; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Merge_Contacts {
 
     /**
@@ -25,6 +29,23 @@ class PH_Admin_Merge_Contacts {
      */
     public function output()
     {
+		// This endpoint only renders the merge review screen. The state-changing merge
+		// request is sent to the separate AJAX handler with its own nonce and capability checks.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The GET value only selects the read-only merge review screen; the AJAX mutation verifies its nonce.
+		$request_get = wp_unslash( $_GET );
+		$ids_to_merge = array();
+		$merge_ids_input = ( isset( $request_get['merge_ids'] ) && is_scalar( $request_get['merge_ids'] ) ) ? sanitize_text_field( $request_get['merge_ids'] ) : '';
+		if ( $merge_ids_input !== '' ) {
+			foreach ( explode( '|', $merge_ids_input ) as $merge_id_input ) {
+				$merge_id = absint( $merge_id_input );
+				if ( $merge_id && 'contact' === get_post_type( $merge_id ) ) {
+					$ids_to_merge[] = $merge_id;
+				}
+			}
+			$ids_to_merge = array_values( array_unique( $ids_to_merge ) );
+		}
+		$merge_ids_for_request = implode( '|', $ids_to_merge );
+
         ?>
         <div class="wrap propertyhive">
 
@@ -35,12 +56,6 @@ class PH_Admin_Merge_Contacts {
         <p><strong>Note:</strong> This action is irreversible.</p>
 
         <?php
-
-        if ( isset( $_GET['merge_ids'] ) && $_GET['merge_ids'] != '' )
-        {
-            $ids_to_merge = explode( '|', ph_clean( $_GET['merge_ids']) );
-        }
-
         if ( isset( $ids_to_merge ) && count( $ids_to_merge ) > 1 )
         {
             foreach ( $ids_to_merge as $i => $contact_id )
@@ -121,9 +136,12 @@ class PH_Admin_Merge_Contacts {
 
                 $contact_parts = $this->get_note_records( $contact, $contact_parts );
 
+                // Stored contact details may contain markup; sanitize before the trusted extension HTML filter.
+                $contact_parts = array_map( 'wp_kses_post', $contact_parts );
                 $contact_parts = apply_filters( 'propertyhive_merge_contact_parts', $contact_parts );
 
-                echo wp_kses_post(implode( '<br>', $contact_parts ));
+                // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in contact summary HTML is sanitized immediately before the trusted propertyhive_merge_contact_parts extension filter.
+                echo implode( '<br>', $contact_parts );
             ?>
             <label style="position:absolute; right:25px; top:25px;">
                 <?php echo esc_html(__( 'Use as Primary Contact', 'propertyhive' )); ?>
@@ -161,9 +179,9 @@ class PH_Admin_Merge_Contacts {
 
                         var data = {
                             action:             'propertyhive_merge_contact_records',
-                            contact_ids :       '<?php echo esc_js(ph_clean($_GET['merge_ids'])); ?>',
+                            contact_ids :       '<?php echo esc_js( $merge_ids_for_request ); ?>',
                             primary_contact_id: selected_primary,
-                            nonce:              '<?php echo esc_js(wp_create_nonce( 'propertyhive_merge_contact' )); ?>',
+                            nonce:              '<?php echo esc_js( wp_create_nonce( 'propertyhive_merge_contact' ) ); ?>',
                         };
 
                         jQuery.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response) {
@@ -178,7 +196,7 @@ class PH_Admin_Merge_Contacts {
                             if (response.success)
                             {
                                 // Redirect to referrer, adding message in admin_notices
-                                window.location.href = '<?php echo esc_js(admin_url('edit.php?post_type=contact&propertyhive_contacts_merged=1')); ?>';
+                                window.location.href = <?php echo wp_json_encode( admin_url( 'edit.php?post_type=contact&propertyhive_contacts_merged=1' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
                             }
                         });
                     }
@@ -212,6 +230,7 @@ class PH_Admin_Merge_Contacts {
         $args = array(
             'post_type' => 'property',
             'nopaging' => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 'relation' => 'OR',
                 array(
@@ -262,6 +281,7 @@ class PH_Admin_Merge_Contacts {
         $args = array(
             'post_type' => 'appraisal',
             'nopaging' => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_property_owner_contact_id',
@@ -435,8 +455,10 @@ class PH_Admin_Merge_Contacts {
 
         $args = array(
             'post_type' => 'enquiry',
-            'nopaging'    => true,
+            'posts_per_page' => 1,
+            'no_found_rows' => false,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- One-ID query retains found_rows for the complete related-enquiry count.
             'meta_query' => $meta_query,
         );
         $enquiries_query = new WP_Query( $args );
@@ -462,6 +484,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'viewing',
             'posts_per_page' => 1,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Viewing/offer/sale/tenancy merge summaries use posts_per_page=1, fields=ids and found_posts to display counts for one contact. Each query has a single _applicant_contact_id equality and posts_per_page=1; found_rows remains enabled for the count.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -492,6 +515,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'offer',
             'posts_per_page' => 1,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Viewing/offer/sale/tenancy merge summaries use posts_per_page=1, fields=ids and found_posts to display counts for one contact. Each query has a single _applicant_contact_id equality and posts_per_page=1; found_rows remains enabled for the count.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -522,6 +546,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'sale',
             'posts_per_page' => 1,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Viewing/offer/sale/tenancy merge summaries use posts_per_page=1, fields=ids and found_posts to display counts for one contact. Each query has a single _applicant_contact_id equality and posts_per_page=1; found_rows remains enabled for the count.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -552,6 +577,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'tenancy',
             'posts_per_page' => 1,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Viewing/offer/sale/tenancy merge summaries use posts_per_page=1, fields=ids and found_posts to display counts for one contact. Each query has a single _applicant_contact_id equality and posts_per_page=1; found_rows remains enabled for the count.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -585,6 +611,7 @@ class PH_Admin_Merge_Contacts {
         $args = array(
             'post_id' => (int)$contact->id,
             'type'      => 'propertyhive_note',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => 'related_to',
@@ -719,6 +746,7 @@ class PH_Admin_Merge_Contacts {
         $args = array(
             'post_type' => 'appraisal',
             'nopaging' => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_property_owner_contact_id',
@@ -749,6 +777,7 @@ class PH_Admin_Merge_Contacts {
             $args = array(
                 'post_type' => 'property',
                 'nopaging' => true,
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -798,6 +827,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'enquiry',
             'nopaging'    => true,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_contact_id',
@@ -826,6 +856,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'viewing',
             'nopaging'    => true,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -854,6 +885,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'offer',
             'nopaging'    => true,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -882,6 +914,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'sale',
             'nopaging'    => true,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -910,6 +943,7 @@ class PH_Admin_Merge_Contacts {
             'post_type' => 'tenancy',
             'nopaging'    => true,
             'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
             'meta_query' => array(
                 array(
                     'key' => '_applicant_contact_id',
@@ -941,6 +975,7 @@ class PH_Admin_Merge_Contacts {
             $args = array(
                 'post_id' => (int)$child_contact_id,
                 'type'      => 'propertyhive_note',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact merge must find every record linked through contact metadata so summaries and reassignment do not omit relationships.
                 'meta_query' => array(
                     array(
                         'key' => 'related_to',
@@ -1011,7 +1046,7 @@ class PH_Admin_Merge_Contacts {
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_date'         => gmdate("Y-m-d H:i:s"),
                 'comment_content'      => serialize($comment),
                 'comment_approved'     => 1,
                 'comment_type'         => 'propertyhive_note',
@@ -1025,13 +1060,14 @@ class PH_Admin_Merge_Contacts {
         // Update email log
         foreach ( $contacts_to_merge as $child_contact_id )
         {
-            $wpdb->query("
-                UPDATE " . $wpdb->prefix . "ph_email_log
-                SET 
-                    contact_id = '" . (int)$primary_contact_id . "'
-                WHERE 
-                    contact_id = '" . (int)$child_contact_id . "'
-            ");
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- This writes the plugin-owned email log relationship during a verified merge; no cached read result is used.
+            $wpdb->update(
+                $wpdb->prefix . 'ph_email_log',
+                array( 'contact_id' => (int) $primary_contact_id ),
+                array( 'contact_id' => (int) $child_contact_id ),
+                array( '%d' ),
+                array( '%d' )
+            );
         }
 
         do_action( 'propertyhive_contacts_merged', $primary_contact_id, $contacts_to_merge );

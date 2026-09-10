@@ -91,7 +91,8 @@ class Bricks_Builder_Property_Image_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
+		echo "<div {$this->render_attributes( '_root' )}>";
 	    	
 		$image_number = 1;
 		if ( isset($settings['image_number']) && $settings['image_number'] != '' && is_numeric($settings['image_number']) )

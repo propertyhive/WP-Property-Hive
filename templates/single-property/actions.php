@@ -37,17 +37,19 @@ global $post, $property;
                <li class="' . esc_attr($action['class']) . '"';
                if ( isset( $action['parent_attributes'] ) && ! empty( $action['parent_attributes'] ) )
                {
+                   // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
                    foreach ( $action['parent_attributes'] as $key => $value )
                    {
-                       echo ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
+                       echo ' ' . esc_attr( $key ) . '="' . esc_attr($value) . '"';
                    }
                }
                echo '><a href="' . esc_url($action['href']) . '"';
                if ( isset( $action['attributes'] ) && ! empty( $action['attributes'] ) )
                {
+                   // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
                    foreach ( $action['attributes'] as $key => $value )
                    {
-                       echo ' ' . esc_attr($key) . '="' . esc_attr($value) . '"';
+                       echo ' ' . esc_attr( $key ) . '="' . esc_attr($value) . '"';
                    }
                }
                echo '>' . esc_html($action['label']) . '</a></li>

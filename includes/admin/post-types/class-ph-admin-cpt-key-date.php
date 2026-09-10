@@ -9,6 +9,7 @@ if ( ! class_exists( 'PH_Admin_CPT' ) ) {
 
 if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Key_Date; preserving the existing PH_* class name is required for plugin and extension compatibility.
 	class PH_Admin_CPT_Key_Date extends PH_Admin_CPT {
 
 		public function __construct() {
@@ -33,6 +34,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 			if ($post_type == 'key_date' && $column_name == 'description')
 			{
+                wp_nonce_field( 'propertyhive-save-key-date', 'propertyhive_key_date_nonce' );
 				?>
 						<fieldset class="inline-edit-col-left inline-edit-ph inline-edit-key_date">
 							<legend class="inline-edit-legend">Quick Edit</legend>
@@ -64,7 +66,8 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 											$output .= '</select>';
 
-											echo $output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+											// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Select markup is assembled above with fixed status values, escaped labels/values and core selected().
+                                            echo $output;
 										?>
 									</span>
 								</label>
@@ -140,12 +143,12 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 							$opening_link_tag = true; 
 						}
 					}
-					echo wp_kses_post($key_date->description()) . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
+					echo esc_html( $key_date->description() ) . ( $opening_link_tag ? '</a>' : '' ) . '</div>';
 					echo '<div class="row-actions">';
 					break;
 
 				case 'notes' :
-					echo '<div class="cell-main-content">' . ( !empty($key_date->notes()) ? wp_kses_post(nl2br( $key_date->notes() )) : '-' ) . '</div>';
+					echo '<div class="cell-main-content">' . ( !empty($key_date->notes()) ? nl2br( esc_html( $key_date->notes() ) ) : '-' ) . '</div>';
 					break;
 
 				case 'property' :
@@ -155,7 +158,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 				case 'tenants' :
 					if ( $tenancy->id )
 					{
-						echo wp_kses_post($tenancy->get_tenants(false, true));
+						echo wp_kses_post( $tenancy->get_tenants(false, true) );
 					}
 					else
 					{
@@ -220,6 +223,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			{
 				case 'date_due':
 					$vars['orderby']  = 'meta_value';
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					$vars['meta_key'] = '_date_due';
 					break;
 			}
@@ -235,32 +239,48 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 			return array();
 		}
 
-		function save_key_date( $post_id ) {
+        function save_key_date( $post_id ) {
+            if ( 'key_date' !== get_post_type( $post_id ) || wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
+                return;
+            }
+            if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+                return;
+            }
+            if ( empty( $_POST['propertyhive_key_date_nonce'] ) || ! is_string( $_POST['propertyhive_key_date_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_key_date_nonce'] ) ), 'propertyhive-save-key-date' ) ) {
+                return;
+            }
+            if ( ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+                return;
+            }
+            $status = isset( $_POST['_key_date_status'] ) && is_string( $_POST['_key_date_status'] ) ? sanitize_key( wp_unslash( $_POST['_key_date_status'] ) ) : '';
+            if ( ! in_array( $status, array( 'pending', 'booked', 'complete', 'on_hold', 'cancelled' ), true ) ) {
+                return;
+            }
+            $description = isset( $_POST['_key_date_description'] ) && is_string( $_POST['_key_date_description'] ) ? sanitize_text_field( wp_unslash( $_POST['_key_date_description'] ) ) : get_post_field( 'post_title', $post_id, 'raw' );
+            $next_date = isset( $_POST['next_date_due'] ) && is_string( $_POST['next_date_due'] ) ? sanitize_text_field( wp_unslash( $_POST['next_date_due'] ) ) : '';
+            $parsed_date = DateTimeImmutable::createFromFormat( '!Y-m-d', $next_date );
 
-			if ( $post_id == null || get_post_type($post_id) != 'key_date' || empty( $_POST['_key_date_status'] ) )
-			{
-				return;
-			}
+			update_post_meta( $post_id, '_key_date_status', $status );
 
-			update_post_meta( $post_id, '_key_date_status', $_POST['_key_date_status'] );
+			$existing_description = get_post_field( 'post_title', $post_id, 'raw' );
 
-			$existing_description = get_the_title($post_id);
-
-			if ( !empty( $_POST['_key_date_description'] ) && $_POST['_key_date_description'] != $existing_description )
+			if ( '' !== $description && $description !== $existing_description )
 			{
 				$post_update = array(
 					'ID'         => $post_id,
-					'post_title' => $_POST['_key_date_description'],
+					'post_title' => wp_slash( $description ),
 				);
 
+                remove_action( 'save_post', array( $this, 'save_key_date' ) );
 				wp_update_post( $post_update );
+                add_action( 'save_post', array( $this, 'save_key_date' ) );
 			}
 
-			if ( isset($_POST['book_next_key_date']) && $_POST['book_next_key_date'] == 'on' && isset($_POST['next_date_due']) && $_POST['next_date_due'] != '' )
+			if ( isset( $_POST['book_next_key_date'] ) && 'on' === $_POST['book_next_key_date'] && $parsed_date && $parsed_date->format( 'Y-m-d' ) === $next_date )
 			{
 				// Insert next key date record
 				$next_key_date_post = array(
-					'post_title' => $_POST['_key_date_description'],
+					'post_title' => wp_slash( $description ),
 					'post_content' => '',
 					'post_type' => 'key_date',
 					'post_status' => 'publish',
@@ -276,7 +296,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Key_Date' ) )
 
 				if ( !is_wp_error($next_key_date_post_id) && $next_key_date_post_id != 0 )
 				{
-					add_post_meta( $next_key_date_post_id, '_date_due', $_POST['next_date_due'] );
+					add_post_meta( $next_key_date_post_id, '_date_due', $next_date );
 					add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
 					add_post_meta( $next_key_date_post_id, '_key_date_type_id', get_post_meta($post_id, '_key_date_type_id', true) );
 

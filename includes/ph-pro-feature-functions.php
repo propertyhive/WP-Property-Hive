@@ -1,11 +1,16 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
 
+
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_ph_pro_features; the established callable name is part of the plugin/extension API and must remain stable.
 function get_ph_pro_features()
 {
     $features = array();
 
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only public feature metadata refresh; no installation, activation or licensing mutation is performed.
     if ( false === ( $features = get_transient( 'propertyhive_features' ) ) || isset($_GET['ph_force_get_features']) ) 
     {
         // It wasn't there, so regenerate the data and save the transient
@@ -35,6 +40,7 @@ function get_ph_pro_features()
     return $features;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper get_ph_pro_feature; the established callable name is part of the plugin/extension API and must remain stable.
 function get_ph_pro_feature( $requested_feature )
 {
 	$features = get_ph_pro_features();

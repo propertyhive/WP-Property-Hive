@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 																<table border="0" cellpadding="0" cellspacing="0" width="100%">
 																	<tr>
 																		<td style="text-align:center; font-size:11px;" class="text">
-																			<?php if ( $unsubscribe_link != '' ) { ?><a href="<?php echo esc_html($unsubscribe_link); ?>">Unsubscribe</a><?php } ?>
+																			<?php if ( $unsubscribe_link != '' ) { ?><a href="<?php echo esc_url( $unsubscribe_link ); ?>">Unsubscribe</a><?php } ?>
 																		</td>
 																	</tr>
 																</table>

@@ -153,6 +153,7 @@ class PH_Install {
 				}
 			}
 		}
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook property_run_update_actions; changing the established name would detach installed callbacks.
 		do_action('property_run_update_actions');
 	}
 

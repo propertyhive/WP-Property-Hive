@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Preserve the existing public PH_AIOSEO class name for plugin and extension compatibility.
 class PH_AIOSEO {
 
 	/** @var PH_AIOSEO The single instance of the class */
@@ -42,6 +43,7 @@ class PH_AIOSEO {
             'fields'            => 'ids',
             'posts_per_page'    => -1,
             'post_type'         => 'property',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Sitemap exclusions require all property IDs explicitly marked off-market in the existing metadata schema; preserve the complete exclusion list and status semantics.
             'meta_query'        => array(
                 array(
                     'key'   => '_on_market',
@@ -73,7 +75,7 @@ class PH_AIOSEO {
 		$title       = get_the_title( $post_id );
 		$url         = get_permalink( $post_id );
 		$description = wp_strip_all_tags( get_the_excerpt( $post_id ) ?: '', true );
-		$datePosted  = date("Y-m-d\TH:i:s", strtotime($property->_on_market_change_date)) . "+00:00";
+		$datePosted  = gmdate("Y-m-d\TH:i:s", strtotime($property->_on_market_change_date)) . "+00:00";
 
 		$department  = $property->_department;
 

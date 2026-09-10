@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,7 +15,20 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     PropertyHive/Admin/Reports
  * @version     1.0.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Report_Lettings_Property_Stock_Analysis; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
+
+    private function get_requested_metric( $key, $default ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Authorized read-only chart filter; the value must name a supported metric.
+        $value = isset( $_POST[ $key ] ) && is_string( $_POST[ $key ] ) ? sanitize_text_field( wp_unslash( $_POST[ $key ] ) ) : $default;
+        return isset( $this->get_metrics()[ $value ] ) ? $value : $default;
+    }
+
+    private function get_requested_metrics() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Authorized read-only chart selection; accept only a flat list of supported metric names.
+        $values = isset( $_POST['metrics'] ) && is_array( $_POST['metrics'] ) ? ph_clean( wp_unslash( $_POST['metrics'] ) ) : array( 'price' );
+        return array_values( array_intersect( array_filter( $values, 'is_string' ), array_keys( $this->get_metrics() ) ) );
+    }
 
 	private function get_metrics()
 	{
@@ -35,7 +51,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 	        'hide_empty' => false,
 	        'parent' => 0
 	    );
-	    $terms = get_terms( 'location', $args );
+	    $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
 	    
 	    if ( !empty( $terms ) && !is_wp_error( $terms ) )
 	    {
@@ -136,6 +152,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 			'post_type' => 'property',
 			'nopaging' => true,
 			'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Complete stock/report totals require all matching on-market properties in the fixed department, fetched as IDs through WordPress; optional office narrowing is retained.
 			'meta_query' => array(
 				array(
 					'key' => '_on_market',
@@ -257,6 +274,7 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 			'post_type' => 'property',
 			'nopaging' => true,
 			'fields' => 'ids',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Complete stock/report totals require all matching on-market properties in the fixed department, fetched as IDs through WordPress; optional office narrowing is retained.
 			'meta_query' => array(
 				array(
 					'key' => '_on_market',
@@ -368,7 +386,8 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 
 		$metrics = $this->get_metrics();
 
-		$report_type = ( ( isset($_GET['report_type']) && in_array($_GET['report_type'], array('averages', 'totals')) ) ? sanitize_text_field($_GET['report_type']) : 'averages' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only report presentation mode; restricted to the two supported choices.
+        $report_type = isset( $_GET['report_type'] ) && is_string( $_GET['report_type'] ) && in_array( $_GET['report_type'], array( 'averages', 'totals' ), true ) ? sanitize_text_field( wp_unslash( $_GET['report_type'] ) ) : 'averages';
 ?>
 <style type="text/css">
 
@@ -399,9 +418,12 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		<?php 
 			if ( $report_type == 'averages' ) 
 			{
-				$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
-				$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
-				$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+				$metric_one = $this->get_requested_metric( 'metric_one', 'property_type' );
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+				$metric_two = $this->get_requested_metric( 'metric_two', 'price' );
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+				$office_id = ( ( isset($_POST['office_id']) && is_string( $_POST['office_id'] ) ) ? (int)$_POST['office_id'] : '' );
 		?>
 		<form method="post" action="">
 
@@ -481,8 +503,10 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 		?>
 		<form method="post" action="">
 		<?php
-				$selected_metrics = ( ( isset($_POST['metrics']) ) ? ph_clean($_POST['metrics']) : array('price') );
-				$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+				$selected_metrics = $this->get_requested_metrics();
+				// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+				$office_id = ( ( isset($_POST['office_id']) && is_string( $_POST['office_id'] ) ) ? (int)$_POST['office_id'] : '' );
 
 				foreach ( $metrics as $metric => $metric_data ) 
 				{
@@ -559,7 +583,8 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 	{
 		$metrics = $this->get_metrics();
 
-		$selected_metrics = ( ( isset($_POST['metrics']) ) ? ph_clean($_POST['metrics']) : array('price') );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+		$selected_metrics = $this->get_requested_metrics();
 
 		$price_ranges = $this->get_price_ranges();
 
@@ -567,9 +592,9 @@ class PH_Report_Lettings_Property_Stock_Analysis extends PH_Admin_Report {
 ?>
 <script>
 
-var totals_data = <?php echo json_encode($totals_data ); ?>;
+var totals_data = <?php echo wp_json_encode( $totals_data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 
-var selected_metrics = <?php echo json_encode($selected_metrics); ?>;
+var selected_metrics = <?php echo wp_json_encode( $selected_metrics, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 
 <?php
 	$price_labels = array();
@@ -578,7 +603,7 @@ var selected_metrics = <?php echo json_encode($selected_metrics); ?>;
 		$price_labels[$price_range['from']] = '£' . number_format($price_range['from']) . ' - £' . number_format($price_range['to']) . ' PCM';
 	}
 ?>
-var price_labels = <?php echo json_encode($price_labels); ?>;
+var price_labels = <?php echo wp_json_encode( $price_labels, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 
 <?php
 	$property_type_labels = array();
@@ -586,7 +611,7 @@ var price_labels = <?php echo json_encode($price_labels); ?>;
         'hide_empty' => false,
         'parent' => 0
     );
-    $terms = get_terms( 'property_type', $args );
+    $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
     
     if ( !empty( $terms ) && !is_wp_error( $terms ) )
     {
@@ -598,7 +623,7 @@ var price_labels = <?php echo json_encode($price_labels); ?>;
                 'hide_empty' => false,
                 'parent' => $term->term_id
             );
-            $subterms = get_terms( 'property_type', $args );
+            $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
             
             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
             {
@@ -610,7 +635,7 @@ var price_labels = <?php echo json_encode($price_labels); ?>;
         }
     }
 ?>
-var property_type_labels = <?php echo json_encode($property_type_labels); ?>;
+var property_type_labels = <?php echo wp_json_encode( $property_type_labels, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 property_type_labels[0] = 'No Property Type Set';
 
 <?php
@@ -619,7 +644,7 @@ property_type_labels[0] = 'No Property Type Set';
         'hide_empty' => false,
         'parent' => 0
     );
-    $terms = get_terms( 'location', $args );
+    $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
     
     if ( !empty( $terms ) && !is_wp_error( $terms ) )
     {
@@ -631,7 +656,7 @@ property_type_labels[0] = 'No Property Type Set';
                 'hide_empty' => false,
                 'parent' => $term->term_id
             );
-            $subterms = get_terms( 'location', $args );
+            $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
             
             if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
             {
@@ -643,7 +668,7 @@ property_type_labels[0] = 'No Property Type Set';
         }
     }
 ?>
-var location_labels = <?php echo json_encode($location_labels); ?>;
+var location_labels = <?php echo wp_json_encode( $location_labels, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 location_labels[0] = 'No Location Set';
 
 jQuery(document).ready(function($)
@@ -773,9 +798,12 @@ jQuery.fn.useTooltip = function () {
 	{
 		$metrics = $this->get_metrics();
 
-		$metric_one = ( ( isset($_POST['metric_one']) ) ? ph_clean($_POST['metric_one']) : 'property_type' );
-		$metric_two = ( ( isset($_POST['metric_two']) ) ? ph_clean($_POST['metric_two']) : 'price' );
-		$office_id = ( ( isset($_POST['office_id']) ) ? (int)$_POST['office_id'] : '' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+		$metric_one = $this->get_requested_metric( 'metric_one', 'property_type' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+		$metric_two = $this->get_requested_metric( 'metric_two', 'price' );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report/chart filters on the authorized CRM reports screen.
+		$office_id = ( ( isset($_POST['office_id']) && is_string( $_POST['office_id'] ) ) ? (int)$_POST['office_id'] : '' );
 		//
 
 		$average_data = $this->get_average_property_data($metric_one, $metric_two, $office_id);
@@ -784,7 +812,7 @@ jQuery.fn.useTooltip = function () {
 ?>
 
 <script>
-var average_data = <?php echo json_encode($average_data); ?>;
+var average_data = <?php echo wp_json_encode( $average_data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>;
 
 var metric_one = '<?php echo esc_js($metric_one); ?>';
 var metric_two = '<?php echo esc_js($metric_two); ?>';
@@ -802,7 +830,7 @@ var metric_one_labels = false;
 	        'hide_empty' => false,
 	        'parent' => 0
 	    );
-	    $terms = get_terms( $metric_one, $args );
+	    $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => $metric_one ) ) );
 	    
 	    if ( !empty( $terms ) && !is_wp_error( $terms ) )
 	    {
@@ -814,7 +842,7 @@ var metric_one_labels = false;
 	                'hide_empty' => false,
 	                'parent' => $term->term_id
 	            );
-	            $subterms = get_terms( $metric_one, $args );
+	            $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => $metric_one ) ) );
 	            
 	            if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
 	            {
@@ -844,7 +872,7 @@ var metric_one_labels = false;
 		}
 	}
 
-	echo 'metric_one_labels = ' . json_encode($labels) . ';';
+	echo 'metric_one_labels = ' . wp_json_encode( $labels, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';';
 ?>
 var metric_one_is_taxonomy = <?php echo ( $metric_one_is_taxonomy ) ? 'true' : 'false'; ?>;
 

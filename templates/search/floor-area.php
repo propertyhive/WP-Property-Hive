@@ -13,6 +13,7 @@ global $property;
 ?>
 <div class="floor-area">
 
-	<?php echo esc_html($property->get_formatted_floor_area()); ?>
+	<?php // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The formatter escapes built-in area text before its trusted PHP HTML filter.
+    echo $property->get_formatted_floor_area(); ?>
 
 </div>

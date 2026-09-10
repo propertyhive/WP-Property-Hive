@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_AJAX; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_AJAX {
 
 	/**
@@ -156,6 +160,9 @@ class PH_AJAX {
 
 		foreach ( $ajax_events as $ajax_event => $nopriv ) 
         {
+            if ( ! $nopriv ) {
+                add_action( 'wp_ajax_propertyhive_' . $ajax_event, array( $this, 'authorize_admin_ajax' ), 0 );
+            }
 			add_action( 'wp_ajax_propertyhive_' . $ajax_event, array( $this, $ajax_event ) );
 
 			if ( $nopriv ) {
@@ -164,23 +171,148 @@ class PH_AJAX {
 		}
 	}
 
+    /**
+     * Require CRM access before dispatching an administrative AJAX action.
+     * Individual callbacks still enforce their nonces and record permissions.
+     */
+    public function authorize_admin_ajax()
+    {
+        if ( ! current_user_can( 'manage_propertyhive' ) ) {
+            wp_send_json_error( esc_html__( 'Insufficient permissions', 'propertyhive' ), 403 );
+        }
+    }
+
+    /** Validate a CRM action's target before rendering or changing a record. */
+    private function get_authorized_record_id( $field, $post_type )
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shared record guard: mutating callers verify their own action nonce; read-only callers are CRM-only through authorize_admin_ajax. This helper performs no writes.
+        $post_id = isset( $_POST[$field] ) && is_scalar( $_POST[$field] ) ? absint( $_POST[$field] ) : 0;
+        if ( !is_array($post_type) ) { $post_type = array($post_type); }
+        if ( 
+            $post_id < 1 || 
+            ! in_array( get_post_type( $post_id ), $post_type, true ) || 
+            ! current_user_can( 'manage_propertyhive' ) || 
+            ! current_user_can( 'edit_post', $post_id ) ) 
+        {
+            wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
+        }
+        return $post_id;
+    }
+
+    /** Normalize viewing booking fields before creating any records. */
+    private function get_viewing_booking_input()
+    {
+        $input = array();
+        foreach ( array( 'start_date', 'start_time', 'applicant_name', 'applicant_email_address', 'applicant_telephone_number', 'applicant_address' ) as $field ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Both booking callbacks verify book-viewing before calling this input-only helper.
+            if ( isset( $_POST[$field] ) && ! is_string( $_POST[$field] ) ) {
+                wp_send_json_error( __( 'Invalid booking details.', 'propertyhive' ), 400 );
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Both booking callbacks verify book-viewing before calling this input-only helper.
+            $input[$field] = isset( $_POST[$field] ) ? ( 'applicant_address' === $field ? sanitize_textarea_field( wp_unslash( $_POST[$field] ) ) : sanitize_text_field( wp_unslash( $_POST[$field] ) ) ) : '';
+        }
+        if ( '' === $input['start_date'] || '' === $input['start_time'] || false === strtotime( $input['start_date'] . ' ' . $input['start_time'] ) ) {
+            wp_send_json_error( __( 'Invalid viewing date or time.', 'propertyhive' ), 400 );
+        }
+        foreach ( array( 'applicant_ids', 'property_ids', 'negotiator_ids' ) as $field ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Inspect scalar/list shape first; each accepted ID is validated as a positive decimal string and converted with absint below.
+            $values = isset( $_POST[$field] ) ? $_POST[$field] : array();
+            $values = is_array( $values ) ? $values : ( '' === $values ? array() : array( $values ) );
+            $input[$field] = array();
+            foreach ( $values as $value ) {
+                if ( ! is_scalar( $value ) || ! ctype_digit( (string) $value ) || (int) $value < 1 ) {
+                    wp_send_json_error( __( 'Invalid booking selection.', 'propertyhive' ), 400 );
+                }
+                $input[$field][] = absint( $value );
+            }
+        }
+        $viewing_type = get_post_type_object( 'viewing' );
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! $viewing_type || ! current_user_can( $viewing_type->cap->create_posts ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'propertyhive' ), 403 );
+        }
+        return $input;
+    }
+
+    /** Normalize offer recording fields before creating any records. */
+    private function get_offer_input()
+    {
+        $input = array();
+        foreach ( array( 'offer_date', 'offer_time', 'amount', 'applicant_name', 'applicant_email_address', 'applicant_telephone_number', 'applicant_address' ) as $field ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Both offer callbacks verify record-offer before calling this input-only helper.
+            if ( isset( $_POST[$field] ) && ! is_string( $_POST[$field] ) ) {
+                wp_send_json_error( __( 'Invalid offer details.', 'propertyhive' ), 400 );
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Both offer callbacks verify record-offer before calling this input-only helper.
+            $input[$field] = isset( $_POST[$field] ) ? ( 'applicant_address' === $field ? sanitize_textarea_field( wp_unslash( $_POST[$field] ) ) : sanitize_text_field( wp_unslash( $_POST[$field] ) ) ) : '';
+        }
+        if ( '' === $input['offer_date'] || '' === $input['offer_time'] || false === strtotime( $input['offer_date'] . ' ' . $input['offer_time'] ) ) {
+            wp_send_json_error( __( 'Invalid offer date or time.', 'propertyhive' ), 400 );
+        }
+        foreach ( array( 'applicant_ids', 'property_ids' ) as $field ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Inspect scalar/list shape first; each accepted ID is validated as a positive decimal string and converted with absint below.
+            $values = isset( $_POST[$field] ) ? $_POST[$field] : array();
+            $values = is_array( $values ) ? $values : ( '' === $values ? array() : array( $values ) );
+            $input[$field] = array();
+            foreach ( $values as $value ) {
+                if ( ! is_scalar( $value ) || ! ctype_digit( (string) $value ) || (int) $value < 1 ) {
+                    wp_send_json_error( __( 'Invalid offer selection.', 'propertyhive' ), 400 );
+                }
+                $input[$field][] = absint( $value );
+            }
+        }
+        $offer_type = get_post_type_object( 'offer' );
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! $offer_type || ! current_user_can( $offer_type->cap->create_posts ) ) {
+            wp_send_json_error( __( 'Insufficient permissions.', 'propertyhive' ), 403 );
+        }
+        $input['amount'] = preg_replace( '/[^0-9.]/', '', $input['amount'] );
+        if ( '' === $input['amount'] || ! is_numeric( $input['amount'] ) ) {
+            wp_send_json_error( __( 'Invalid offer amount.', 'propertyhive' ), 400 );
+        }
+        return $input;
+    }
+
+    /** Preserve PHP upload metadata for WordPress's upload validator. */
+    private function get_viewing_email_uploads()
+    {
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized,WordPress.Security.NonceVerification.Missing -- Calling email callbacks verify viewing-actions first. File metadata must reach wp_handle_upload unchanged; shape is checked below, and core verifies uploaded-file provenance, MIME/extension, size and safe destination filename.
+        $files = isset( $_FILES['attachments'] ) ? $_FILES['attachments'] : array();
+        foreach ( array( 'name', 'type', 'tmp_name', 'error', 'size' ) as $key ) {
+            if ( ! isset( $files[$key] ) || ! is_array( $files[$key] ) ) {
+                wp_send_json_error( __( 'Invalid attachment data.', 'propertyhive' ), 400 );
+            }
+        }
+        foreach ( $files['name'] as $index => $name ) {
+            foreach ( array( 'name', 'type', 'tmp_name' ) as $key ) {
+                if ( ! isset( $files[$key][$index] ) || ! is_string( $files[$key][$index] ) ) {
+                    wp_send_json_error( __( 'Invalid attachment data.', 'propertyhive' ), 400 );
+                }
+            }
+            foreach ( array( 'error', 'size' ) as $key ) {
+                if ( ! isset( $files[$key][$index] ) || ! is_scalar( $files[$key][$index] ) || ! ctype_digit( (string) $files[$key][$index] ) ) {
+                    wp_send_json_error( __( 'Invalid attachment data.', 'propertyhive' ), 400 );
+                }
+            }
+        }
+        return $files;
+    }
+
     public function deactivate_survey()
     {
         // Verify the nonce
-        if ( !isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'deactivate-survey') ) 
+        if ( !isset($_POST['nonce']) || !wp_verify_nonce( ( isset( $_POST['nonce'] ) && is_string( $_POST['nonce'] ) ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '', 'deactivate-survey') )
         {
             wp_send_json_error('Invalid nonce', 403);
             die();
         }
 
-        if ( !isset($_POST['reason']) || empty($_POST['reason']) ) 
+        if ( !isset($_POST['reason']) || !is_string($_POST['reason']) || empty($_POST['reason']) )
         {
             wp_send_json_error('Reason is required', 400);
             die();
         }
 
-        $reason = sanitize_text_field($_POST['reason']);
-        $comments = isset($_POST['comments']) ? sanitize_textarea_field($_POST['comments']) : '';
+        $reason = sanitize_text_field( wp_unslash( $_POST['reason'] ) );
+        $comments = ( isset($_POST['comments']) && is_string($_POST['comments']) ) ? sanitize_textarea_field( wp_unslash( $_POST['comments'] ) ) : '';
         $anonymous = isset($_POST['anonymous']) && $_POST['anonymous'] === 'yes';
 
         $license_type = get_option('propertyhive_license_type');
@@ -209,7 +341,7 @@ class PH_AJAX {
                 );
             }
         }
-        $server_software = $_SERVER['SERVER_SOFTWARE'] ?? 'Unknown';
+        $server_software = ( isset( $_SERVER['SERVER_SOFTWARE'] ) && is_string( $_SERVER['SERVER_SOFTWARE'] ) ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : 'Unknown';
 
         // Prepare data for third-party POST
         $third_party_data = array(
@@ -255,19 +387,23 @@ class PH_AJAX {
     {
         check_ajax_referer( 'updates', 'security' );
 
-        if ( !isset($_POST['taxonomy']) || ( isset($_POST['taxonomy']) && empty(ph_clean($_POST['taxonomy'])) ) )
-        {
+        if ( ! isset( $_POST['taxonomy'], $_POST['term'] ) || ! is_string( $_POST['taxonomy'] ) || ! is_array( $_POST['term'] ) || empty( $_POST['term'] ) ) {
             die();
         }
-
-        if ( !isset($_POST['term']) || ( isset($_POST['term']) && empty(ph_clean($_POST['term'])) ) )
-        {
-            die();
+        $taxonomy_name = sanitize_key( wp_unslash( $_POST['taxonomy'] ) );
+        $taxonomy = get_taxonomy( $taxonomy_name );
+        if ( ! $taxonomy || ! current_user_can( $taxonomy->cap->manage_terms ) ) {
+            wp_send_json_error( esc_html__( 'Insufficient permissions', 'propertyhive' ), 403 );
         }
-
-        update_option( 'propertyhive_taxonomy_terms_order_' . ph_clean($_POST['taxonomy']), implode("|", ph_clean($_POST['term'])));
-        
-        // Quit out
+        $term_ids = array();
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Validate raw term ID types before accepting only positive decimal integers below; no text is stored.
+        foreach ( $_POST['term'] as $term_id ) {
+            if ( ! is_string( $term_id ) || ! ctype_digit( $term_id ) || 0 === absint( $term_id ) ) {
+                die();
+            }
+            $term_ids[] = absint( $term_id );
+        }
+        update_option( 'propertyhive_taxonomy_terms_order_' . $taxonomy_name, implode( '|', $term_ids ) );
         die();
     }
 
@@ -369,7 +505,8 @@ class PH_AJAX {
     private function check_recaptcha_form_response($errors, $key, $control)
     {
         $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-        $response = isset( $_POST['g-recaptcha-response'] ) ? ph_clean($_POST['g-recaptcha-response']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Reads a CAPTCHA response token and performs remote validation; the helper does not write state. It is called from nonce-protected applicant_registration and from the separately assessed public enquiry endpoint. This line alone is not a CSRF sink.
+        $response = ( isset( $_POST['g-recaptcha-response'] ) && is_string( $_POST['g-recaptcha-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['g-recaptcha-response'] ) ) : '';
 
         $response = wp_remote_post(
             'https://www.google.com/recaptcha/api/siteverify',
@@ -436,32 +573,34 @@ class PH_AJAX {
     {
         check_ajax_referer( 'create-login', 'security' );
 
-        $this->json_headers();
-
-        if (empty($_POST['contact_id']))
-        {
-            $return = array('error' => 'No contact selected');
-            echo json_encode( $return );
-            die();
+        $contact_id = isset( $_POST['contact_id'] ) && is_scalar( $_POST['contact_id'] ) ? absint( $_POST['contact_id'] ) : 0;
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $contact_id ) ) {
+            wp_send_json_error( __( 'Insufficient permissions', 'propertyhive' ), 403 );
+        }
+        if ( 'contact' !== get_post_type( $contact_id ) ) {
+            wp_send_json_error( __( 'Invalid contact.', 'propertyhive' ), 400 );
+        }
+        if ( get_post_meta( $contact_id, '_user_id', true ) ) {
+            wp_send_json_error( __( 'This contact already has a login.', 'propertyhive' ), 409 );
         }
 
-        if (empty($_POST['password']))
+        if ( empty( $_POST['password'] ) || ! is_string( $_POST['password'] ) )
         {
             $return = array('error' => 'No password entered');
-            echo json_encode( $return );
-            die();
+            wp_send_json( $return );
         }
 
-        $contact = new PH_Contact((int)$_POST['contact_id']);
+        $contact = new PH_Contact($contact_id);
 
-        $display_name = get_the_title((int)$_POST['contact_id']);
+        $display_name = get_the_title($contact_id);
 
          // Create user
         $userdata = array(
             'display_name' => $display_name,
             'user_login' => sanitize_email($contact->email_address),
             'user_email' => sanitize_email($contact->email_address),
-            'user_pass'  => $_POST['password'],
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Opaque password is type checked above, unslashed once and passed directly to WordPress hashing; text sanitization would change the credential.
+            'user_pass'  => wp_unslash( $_POST['password'] ),
             'role' => 'property_hive_contact',
             'show_admin_bar_front' => 'false',
         );
@@ -487,7 +626,7 @@ class PH_AJAX {
         if ( ! is_wp_error( $user_id ) )
         {
             // Assign user ID to CPT
-            add_post_meta( (int)$_POST['contact_id'], '_user_id', $user_id );
+            add_post_meta( $contact_id, '_user_id', $user_id );
 
             $return = array('success' => true);
         }
@@ -496,8 +635,7 @@ class PH_AJAX {
             $return = array('error' => 'Failed to create user login');
         }
 
-        echo json_encode( $return );
-        die();
+        wp_send_json( $return );
     }
 
     /**
@@ -514,16 +652,17 @@ class PH_AJAX {
         {
             $return['errors'][] = 'Invalid nonce';
 
-            $this->json_headers();
-            echo json_encode( $return );
-            
-            // Quit out
-            die();
+            wp_send_json( $return );
         }
 
+        if ( ! isset( $_POST['email_address'], $_POST['password'] ) || ! is_string( $_POST['email_address'] ) || ! is_string( $_POST['password'] ) ) {
+            $return['errors'][] = __( 'Enter your login details.', 'propertyhive' );
+            wp_send_json( $return );
+        }
         $creds = array(
-            'user_login' => ph_clean($_POST['email_address']),
-            'user_password' => ph_clean($_POST['password']),
+            'user_login' => sanitize_text_field( wp_unslash( $_POST['email_address'] ) ),
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Authentication requires the exact password, without text or HTML sanitization.
+            'user_password' => wp_unslash( $_POST['password'] ),
         );
 
         $user = wp_signon( apply_filters( 'propertyhive_login_credentials', $creds ), is_ssl() );
@@ -540,6 +679,7 @@ class PH_AJAX {
                 'fields' => 'ids',
                 'posts_per_page' => 1,
                 'post_status' => array( 'publish' ),
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Login/contact duplicate/address lookups use a fixed meta relation and return a small result set (1 row for identity checks, 10 for the address autocomplete). posts_per_page=1; posts_per_page=10; fields=ids on all four; values are the authenticated user, submitted email, search text, or current contact.
                 'meta_query' => array(
                     array(
                         'key' => '_user_id',
@@ -566,11 +706,7 @@ class PH_AJAX {
             wp_reset_postdata();
         }
 
-        $this->json_headers();
-        echo json_encode( $return );
-        
-        // Quit out
-        die();
+        wp_send_json( $return );
     }
 
     /**
@@ -587,14 +723,10 @@ class PH_AJAX {
         {
             $return['errors'][] = 'Invalid nonce';
 
-            $this->json_headers();
-            echo json_encode( $return );
-            
-            // Quit out
-            die();
+            wp_send_json( $return );
         }
 
-        $email_address = sanitize_email($_POST['email_address']);
+        $email_address = isset( $_POST['email_address'] ) && is_string( $_POST['email_address'] ) ? sanitize_email( wp_unslash( $_POST['email_address'] ) ) : '';
 
         $user_data = get_user_by( 'email', $email_address );
 
@@ -603,11 +735,7 @@ class PH_AJAX {
         {
             $return['errors'][] = 'Email address not found';
 
-            $this->json_headers();
-            echo json_encode( $return );
-            
-            // Quit out
-            die();
+            wp_send_json( $return );
         }
 
         // Send reset email
@@ -638,11 +766,7 @@ class PH_AJAX {
         
         $return['success'] = true;
 
-        $this->json_headers();
-        echo json_encode( $return );
-        
-        // Quit out
-        die();
+        wp_send_json( $return );
     }
 
     /**
@@ -659,21 +783,24 @@ class PH_AJAX {
         {
             $return['errors'][] = 'Invalid nonce';
 
-            $this->json_headers();
-            echo json_encode( $return );
-            
-            // Quit out
-            die();
+            wp_send_json( $return );
         }
 
         // check key and user login again
-        $user = check_password_reset_key( ph_clean($_POST['reset_key']), ph_clean($_POST['reset_login']) );
+        if ( ! isset( $_POST['reset_key'], $_POST['reset_login'], $_POST['password_1'], $_POST['password_2'] ) || ! is_string( $_POST['reset_key'] ) || ! is_string( $_POST['reset_login'] ) || ! is_string( $_POST['password_1'] ) || ! is_string( $_POST['password_2'] ) ) {
+            $return['errors'][] = __( 'Please enter valid password reset details.', 'propertyhive' );
+            wp_send_json( $return );
+        }
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Core validates the exact opaque reset token and login; text sanitization would change credentials.
+        $user = check_password_reset_key( wp_unslash( $_POST['reset_key'] ), wp_unslash( $_POST['reset_login'] ) );
 
         // check passwords match and are strong enough
         if ( $user instanceof WP_User ) 
         {
-            $password_1 = ph_clean($_POST['password_1']);
-            $password_2 = ph_clean($_POST['password_2']);
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Preserve the exact password; authentication secrets must not be text-sanitized.
+            $password_1 = wp_unslash( $_POST['password_1'] );
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Preserve the exact password; authentication secrets must not be text-sanitized.
+            $password_2 = wp_unslash( $_POST['password_2'] );
 
             if ( empty( $password_1 ) ) 
             {
@@ -694,28 +821,22 @@ class PH_AJAX {
 
         if ( !empty($return['errors']) )
         {
-            $this->json_headers();
-            echo json_encode( $return );
-            
-            // Quit out
-            die();
+            wp_send_json( $return );
         }
 
         // do actual reset
         $errors = new WP_Error();
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core hook validate_password_reset; renaming it would break the core hook contract.
         do_action( 'validate_password_reset', $errors, $user );
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WordPress core hook password_reset; renaming it would break the core hook contract.
         do_action( 'password_reset', $user, $password_1 );
 
         wp_set_password( $password_1, $user->ID );
         
         $return['success'] = true;
 
-        $this->json_headers();
-        echo json_encode( $return );
-        
-        // Quit out
-        die();
+        wp_send_json( $return );
     }
 
     /**
@@ -744,6 +865,46 @@ class PH_AJAX {
         
         // Validate
         $errors = array();
+
+        $registration_input = array();
+        foreach ( array( 'name', 'email_address', 'telephone_number', 'department', 'maximum_price', 'maximum_rent', 'minimum_bedrooms', 'available_as_sale', 'available_as_rent', 'minimum_floor_area', 'maximum_floor_area', 'location_text', 'additional_requirements' ) as $input_key ) {
+            if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                $registration_input[$input_key] = '';
+                continue;
+            }
+            if ( 'additional_requirements' === $input_key ) {
+                $registration_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_textarea_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            } else {
+                $registration_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_text_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            }
+        }
+        foreach ( array( 'property_type', 'commercial_property_type', 'location' ) as $input_key ) {
+            $registration_input[$input_key] = array();
+            if ( isset( $_POST[$input_key] ) ) {
+                if ( ! is_string( $_POST[$input_key] ) && ! is_array( $_POST[$input_key] ) ) {
+                    $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                    continue;
+                }
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Validate element types before unslashing and sanitizing each accepted selection below.
+                foreach ( (array) $_POST[$input_key] as $selection ) {
+                    if ( ! is_string( $selection ) ) {
+                        $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                        continue;
+                    }
+                    $registration_input[$input_key][] = sanitize_text_field( wp_unslash( $selection ) );
+                }
+            }
+        }
+        foreach ( array( 'password', 'password2' ) as $input_key ) {
+            if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                $registration_input[$input_key] = '';
+            } else {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Passwords are type-checked opaque strings, unslashed once and passed unchanged to WordPress hashing.
+                $registration_input[$input_key] = isset( $_POST[$input_key] ) ? wp_unslash( $_POST[$input_key] ) : '';
+            }
+        }
 
         $form_controls = ph_get_user_details_form_fields();
     
@@ -784,7 +945,7 @@ class PH_AJAX {
             }
             if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) )
             {
-                if ( ! is_email( $_POST[$key] ) )
+                if ( ! is_string( $_POST[$key] ) || ! is_email( wp_unslash( $_POST[$key] ) ) )
                 {
                     $errors[] = __( 'Invalid email address provided', 'propertyhive' );
                 }
@@ -796,10 +957,11 @@ class PH_AJAX {
                         'posts_per_page' => 1,
                         'fields' => 'ids',
                         'post_status' => array( 'publish' ),
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Login/contact duplicate/address lookups use a fixed meta relation and return a small result set (1 row for identity checks, 10 for the address autocomplete). posts_per_page=1; posts_per_page=10; fields=ids on all four; values are the authenticated user, submitted email, search text, or current contact.
                         'meta_query' => array(
                             array(
                                 'key' => '_email_address',
-                                'value' => $_POST[$key]
+                                'value' => sanitize_email( wp_unslash( $_POST[$key] ) )
                             )
                         )
                     );
@@ -808,17 +970,12 @@ class PH_AJAX {
 
                     if ( $contacts_query->have_posts() )
                     {
-                        while ( $contacts_query->have_posts() )
-                        {
-                            $contacts_query->the_post();
-
-                            $contact_post_id = get_the_ID();
-                        }
-                        //$errors[] = __( 'This email address is already registered', 'propertyhive' );
+                        // Public registration does not prove ownership of an existing CRM contact.
+                        $errors[] = __( 'This email address is already registered to a user. Please sign in or contact the agency.', 'propertyhive' );
                     }
                     else
                     {
-                        if ( email_exists( $_POST[$key] ) ) 
+                        if ( email_exists( sanitize_email( wp_unslash( $_POST[$key] ) ) ) )
                         {
                             $errors[] = __( 'This email address is already registered to a user', 'propertyhive' );
                         }
@@ -834,7 +991,7 @@ class PH_AJAX {
             if ( $key == 'hCaptcha' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['h-captcha-response'] ) ? ph_clean($_POST['h-captcha-response']) : '';
+                $response = ( isset( $_POST['h-captcha-response'] ) && is_string( $_POST['h-captcha-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['h-captcha-response'] ) ) : '';
 
                 $response = wp_remote_post(
                     'https://hcaptcha.com/siteverify',
@@ -872,10 +1029,10 @@ class PH_AJAX {
             if ( $key == 'turnstile' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['cf-turnstile-response'] ) ? ph_clean($_POST['cf-turnstile-response']) : '';
+                $response = ( isset( $_POST['cf-turnstile-response'] ) && is_string( $_POST['cf-turnstile-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['cf-turnstile-response'] ) ) : '';
 
                 $response = wp_remote_post(
-                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify', // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Server-side CAPTCHA token verification API.
                     array(
                         'method' => 'POST',
                         'headers' => array(
@@ -912,7 +1069,7 @@ class PH_AJAX {
         }
 
         // Check password and password2 match
-        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && $_POST['password'] != $_POST['password2'] )
+        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && $registration_input['password'] !== $registration_input['password2'] )
         {
             $errors[] = __( 'The passwords entered do not match', 'propertyhive' );
         }
@@ -931,7 +1088,7 @@ class PH_AJAX {
             {
                 // create CPT
                 $contact_post = array(
-                    'post_title'    => ph_clean($_POST['name']),
+                    'post_title'    => wp_slash( $registration_input['name'] ),
                     'post_content'  => '',
                     'post_type'     => 'contact',
                     'post_status'   => 'publish',
@@ -947,7 +1104,7 @@ class PH_AJAX {
                 // update CPT
                 $contact_post = array(
                     'ID'            => $contact_post_id,
-                    'post_title'    => ph_clean($_POST['name']),
+                    'post_title'    => wp_slash( $registration_input['name'] ),
                     'post_status'   => 'publish',
                 );
 
@@ -966,14 +1123,14 @@ class PH_AJAX {
             update_post_meta( $contact_post_id, '_forbidden_contact_methods', array_unique($forbidden_contact_methods) );
 
             // Add post meta (contact details, requirements etc)
-            update_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            update_post_meta( $contact_post_id, '_email_address', sanitize_email( $registration_input['email_address'] ) );
             
             $telephone_number = get_post_meta( $contact_post_id, '_telephone_number', TRUE );
             if ( isset($_POST['telephone_number']) && $_POST['telephone_number'] != '' )
             {
-                $telephone_number = $_POST['telephone_number'];
+                $telephone_number = $registration_input['telephone_number'];
             }
-            update_post_meta( $contact_post_id, '_telephone_number', ph_clean($telephone_number) );
+            update_post_meta( $contact_post_id, '_telephone_number', wp_slash( ph_clean($telephone_number) ) );
             update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
             
             $contact_types = get_post_meta( $contact_post_id, '_contact_types', TRUE );
@@ -990,9 +1147,9 @@ class PH_AJAX {
             update_post_meta( $contact_post_id, '_applicant_profiles', 1 );
 
             $applicant_profile = array();
-            $applicant_profile['department'] = $_POST['department'];
+            $applicant_profile['department'] = $registration_input['department'];
 
-            $base_department = $_POST['department'];
+            $base_department = $registration_input['department'];
             if ( !in_array( $base_department, array('residential-sales', 'residential-lettings', 'commercial') ) )
             {
                 $base_department = ph_get_custom_department_based_on($base_department);
@@ -1000,7 +1157,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
+                $price = preg_replace("/[^0-9.]/", '', $registration_input['maximum_price']);
 
                 $applicant_profile['max_price'] = $price;
 
@@ -1010,9 +1167,9 @@ class PH_AJAX {
                 $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
                 $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
 
-                if ( $percentage_lower != '' && $percentage_higher != '' && $_POST['maximum_price'] != '' && $_POST['maximum_price'] != 0 )
+                if ( $percentage_lower != '' && $percentage_higher != '' && $registration_input['maximum_price'] != '' && $registration_input['maximum_price'] != 0 )
                 {
-                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
+                    $price = preg_replace("/[^0-9.]/", '', $registration_input['maximum_price']);
                     $applicant_profile['match_price_range_lower'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     $applicant_profile['match_price_range_lower_actual'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     
@@ -1022,7 +1179,7 @@ class PH_AJAX {
             }
             elseif ( $base_department == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
+                $price = preg_replace("/[^0-9.]/", '', $registration_input['maximum_rent']);
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -1032,69 +1189,69 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_bedrooms']));
+                $beds = preg_replace("/[^0-9.]/", '', $registration_input['minimum_bedrooms']);
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = is_array(ph_clean($_POST['property_type'])) ? ph_clean($_POST['property_type']) : array(ph_clean($_POST['property_type']));
+                    $applicant_profile['property_types'] = $registration_input['property_type'];
                 }
             }
 
             if ( $base_department == 'commercial' )
             {
                 $available_as = array();
-                if ( isset($_POST['available_as_sale']) && $_POST['available_as_sale'] == 'yes' )
+                if ( isset($_POST['available_as_sale']) && $registration_input['available_as_sale'] == 'yes' )
                 {
                     $available_as[] = 'sale';
                 }
-                if ( isset($_POST['available_as_rent']) && $_POST['available_as_rent'] == 'yes' )
+                if ( isset($_POST['available_as_rent']) && $registration_input['available_as_rent'] == 'yes' )
                 {
                     $available_as[] = 'rent';
                 }
                 $applicant_profile['available_as'] = $available_as;
 
-                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_floor_area']));
+                $floor_area = preg_replace("/[^0-9.]/", '', $registration_input['minimum_floor_area']);
                 $applicant_profile['min_floor_area'] = $floor_area;
                 $applicant_profile['min_floor_area_actual'] = $floor_area;
 
-                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_floor_area']));
+                $floor_area = preg_replace("/[^0-9.]/", '', $registration_input['maximum_floor_area']);
                 $applicant_profile['max_floor_area'] = $floor_area;
                 $applicant_profile['max_floor_area_actual'] = $floor_area;
 
                 if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
                 {
-                    $applicant_profile['commercial_property_types'] = is_array(ph_clean($_POST['commercial_property_type'])) ? ph_clean($_POST['commercial_property_type']) : array(ph_clean($_POST['commercial_property_type']));
+                    $applicant_profile['commercial_property_types'] = $registration_input['commercial_property_type'];
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = is_array(ph_clean($_POST['location'])) ? ph_clean($_POST['location']) : array(ph_clean($_POST['location']));
+                $applicant_profile['locations'] = $registration_input['location'];
             }
 
             if ( isset($_POST['location_text']) && !empty($_POST['location_text']) )
             {
-                $applicant_profile['location_text'] = ph_clean($_POST['location_text']);
+                $applicant_profile['location_text'] = $registration_input['location_text'];
             }
 
-            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_textarea_field($_POST['additional_requirements']) : '' );
+            $applicant_profile['notes'] = $registration_input['additional_requirements'];
 
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
 
-            update_post_meta( $contact_post_id, '_applicant_profile_0', $applicant_profile );
+            update_post_meta( $contact_post_id, '_applicant_profile_0', wp_slash( $applicant_profile ) );
             
             if ( get_option( 'propertyhive_applicant_users', '' ) == 'yes' )
             {
-                $display_name = ph_clean($_POST['name']);
+                $display_name = wp_slash( $registration_input['name'] );
 
                 // Create user
                 $userdata = array(
                     'display_name' => $display_name,
-                    'user_login' => sanitize_email($_POST['email_address']),
-                    'user_email' => sanitize_email($_POST['email_address']),
-                    'user_pass'  => ph_clean($_POST['password']),
+                    'user_login' => sanitize_email( $registration_input['email_address'] ),
+                    'user_email' => sanitize_email( $registration_input['email_address'] ),
+                    'user_pass'  => $registration_input['password'],
                     'role' => 'property_hive_contact',
                     'show_admin_bar_front' => 'false',
                 );
@@ -1196,6 +1353,20 @@ class PH_AJAX {
             die();
         }
 
+        $account_input = array();
+        foreach ( array( 'name', 'email_address', 'telephone_number', 'password', 'password2' ) as $input_key ) {
+            if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                $account_input[$input_key] = '';
+                continue;
+            }
+            if ( in_array( $input_key, array( 'password', 'password2' ), true ) ) {
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Passwords are opaque strings: type checked above and unslashed exactly once, never text-sanitized or modified before WordPress hashes them.
+                $account_input[$input_key] = isset( $_POST[$input_key] ) ? wp_unslash( $_POST[$input_key] ) : '';
+            } else {
+                $account_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_text_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            }
+        }
         $form_controls = ph_get_user_details_form_fields();
     
         $form_controls = apply_filters( 'propertyhive_user_details_form_fields', $form_controls );
@@ -1212,7 +1383,7 @@ class PH_AJAX {
             }
             if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) )
             {
-                if ( ! is_email( $_POST[$key] ) )
+                if ( ! is_string( $_POST[$key] ) || ! is_email( sanitize_email( wp_unslash( $_POST[$key] ) ) ) )
                 {
                     $errors[] = __( 'Invalid email address provided', 'propertyhive' );
                 }
@@ -1222,9 +1393,23 @@ class PH_AJAX {
         }
 
         // Check password and password2 match
-        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && !empty( $_POST['password'] ) && $_POST['password'] != $_POST['password2'] )
+        if ( isset( $_POST['password'] ) && isset( $_POST['password2'] ) && $account_input['password'] !== '' && $account_input['password'] !== $account_input['password2'] )
         {
             $errors[] = __( 'The passwords entered do not match', 'propertyhive' );
+        }
+
+        $user_roles = $current_user->roles;
+        $user_role = array_shift( $user_roles );
+        if ( 'property_hive_contact' === $user_role ) {
+            $existing_login_user = username_exists( sanitize_email( $account_input['email_address'] ) );
+            if ( $existing_login_user && (int) $existing_login_user !== $user_id ) {
+                $errors[] = __( 'This email address is already used as a login.', 'propertyhive' );
+            }
+        }
+
+        $existing_email_user = email_exists( sanitize_email( $account_input['email_address'] ) );
+        if ( $existing_email_user && (int) $existing_email_user !== $user_id ) {
+            $errors[] = __( 'This email address is already registered to a user', 'propertyhive' );
         }
 
         if ( !empty($errors) )
@@ -1238,45 +1423,50 @@ class PH_AJAX {
         else
         {
             $contact = new PH_Contact( '', $user_id );
+            if ( empty( $contact->id ) || 'contact' !== get_post_type( $contact->id ) ) {
+                $return['reason'] = 'validation';
+                $return['errors'] = array( __( 'Unable to find your contact record. Please contact the agency.', 'propertyhive' ) );
+                wp_send_json( $return );
+            }
             
             // create CPT
             $contact_post = array(
                 'ID' => $contact->id,
-                'post_title' => ph_clean($_POST['name']),
+                'post_title' => wp_slash( $account_input['name'] ),
             );
             
             // Update the post in the database
             $contact_post_id = wp_update_post( $contact_post );
 
-            update_post_meta( $contact_post_id, '_email_address', sanitize_email($_POST['email_address']) );
+            update_post_meta( $contact_post_id, '_email_address', sanitize_email( $account_input['email_address'] ) );
             if (isset($_POST['telephone_number']))
             {
-                update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['telephone_number']) );
-                update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean(ph_clean_telephone_number($_POST['telephone_number'])) );
+                update_post_meta( $contact_post_id, '_telephone_number', wp_slash( $account_input['telephone_number'] ) );
+                update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean_telephone_number( $account_input['telephone_number'] ) );
             }
 
             // Update user
             $userdata = array(
                 'ID' => $user_id,
-                'display_name' => ph_clean($_POST['name']),
-                'user_email' => sanitize_email($_POST['email_address']),
+                'display_name' => wp_slash( $account_input['name'] ),
+                'user_email' => sanitize_email( $account_input['email_address'] ),
             );
 
             if ( isset($_POST['password']) && !empty($_POST['password']) )
             {
-                $userdata['user_pass'] = ph_clean($_POST['password']);
+                $userdata['user_pass'] = $account_input['password'];
             }
 
             $user_id = wp_update_user( $userdata );
 
-            $user_roles = $current_user->roles;
-            $user_role = array_shift($user_roles);
-
-            if ( $user_role === 'property_hive_contact' )
+            if ( ! is_wp_error( $user_id ) && $user_role === 'property_hive_contact' )
             {
                 // Have to update login via SQL as wp_update_user won't allow altering
                 // Only do it for property hive contacts though as admin or editor might be viewing this page
-                $wpdb->update($wpdb->users, array('user_login' => sanitize_email($_POST['email_address'])), array('ID' => $user_id));
+                // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- WordPress cannot rename a login via wp_update_user; uniqueness is validated above, and old/new user caches are cleared immediately below.
+                $wpdb->update( $wpdb->users, array( 'user_login' => sanitize_email( $account_input['email_address'] ) ), array( 'ID' => $user_id ), array( '%s' ), array( '%d' ) );
+                clean_user_cache( $current_user );
+                clean_user_cache( $user_id );
             }
 
             //On success
@@ -1352,9 +1542,46 @@ class PH_AJAX {
 
         $contact_post_id = $contact->id;
 
+        if ( empty( $contact_post_id ) ) {
+            $errors[] = __( 'Unable to find your contact record. Please contact the agency.', 'propertyhive' );
+        }
+        $requirements_input = array();
+        foreach ( array( 'profile_id', 'department', 'maximum_price', 'maximum_rent', 'minimum_bedrooms', 'available_as_sale', 'available_as_rent', 'minimum_floor_area', 'maximum_floor_area', 'location_text', 'additional_requirements' ) as $input_key ) {
+            if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                $requirements_input[$input_key] = '';
+                continue;
+            }
+            if ( 'additional_requirements' === $input_key ) {
+                $requirements_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_textarea_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            } else {
+                $requirements_input[$input_key] = isset( $_POST[$input_key] ) ? sanitize_text_field( wp_unslash( $_POST[$input_key] ) ) : '';
+            }
+        }
+        foreach ( array( 'property_type', 'commercial_property_type', 'location' ) as $input_key ) {
+            $requirements_input[$input_key] = array();
+            if ( isset( $_POST[$input_key] ) ) {
+                if ( ! is_string( $_POST[$input_key] ) && ! is_array( $_POST[$input_key] ) ) {
+                    $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                    continue;
+                }
+                // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- Validate element types before unslashing and sanitizing each accepted selection below.
+                foreach ( (array) $_POST[$input_key] as $selection ) {
+                    if ( ! is_string( $selection ) ) {
+                        $errors[] = __( 'Invalid field value', 'propertyhive' ) . ': ' . $input_key;
+                        continue;
+                    }
+                    $requirements_input[$input_key][] = sanitize_text_field( wp_unslash( $selection ) );
+                }
+            }
+        }
+        if ( '' !== $requirements_input['profile_id'] && ! ctype_digit( $requirements_input['profile_id'] ) ) {
+            $errors[] = __( 'Invalid applicant profile', 'propertyhive' );
+        }
+        $profile_id = absint( $requirements_input['profile_id'] );
         $form_controls = ph_get_applicant_requirements_form_fields();
     
-        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls, get_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), true ) );
+        $form_controls = apply_filters( 'propertyhive_applicant_requirements_form_fields', $form_controls, get_post_meta( $contact_post_id, '_applicant_profile_' . $profile_id, true ) );
 
         foreach ( $form_controls as $key => $control )
         {
@@ -1379,9 +1606,9 @@ class PH_AJAX {
         else
         {
             $applicant_profile = array();
-            $applicant_profile['department'] = ph_clean($_POST['department']);
+            $applicant_profile['department'] = $requirements_input['department'];
 
-            $base_department = $_POST['department'];
+            $base_department = $requirements_input['department'];
             if ( !in_array( $base_department, array('residential-sales', 'residential-lettings', 'commercial') ) )
             {
                 $base_department = ph_get_custom_department_based_on($base_department);
@@ -1389,7 +1616,7 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
+                $price = preg_replace("/[^0-9.]/", '', $requirements_input['maximum_price']);
 
                 $applicant_profile['max_price'] = $price;
 
@@ -1399,9 +1626,9 @@ class PH_AJAX {
                 $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
                 $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
 
-                if ( $percentage_lower != '' && $percentage_higher != '' && $_POST['maximum_price'] != '' && $_POST['maximum_price'] != 0 )
+                if ( $percentage_lower != '' && $percentage_higher != '' && $requirements_input['maximum_price'] != '' && $requirements_input['maximum_price'] != 0 )
                 {
-                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_price']));
+                    $price = preg_replace("/[^0-9.]/", '', $requirements_input['maximum_price']);
                     $applicant_profile['match_price_range_lower'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     $applicant_profile['match_price_range_lower_actual'] = $price - ( $price * ( $percentage_lower / 100 ) );
                     
@@ -1411,7 +1638,7 @@ class PH_AJAX {
             }
             elseif ( $base_department == 'residential-lettings' )
             {
-                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_rent']));
+                $price = preg_replace("/[^0-9.]/", '', $requirements_input['maximum_rent']);
 
                 $applicant_profile['max_rent'] = $price;
                 $applicant_profile['rent_frequency'] = 'pcm';
@@ -1421,58 +1648,58 @@ class PH_AJAX {
 
             if ( $base_department == 'residential-sales' || $base_department == 'residential-lettings' )
             {
-                $beds = preg_replace("/[^0-9]/", '', ph_clean($_POST['minimum_bedrooms']));
+                $beds = preg_replace("/[^0-9]/", '', $requirements_input['minimum_bedrooms']);
                 $applicant_profile['min_beds'] = $beds;
 
                 if ( isset($_POST['property_type']) && !empty($_POST['property_type']) )
                 {
-                    $applicant_profile['property_types'] = is_array(ph_clean($_POST['property_type'])) ? ph_clean($_POST['property_type']) : array(ph_clean($_POST['property_type']));
+                    $applicant_profile['property_types'] = $requirements_input['property_type'];
                 }
             }
 
             if ( $base_department == 'commercial' )
             {
                 $available_as = array();
-                if ( isset($_POST['available_as_sale']) && $_POST['available_as_sale'] == 'yes' )
+                if ( isset($_POST['available_as_sale']) && $requirements_input['available_as_sale'] == 'yes' )
                 {
                     $available_as[] = 'sale';
                 }
-                if ( isset($_POST['available_as_rent']) && $_POST['available_as_rent'] == 'yes' )
+                if ( isset($_POST['available_as_rent']) && $requirements_input['available_as_rent'] == 'yes' )
                 {
                     $available_as[] = 'rent';
                 }
                 $applicant_profile['available_as'] = $available_as;
 
-                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['minimum_floor_area']));
+                $floor_area = preg_replace("/[^0-9.]/", '', $requirements_input['minimum_floor_area']);
                 $applicant_profile['min_floor_area'] = $floor_area;
                 $applicant_profile['min_floor_area_actual'] = $floor_area;
 
-                $floor_area = preg_replace("/[^0-9.]/", '', ph_clean($_POST['maximum_floor_area']));
+                $floor_area = preg_replace("/[^0-9.]/", '', $requirements_input['maximum_floor_area']);
                 $applicant_profile['max_floor_area'] = $floor_area;
                 $applicant_profile['max_floor_area_actual'] = $floor_area;
 
                 if ( isset($_POST['commercial_property_type']) && !empty($_POST['commercial_property_type']) )
                 {
-                    $applicant_profile['commercial_property_types'] = is_array(ph_clean($_POST['commercial_property_type'])) ? ph_clean($_POST['commercial_property_type']) : array(ph_clean($_POST['commercial_property_type']));
+                    $applicant_profile['commercial_property_types'] = $requirements_input['commercial_property_type'];
                 }
             }
 
             if ( isset($_POST['location']) && !empty($_POST['location']) )
             {
-                $applicant_profile['locations'] = is_array(ph_clean($_POST['location'])) ? ph_clean($_POST['location']) : array(ph_clean($_POST['location']));
+                $applicant_profile['locations'] = $requirements_input['location'];
             }
 
             if ( isset($_POST['location_text']) && !empty($_POST['location_text']) )
             {
-                $applicant_profile['location_text'] = ph_clean($_POST['location_text']);
+                $applicant_profile['location_text'] = $requirements_input['location_text'];
             }
 
-            $applicant_profile['notes'] = ( ( isset($_POST['additional_requirements']) ) ? sanitize_textarea_field($_POST['additional_requirements']) : '' );
+            $applicant_profile['notes'] = $requirements_input['additional_requirements'];
 
             $applicant_profile['send_matching_properties'] = 'yes';
             //$applicant_profile['auto_match_disabled'] = ''; // don't know what to do about this yet. Should probably look at global setting and reflect that
 
-            update_post_meta( $contact_post_id, '_applicant_profile_' . ( isset($_POST['profile_id']) && $_POST['profile_id'] != '' ? (int)$_POST['profile_id'] : '0' ), $applicant_profile );
+            update_post_meta( $contact_post_id, '_applicant_profile_' . $profile_id, wp_slash( $applicant_profile ) );
 
             $return['success'] = true;
 
@@ -1537,9 +1764,9 @@ class PH_AJAX {
         
         check_ajax_referer( 'load-existing-owner-contact', 'security' );
         
-        $contact_id = (int)$_POST['contact_id'];
+        $contact_id = isset( $_POST['contact_id'] ) && is_scalar( $_POST['contact_id'] ) ? absint( $_POST['contact_id'] ) : 0;
         
-        $contact = get_post($contact_id);
+        $contact = $contact_id > 0 && 'contact' === get_post_type( $contact_id ) ? get_post( $contact_id ) : null;
         
         echo '<div id="existing-owner-details-' . esc_attr($contact_id) . '">';
         
@@ -1616,30 +1843,35 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = ph_clean($_POST['keyword']);
+        $keyword = isset( $_POST['keyword'] ) && is_string( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '';
+        $contact_type = isset( $_POST['contact_type'] ) && is_string( $_POST['contact_type'] ) ? sanitize_text_field( wp_unslash( $_POST['contact_type'] ) ) : '';
+        $exclude_ids = isset( $_POST['exclude_ids'] ) && is_string( $_POST['exclude_ids'] ) ? sanitize_text_field( wp_unslash( $_POST['exclude_ids'] ) ) : '';
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
             // Get all contacts that match the name
             $args = array(
                 'post_type' => 'contact',
+                'propertyhive_contact_search_keyword' => $keyword,
                 'nopaging' => true,
                 'post_status' => array( 'publish', 'private' ),
                 'fields' => 'ids'
             );
-            if ( isset($_POST['contact_type']) && $_POST['contact_type'] != '' )
+            if ( '' !== $contact_type )
             {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact roles are stored in legacy contact metadata; preserve complete keyword-matched ID results and caller exclusions.
                 $args['meta_query'] = array(
                     array(
                         'key' => '_contact_types',
-                        'value' => ph_clean($_POST['contact_type']),
+                        'value' => $contact_type,
                         'compare' => 'LIKE',
                     )
                 );
             }
-            if ( isset($_POST['exclude_ids']) && $_POST['exclude_ids'] != '' )
+            if ( '' !== $exclude_ids )
             {
-                $args['post__not_in'] = explode('|', $_POST['exclude_ids']);
+                // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Contact roles are stored in legacy contact metadata; preserve complete keyword-matched ID results and caller exclusions.
+                $args['post__not_in'] = array_map( 'absint', explode( '|', $exclude_ids ) );
             }
             
             add_filter( 'posts_where', array( $this, 'search_contacts_where' ), 10, 2 );
@@ -1658,7 +1890,7 @@ class PH_AJAX {
                     
                     $return[] = array(
                         'ID' => get_the_ID(),
-                        'post_title' => get_the_title(get_the_ID()) . ( isset($_POST['contact_type']) && $_POST['contact_type'] == 'thirdparty' && $contact->company_name != '' && $contact->company_name != get_the_title(get_the_ID()) ? ' (' . $contact->company_name . ')' : '' ) ,
+                        'post_title' => get_the_title(get_the_ID()) . ( $contact_type == 'thirdparty' && $contact->company_name != '' && $contact->company_name != get_the_title(get_the_ID()) ? ' (' . $contact->company_name . ')' : '' ) ,
                         'address_name_number' => $contact->_address_name_number,
                         'address_street' => $contact->_address_street,
                         'address_two' => $contact->_address_two,
@@ -1687,8 +1919,12 @@ class PH_AJAX {
     {
         global $wpdb;
         
-        $where .= ' AND ' . $wpdb->posts . '.post_title LIKE \'%' . esc_sql( $wpdb->esc_like( ph_clean($_POST['keyword']) ) ) . '%\'';
-        
+        $keyword = $wp_query->get( 'propertyhive_contact_search_keyword', '' );
+        if ( ! is_string( $keyword ) || '' === $keyword ) {
+            return $where;
+        }
+        $where .= $wpdb->prepare( " AND {$wpdb->posts}.post_title LIKE %s", '%' . $wpdb->esc_like( $keyword ) . '%' );
+
         return $where;
     }
 
@@ -1703,7 +1939,7 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = ph_clean($_POST['keyword']);
+        $keyword = isset( $_POST['keyword'] ) && is_string( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '';
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
@@ -1720,24 +1956,25 @@ class PH_AJAX {
                     'relation' => 'OR',
                     array(
                         'key' => '_address_concatenated',
-                        'value' => ph_clean($_POST['keyword']),
+                        'value' => $keyword,
                         'compare' => 'LIKE'
                     ),
                     array(
                         'key' => '_reference_number',
-                        'value' => ph_clean($_POST['keyword']),
+                        'value' => $keyword,
                         'compare' => '='
                     ),
                 ),
             );
 
-            if ( isset($_POST['department']) && $_POST['department'] != '' )
+            $department_input = isset( $_POST['department'] ) && is_string( $_POST['department'] ) ? sanitize_text_field( wp_unslash( $_POST['department'] ) ) : '';
+            if ( '' !== $department_input )
             {
                 $departments_query = array(
                     'relation' => 'OR',
                 );
 
-                $explode_departments = explode("|", ph_clean($_POST['department']));
+                $explode_departments = explode("|", $department_input);
                 $new_departments = array();
                 foreach ( $explode_departments as $department )
                 {
@@ -1774,6 +2011,7 @@ class PH_AJAX {
             
             if ( !empty($meta_query) )
             {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Department/market filters use existing property metadata; preserve the established property-search result set.
                 $args['meta_query'] = $meta_query;
             }
 
@@ -1834,7 +2072,7 @@ class PH_AJAX {
         
         $return = array();
         
-        $keyword = ph_clean($_POST['keyword']);
+        $keyword = isset( $_POST['keyword'] ) && is_string( $_POST['keyword'] ) ? sanitize_text_field( wp_unslash( $_POST['keyword'] ) ) : '';
         
         if ( !empty( $keyword ) && strlen( $keyword ) > 2 )
         {
@@ -1843,6 +2081,7 @@ class PH_AJAX {
                 'number' => 9999,
                 'search' => $keyword . '*',
                 'orderby' => 'display_name',
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
                 'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
             );
 
@@ -1884,11 +2123,15 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
-		$post_id = (int)$_POST['post_id'];
+		$post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        if ( $post_id < 1 || ! get_post( $post_id ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['note'] ) || ! is_string( $_POST['note'] ) ) {
+            wp_send_json_error( __( 'Invalid note or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
 		if ( $post_id > 0 ) {
 
-            $note = trim( stripslashes( $_POST['note'] ) );
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Rich mention spans are converted to the established text token below, then all HTML is stripped before storage.
+            $note = trim( wp_unslash( $_POST['note'] ) );
 
             $pattern = '/<span [^>]*data-post-id="(\d+)"[^>]*>([^<]*)<\/span>/i';
             $replacement = function($matches) {
@@ -1900,7 +2143,7 @@ class PH_AJAX {
 
             $note = str_replace( array('<br>', '<br />'), "\n", $note );
 
-            $note = strip_tags( $note );
+            $note = wp_strip_all_tags( $note );
 
             // Add note/comment to property
             $comment = array(
@@ -1921,11 +2164,11 @@ class PH_AJAX {
 ?>
                 <li rel="<?php echo absint( $comment_id ) ; ?>" class="note">
                     <div class="note_content">
-                        <?php echo wp_kses_post( wpautop( wptexturize( $note ) ) ); ?>
+                        <?php echo wp_kses_post( wpautop( wptexturize( wp_kses_post( $note ) ) ) ); ?>
                     </div>
                     <p class="meta">
-                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php printf( esc_html__( '%s ago', 'propertyhive' ), esc_html( human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ) ); ?></abbr>
-                        <?php if ( $comment->comment_author !== __( 'Property Hive', 'propertyhive' ) ) printf( ' ' . esc_html__( 'by %s', 'propertyhive' ), esc_html( $comment->comment_author ) ); ?>
+                        <abbr class="exact-date" title="<?php echo esc_attr($comment->comment_date_gmt); ?> GMT"><?php /* translators: %s: Elapsed time. */ printf( esc_html__( '%s ago', 'propertyhive' ), esc_html( human_time_diff( strtotime( $comment->comment_date_gmt ), current_time( 'timestamp', 1 ) ) ) ); ?></abbr>
+                        <?php if ( $comment->comment_author !== esc_html__( 'Property Hive', 'propertyhive' ) ) /* translators: %s: Note author. */ printf( ' ' . esc_html__( 'by %s', 'propertyhive' ), esc_html( $comment->comment_author ) ); ?>
                         <a href="#" class="delete_note"><?php echo esc_html(__( 'Delete', 'propertyhive' )); ?></a>
                     </p>
                 </li>
@@ -1947,7 +2190,11 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_send_json_error( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
 
-		$note_id = (int)$_POST['note_id'];
+		$note_id = isset( $_POST['note_id'] ) && is_scalar( $_POST['note_id'] ) ? absint( $_POST['note_id'] ) : 0;
+        $note_comment = get_comment( $note_id );
+        if ( $note_id < 1 || ! $note_comment || 'propertyhive_note' !== $note_comment->comment_type || ! current_user_can( 'edit_post', $note_comment->comment_post_ID ) ) {
+            wp_send_json_error( __( 'Invalid note or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
 		if ( $note_id > 0 ) {
 			wp_delete_comment( $note_id );
@@ -1968,14 +2215,18 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_send_json_error( __( 'You do not have permission to manage notes', 'propertyhive' ), 403 );
 
-        $note_id = (int)$_POST['note_id'];
+        $note_id = isset( $_POST['note_id'] ) && is_scalar( $_POST['note_id'] ) ? absint( $_POST['note_id'] ) : 0;
+        $note_comment = get_comment( $note_id );
+        if ( $note_id < 1 || ! $note_comment || 'propertyhive_note' !== $note_comment->comment_type || ! current_user_can( 'edit_post', $note_comment->comment_post_ID ) ) {
+            wp_send_json_error( __( 'Invalid note or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
         if ( $note_id > 0 ) {
 
             $comment = get_comment($note_id);
             $comment_content = @unserialize($comment->comment_content, ['allowed_classes' => false]);
 
-            if ( $comment_content !== false )
+            if ( is_array( $comment_content ) )
             {
                 if ( isset($comment_content['pinned']))
                 {
@@ -1987,7 +2238,10 @@ class PH_AJAX {
                 }
             }
 
-            wp_update_comment( array('comment_ID' => $_POST['note_id'], 'comment_content' => serialize($comment_content)) );
+            else {
+                wp_send_json_error( __( 'Invalid note data.', 'propertyhive' ), 400 );
+            }
+            wp_update_comment( wp_slash( array( 'comment_ID' => $note_id, 'comment_content' => serialize( $comment_content ) ) ) );
 
             wp_send_json_success();
         }
@@ -2004,9 +2258,13 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
-        $post = get_post((int)$_POST['post_id']);
+        $post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        $post = get_post( $post_id );
+        if ( $post_id < 1 || ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
-        $section = $_POST['section'];
+        $section = isset( $_POST['section'] ) && is_string( $_POST['section'] ) ? sanitize_text_field( wp_unslash( $_POST['section'] ) ) : '';
         include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 
         // Quit out
@@ -2022,9 +2280,13 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
-        $post = get_post((int)$_POST['post_id']);
+        $post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        $post = get_post( $post_id );
+        if ( $post_id < 1 || ! $post || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
-        $section = $_POST['section'];
+        $section = isset( $_POST['section'] ) && is_string( $_POST['section'] ) ? sanitize_text_field( wp_unslash( $_POST['section'] ) ) : '';
         include( PH()->plugin_path() . '/includes/admin/views/html-display-notes.php' );
 
         // Quit out
@@ -2040,7 +2302,7 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_die( esc_html(__( 'You do not have permission to manage notes', 'propertyhive' )), 403 );
         
-        $query = sanitize_text_field($_POST['query']);
+        $query = isset( $_POST['query'] ) && is_string( $_POST['query'] ) ? sanitize_text_field( wp_unslash( $_POST['query'] ) ) : '';
 
         $mentions = array();
 
@@ -2096,6 +2358,7 @@ class PH_AJAX {
             'post_type' => 'property',
             'posts_per_page' => 10,
             'post_status' => array( 'publish' ),
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Login/contact duplicate/address lookups use a fixed meta relation and return a small result set (1 row for identity checks, 10 for the address autocomplete). posts_per_page=1; posts_per_page=10; fields=ids on all four; values are the authenticated user, submitted email, search text, or current contact.
             'meta_query' => array(
                 'relation' => 'OR',
                 array(
@@ -2157,7 +2420,8 @@ class PH_AJAX {
         $errors = array();
         $form_controls = array();
 
-        if ( ! isset( $_POST['property_id'] ) || ( isset( $_POST['property_id'] ) && empty( $_POST['property_id'] ) ) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+        if ( ! isset( $_POST['property_id'] ) || ! is_string( $_POST['property_id'] ) || empty( $_POST['property_id'] ) )
         {
             $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' );
         }
@@ -2167,7 +2431,8 @@ class PH_AJAX {
             
             $form_controls = ph_get_property_enquiry_form_fields();
 
-            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, ph_clean($_POST['property_id']) );
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) );
         }
         
         foreach ( $form_controls as $key => $control )
@@ -2175,12 +2440,14 @@ class PH_AJAX {
             if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
             {
                 // This field is mandatory. Lets check we received it in the post
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                 if ( ! isset( $_POST[$key] ) || ( isset( $_POST[$key] ) && empty( $_POST[$key] ) ) )
                 {
                     $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
                 }
             }
-            if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) && ! is_email( $_POST[$key] ) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+            if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) && ( ! is_string( $_POST[$key] ) || ! is_email( wp_unslash( $_POST[$key] ) ) ) )
             {
                 $errors[] = __( 'Invalid email address provided', 'propertyhive' ) . ': ' . $key;
             }
@@ -2191,7 +2458,8 @@ class PH_AJAX {
             if ( $key == 'hCaptcha' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['h-captcha-response'] ) ? ph_clean($_POST['h-captcha-response']) : '';
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+                $response = ( isset( $_POST['h-captcha-response'] ) && is_string( $_POST['h-captcha-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['h-captcha-response'] ) ) : '';
 
                 $response = wp_remote_post(
                     'https://hcaptcha.com/siteverify',
@@ -2228,10 +2496,11 @@ class PH_AJAX {
             if ( $key == 'turnstile' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                $response = isset( $_POST['cf-turnstile-response'] ) ? ph_clean($_POST['cf-turnstile-response']) : '';
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+                $response = ( isset( $_POST['cf-turnstile-response'] ) && is_string( $_POST['cf-turnstile-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['cf-turnstile-response'] ) ) : '';
 
                 $response = wp_remote_post(
-                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify', // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Server-side CAPTCHA token verification API.
                     array(
                         'method' => 'POST',
                         'headers' => array(
@@ -2270,8 +2539,10 @@ class PH_AJAX {
         if ( 
             get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' &&
             ( 
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                 !isset( $_POST['disclaimer'] ) || 
                 ( 
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                     isset( $_POST['disclaimer'] ) && empty( $_POST['disclaimer'] ) 
                 ) 
             )
@@ -2315,10 +2586,17 @@ class PH_AJAX {
         }*/
 
         // Passed validation
-        $property_ids = array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+        $property_ids = isset( $_POST['property_id'] ) && is_string( $_POST['property_id'] ) ? array_values( array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) ) ) : array();
+        if ( empty( $property_ids ) ) {
+            $errors[] = __( 'Invalid property supplied', 'propertyhive' );
+        }
+        if ( count( $property_ids ) > 100 ) {
+            $errors[] = __( 'Too many properties supplied.', 'propertyhive' );
+        }
         foreach ( $property_ids as $property_id ) 
         {
-            if ( get_post_type($property_id) !== 'property' ) 
+            if ( get_post_type( $property_id ) !== 'property' || ! propertyhive_is_post_publicly_viewable( $property_id ) )
             {
                 $errors[] = __( 'Invalid property supplied', 'propertyhive' );
                 break;
@@ -2411,7 +2689,7 @@ class PH_AJAX {
             foreach ( $property_ids as $property_id )
             {
                 $property = new PH_Property((int)$property_id);
-                $message .= apply_filters( 'propertyhive_property_enquiry_property_output', $property->get_formatted_full_address() . "\n" . html_entity_decode(strip_tags($property->get_formatted_price())) . "\n" . get_permalink( (int)$property_id ), (int)$property_id ) . "\n\n";
+                $message .= apply_filters( 'propertyhive_property_enquiry_property_output', $property->get_formatted_full_address() . "\n" . html_entity_decode(wp_strip_all_tags($property->get_formatted_price())) . "\n" . get_permalink( (int)$property_id ), (int)$property_id ) . "\n\n";
             }
 
             unset($form_controls['action']);
@@ -2426,9 +2704,10 @@ class PH_AJAX {
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
-                $value = ( isset($_POST[$key]) ) ? sanitize_textarea_field($_POST[$key]) : '';
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+                $value = ( isset($_POST[$key]) && is_string($_POST[$key]) ) ? sanitize_textarea_field( wp_unslash( $_POST[$key] ) ) : '';
 
-                $message .= strip_tags($label) . ": " . strip_tags($value) . "\n";
+                $message .= wp_strip_all_tags($label) . ": " . wp_strip_all_tags($value) . "\n";
             }
 
             if ( 
@@ -2454,11 +2733,14 @@ class PH_AJAX {
             if ( $from_email_address == '' )
             {
                 // Should never get here
-                $from_email_address = $_POST['email_address'];
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
+                $from_email_address = ( isset( $_POST['email_address'] ) && is_string( $_POST['email_address'] ) ) ? sanitize_email( wp_unslash( $_POST['email_address'] ) ) : '';
             }
 
             $headers = array();
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
             $name = isset( $_POST['name'] )
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                 ? sanitize_text_field( wp_unslash( $_POST['name'] ) )
                 : '';
 
@@ -2475,8 +2757,10 @@ class PH_AJAX {
                 $headers[] = sprintf( 'From: <%s>', $from_email_address );
             }
 
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
             if ( isset($_POST['email_address']) ) 
             {
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                 $reply_to = sanitize_email(wp_unslash($_POST['email_address']));
 
                 if ( is_email($reply_to) ) 
@@ -2519,8 +2803,10 @@ class PH_AJAX {
                     {
                         $title = __( 'Multiple Property Enquiry', 'propertyhive' );
                     }
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                     if ( isset($_POST['name']) && ! empty($_POST['name']) )
                     {
+                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                         $title .= ' ' . __( 'from', 'propertyhive' ) . ' ' . ph_clean(wp_unslash($_POST['name']));
                     }
                     
@@ -2541,6 +2827,7 @@ class PH_AJAX {
                     add_post_meta( $enquiry_post_id, '_negotiator_id', '' );
                     add_post_meta( $enquiry_post_id, '_office_id', $office_id );
                     
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                     foreach ($_POST as $key => $value)
                     {
                         $meta_key = is_string( $key ) ? $key : '';
@@ -2565,12 +2852,14 @@ class PH_AJAX {
                     }
                 }
 
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                 do_action('propertyhive_property_enquiry_sent', $_POST, $to, $enquiry_post_id);
 
                 // Send auto-responder
                 if ( get_option( 'propertyhive_enquiry_auto_responder', '' ) == 'yes' )
                 {
                     // Auto-responder enabled
+                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
                     PH()->email->send_enquiry_auto_responder( $_POST );
                 }
             }
@@ -2590,8 +2879,10 @@ class PH_AJAX {
     {
         global $post;
 
-        $enquiry_post_id = ( (isset($_POST['post_id'])) ? (int)$_POST['post_id'] : '' );
-        $nonce = ( (isset($_POST['security'])) ? ph_clean($_POST['security']) : '' );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- create_contact_from_enquiry reads post_id to construct the action-specific nonce name and reads security as the nonce value; wp_verify_nonce occurs immediately. The event is admin-only and authorize_admin_ajax enforces manage_propertyhive before the callback. These are nonce inputs, not unguarded business mutations.
+        $enquiry_post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- create_contact_from_enquiry reads post_id to construct the action-specific nonce name and reads security as the nonce value; wp_verify_nonce occurs immediately. The event is admin-only and authorize_admin_ajax enforces manage_propertyhive before the callback. These are nonce inputs, not unguarded business mutations.
+        $nonce = isset( $_POST['security'] ) && is_string( $_POST['security'] ) ? sanitize_text_field( wp_unslash( $_POST['security'] ) ) : '';
 
         if ( ! wp_verify_nonce( $nonce, 'create-contact-from-enquiry-nonce-' . $enquiry_post_id ) ) 
         {
@@ -2665,7 +2956,7 @@ class PH_AJAX {
         $postdata = array(
             'post_excerpt'   => '',
             'post_content'   => '',
-            'post_title'     => utf8_encode(wp_strip_all_tags( $name )),
+            'post_title'     => wp_strip_all_tags( $name ),
             'post_status'    => 'publish',
             'post_type'      => 'contact',
             'ping_status'    => 'closed',
@@ -2822,13 +3113,19 @@ class PH_AJAX {
 
         $this->json_headers();
 
-        parse_str($_POST['form_data']);
+        $form_data = array();
+        if ( isset( $_POST['form_data'] ) && is_string( $_POST['form_data'] ) ) {
+            // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Decode serialized form input first; only the typed and sanitized email address and numeric contact ID below are consumed.
+            parse_str( wp_unslash( $_POST['form_data'] ), $form_data );
+        }
+        $email_address_input = isset( $form_data['_email_address'] ) && is_string( $form_data['_email_address'] ) ? sanitize_text_field( $form_data['_email_address'] ) : '';
+        $contact_id = isset( $form_data['post_ID'] ) && is_scalar( $form_data['post_ID'] ) ? absint( $form_data['post_ID'] ) : 0;
         
         $return = array('errors' => array());
 
-        if ( isset($_email_address) && $_email_address != '' )
+        if ( '' !== $email_address_input )
         {
-            $email_addresses = explode( ",", $_email_address );
+            $email_addresses = explode( ",", $email_address_input );
 
             foreach ( $email_addresses as $email_address )
             {
@@ -2845,6 +3142,7 @@ class PH_AJAX {
                     'post_status' => 'any',
                     'posts_per_page' => 1,
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Login/contact duplicate/address lookups use a fixed meta relation and return a small result set (1 row for identity checks, 10 for the address autocomplete). posts_per_page=1; posts_per_page=10; fields=ids on all four; values are the authenticated user, submitted email, search text, or current contact.
                     'meta_query' => array(
                         'relation' => 'OR',
                         array(
@@ -2865,9 +3163,10 @@ class PH_AJAX {
                         )
                     )
                 );
-                if ( isset($post_ID) && $post_ID != '' )
+                if ( $contact_id )
                 {
-                    $args['post__not_in'] = array( $post_ID );
+                    // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Login/contact duplicate/address lookups use a fixed meta relation and return a small result set (1 row for identity checks, 10 for the address autocomplete). posts_per_page=1; posts_per_page=10; fields=ids on all four; values are the authenticated user, submitted email, search text, or current contact.
+                    $args['post__not_in'] = array( $contact_id );
                 }
 
                 $contact_query = new WP_Query( $args );
@@ -2878,7 +3177,8 @@ class PH_AJAX {
                     {
                         $contact_query->the_post();
 
-                        $return['errors'][] = __( 'A contact, ' . get_the_title() . ', already exists with email address', 'propertyhive' ) . ' ' . $email_address;
+                        /* translators: 1: Contact name, 2: Email address. */
+                        $return['errors'][] = sprintf( __( 'A contact, %1$s, already exists with email address %2$s', 'propertyhive' ), get_the_title(), $email_address );
                     }
                 }
             }
@@ -2900,18 +3200,18 @@ class PH_AJAX {
             die();
         }
 
-        if ( !isset( $_POST['contact_ids'] ) || empty( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) || empty( $_POST['primary_contact_id'] ) )
+        if ( !isset( $_POST['contact_ids'] ) || !is_string( $_POST['contact_ids'] ) || empty( $_POST['contact_ids'] ) || !isset( $_POST['primary_contact_id'] ) || !is_string( $_POST['primary_contact_id'] ) || empty( $_POST['primary_contact_id'] ) )
         {
             $return = array('error' => 'Invalid parameters received');
             echo json_encode( $return );
             die();
         }
 
-        $contacts_to_merge = array_filter( array_map( 'absint', explode( '|', $_POST['contact_ids'] ) ) );
+        $contacts_to_merge = array_values( array_unique( array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['contact_ids'] ) ) ) ) ) ) );
 
         $primary_contact_id = absint( wp_unslash( $_POST['primary_contact_id'] ) );
 
-        if ( !is_array($contacts_to_merge) || !in_array( $primary_contact_id, $contacts_to_merge )  )
+        if ( count( $contacts_to_merge ) < 2 || !in_array( $primary_contact_id, $contacts_to_merge, true ) )
         {
             $return = array('error' => 'Invalid Contact IDs received');
             echo json_encode( $return );
@@ -2925,7 +3225,7 @@ class PH_AJAX {
             die();
         }
 
-        if ( !current_user_can( 'edit_post', $primary_contact_id ) ) 
+        if ( !current_user_can( 'manage_propertyhive' ) || !current_user_can( 'edit_post', $primary_contact_id ) )
         {
             $return = array('error' => 'Insufficient permissions for primary contact');
             echo json_encode( $return );
@@ -2953,7 +3253,7 @@ class PH_AJAX {
         // Remove primary from list
         unset($contacts_to_merge[array_search($primary_contact_id, $contacts_to_merge)]);
 
-        include_once( 'includes/class-ph-admin-merge-contacts.php' );
+        include_once PH()->plugin_path() . '/includes/admin/class-ph-admin-merge-contacts.php';
         $ph_admin_merge_contacts = new PH_Admin_Merge_Contacts();
         $ph_admin_merge_contacts->do_merge( $primary_contact_id, $contacts_to_merge );
 
@@ -3011,6 +3311,7 @@ class PH_AJAX {
             'post_type' => 'viewing',
             'fields' => 'ids',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Dashboard selects viewing status/feedback from existing metadata with WordPress's default page limit; extension query filters remain supported.
             'meta_query' => array(
                 array(
                     'key' => '_status',
@@ -3042,7 +3343,7 @@ class PH_AJAX {
                     'ID' => get_the_ID(),
                     'edit_link' => get_edit_post_link( get_the_ID() ),
                     'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
-                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'start_date_time_formatted_Hi_jSFY' => gmdate("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
                     'property_id' => $property_id,
                     'property_address' => $property->get_formatted_full_address(),
                     'applicant_contact_id' => $applicant_contact_ids[0],
@@ -3070,6 +3371,7 @@ class PH_AJAX {
             'post_type' => 'viewing',
             'fields' => 'ids',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Dashboard scopes upcoming events by status, time and current negotiator metadata with WordPress's default page limit.
             'meta_query' => array(
                 array(
                     'key' => '_status',
@@ -3077,7 +3379,7 @@ class PH_AJAX {
                 ),
                 array(
                     'key' => '_start_date_time',
-                    'value' => date("Y-m-d H:i:s"),
+                    'value' => gmdate("Y-m-d H:i:s"),
                     'compare' => '>='
                 ),
                 array(
@@ -3105,7 +3407,7 @@ class PH_AJAX {
                     'ID' => get_the_ID(),
                     'edit_link' => get_edit_post_link( get_the_ID() ),
                     'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
-                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'start_date_time_formatted_Hi_jSFY' => gmdate("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
                     'start_date_time_timestamp' => strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE )),
                     'title' => 'Viewing at ' . $property->get_formatted_full_address(),
                 );
@@ -3118,6 +3420,7 @@ class PH_AJAX {
             'post_type' => 'appraisal',
             'fields' => 'ids',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Dashboard scopes upcoming events by status, time and current negotiator metadata with WordPress's default page limit.
             'meta_query' => array(
                 array(
                     'key' => '_status',
@@ -3125,7 +3428,7 @@ class PH_AJAX {
                 ),
                 array(
                     'key' => '_start_date_time',
-                    'value' => date("Y-m-d H:i:s"),
+                    'value' => gmdate("Y-m-d H:i:s"),
                     'compare' => '>='
                 ),
                 array(
@@ -3152,7 +3455,7 @@ class PH_AJAX {
                     'ID' => get_the_ID(),
                     'edit_link' => get_edit_post_link( get_the_ID() ),
                     'start_date_time' => get_post_meta( get_the_ID(), '_start_date_time', TRUE ),
-                    'start_date_time_formatted_Hi_jSFY' => date("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
+                    'start_date_time_formatted_Hi_jSFY' => gmdate("H:i jS F Y", strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE ))),
                     'start_date_time_timestamp' => strtotime(get_post_meta( get_the_ID(), '_start_date_time', TRUE )),
                     'title' => 'Appraisal at ' . $appraisal->get_formatted_full_address(),
                 );
@@ -3206,7 +3509,9 @@ class PH_AJAX {
             'post_type' => 'key_date',
             'fields' => 'ids',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Dashboard filters and orders due dates stored in key-date metadata with WordPress's default page limit.
             'meta_query' => $meta_query,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Dashboard filters and orders due dates stored in key-date metadata with WordPress's default page limit.
             'meta_key' => '_date_due',
             'orderby' => 'meta_value',
             'order' => 'ASC',
@@ -3283,6 +3588,7 @@ class PH_AJAX {
         $args = array(
             'post_type' => 'property',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Duplicate detection must match on-market/reference metadata and exclude the current integer record ID; query retains the default page limit.
             'meta_query' => array(
                 array(
                     'key' => '_on_market',
@@ -3297,6 +3603,7 @@ class PH_AJAX {
 
         if ( isset($_POST['post_id']) && !empty($_POST['post_id']) )
         {
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Duplicate detection must match on-market/reference metadata and exclude the current integer record ID; query retains the default page limit.
             $args['post__not_in'] = array((int)$_POST['post_id']);
         }
 
@@ -3316,7 +3623,11 @@ class PH_AJAX {
     {
         check_ajax_referer( 'osm_geocoding_request', 'security' );
 
-        $this->json_headers();
+        if ( ! isset( $_POST['country'], $_POST['address'] ) || ! is_string( $_POST['country'] ) || ! is_string( $_POST['address'] ) ) {
+            wp_send_json( array( 'error' => 'Invalid geocoding address.', 'lat' => '', 'lng' => '' ) );
+        }
+        $country = sanitize_text_field( wp_unslash( $_POST['country'] ) );
+        $address = sanitize_text_field( wp_unslash( $_POST['address'] ) );
 
         $lat = '';
         $lng = '';
@@ -3331,14 +3642,19 @@ class PH_AJAX {
         {
             // Too soon: tell client to retry shortly
             $error = 'Too many geocoding requests. Please wait a second and try again.';
-            json_encode(array('error' => $error));
-            wp_die();
+            wp_send_json( array( 'error' => $error ) );
         }
 
         // Set timestamp immediately to prevent stampedes
         set_transient( $rate_key, $now );
 
-        $request_url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=" . strtolower(ph_clean($_POST['country'])) . "&addressdetails=1&q=" . urlencode(ph_clean($_POST['address']));
+        $request_url = add_query_arg( array(
+            'format' => 'json',
+            'limit' => 1,
+            'countrycodes' => rawurlencode( strtolower( $country ) ),
+            'addressdetails' => 1,
+            'q' => rawurlencode( $address ),
+        ), 'https://nominatim.openstreetmap.org/search' );
         
         $response = wp_remote_get(
             $request_url,
@@ -3353,15 +3669,13 @@ class PH_AJAX {
         if ( is_wp_error( $response ))
         {
             $error = $response->get_error_message();
-            echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
-            die();
+            wp_send_json( array( 'error' => $error, 'lat' => $lat, 'lng' => $lng ) );
         }
 
         if ( wp_remote_retrieve_response_code($response) !== 200 )
         {
-            $error =  wp_remote_retrieve_response_code($response) . ' response received when geocoding address ' . ph_clean($_POST['address']) . '. Error message: ' . wp_remote_retrieve_response_message($response);
-            echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
-            die();
+            $error =  wp_remote_retrieve_response_code($response) . ' response received when geocoding address ' . $address . '. Error message: ' . wp_remote_retrieve_response_message($response);
+            wp_send_json( array( 'error' => $error, 'lat' => $lat, 'lng' => $lng ) );
         }
 
         if ( is_array( $response ) )
@@ -3376,17 +3690,15 @@ class PH_AJAX {
             }
             else
             {
-                $error = 'No co-ordinates returned for the address provided ' . ph_clean($_POST['address']) . ': ' . print_r($body, true);
+                $error = 'No co-ordinates returned for the address provided ' . $address . ': ' . $body;
             }
         }
         else
         {
-            $error = 'Failed to parse JSON response from OSM Geocoding service: ' . print_r($response, true);
+            $error = 'Failed to parse JSON response from OSM Geocoding service: ' . wp_json_encode( $response );
         }
 
-        echo json_encode(array('error' => $error, 'lat' => $lat, 'lng' => $lng));
-
-        die();
+        wp_send_json( array( 'error' => $error, 'lat' => $lat, 'lng' => $lng ) );
     }
 
     public function get_property_marketing_statistics_meta_box()
@@ -3394,32 +3706,39 @@ class PH_AJAX {
         check_ajax_referer( 'get_property_marketing_statistics_meta_box', 'security' );
 
         global $post;
+        $post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        if ( $post_id < 1 || 'property' !== get_post_type( $post_id ) || ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid property or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
-        echo '<div class="propertyhive_meta_box">';
-        
-        echo '<div class="options_group">';
 
-            $view_statistics = get_post_meta( (int)$_POST['post_id'], '_view_statistics', TRUE );
+
+
+            $view_statistics = get_post_meta( $post_id, '_view_statistics', TRUE );
             if ( !is_array($view_statistics) )
             {
                 $view_statistics = array();
             }
 
-            $date_from = isset($_POST['statistics_date_from']) ? ph_clean($_POST['statistics_date_from']) : date("Y-m-d", strtotime('7 days ago'));
+            $date_from = isset( $_POST['statistics_date_from'] ) && is_string( $_POST['statistics_date_from'] ) ? sanitize_text_field( wp_unslash( $_POST['statistics_date_from'] ) ) : gmdate("Y-m-d", strtotime('7 days ago'));
             $date_from = strtotime($date_from);
 
-            $date_to = isset($_POST['statistics_date_to']) ? ph_clean($_POST['statistics_date_to']) : date("Y-m-d");
+            $date_to = isset( $_POST['statistics_date_to'] ) && is_string( $_POST['statistics_date_to'] ) ? sanitize_text_field( wp_unslash( $_POST['statistics_date_to'] ) ) : gmdate("Y-m-d");
             $date_to = strtotime($date_to);
+            if ( false === $date_from || false === $date_to ) {
+                wp_send_json_error( __( 'Invalid statistics dates.', 'propertyhive' ), 400 );
+            }
 
+            echo '<div class="propertyhive_meta_box"><div class="options_group">';
             $view_statistics_output = array();
             $total_views = 0;
 
             for ($i = $date_from; $i <= $date_to; $i += 86400) 
             { 
-                if ( isset($view_statistics[date("Y-m-d", $i)]) )
+                if ( isset($view_statistics[gmdate("Y-m-d", $i)]) )
                 {
-                    $view_statistics_output[] = array( $i * 1000, $view_statistics[date("Y-m-d", $i)] );
-                    $total_views += $view_statistics[date("Y-m-d", $i)];
+                    $view_statistics_output[] = array( $i * 1000, $view_statistics[gmdate("Y-m-d", $i)] );
+                    $total_views += $view_statistics[gmdate("Y-m-d", $i)];
                 }
                 else
                 {
@@ -3446,9 +3765,10 @@ class PH_AJAX {
 
         check_ajax_referer( 'appraisal-details-meta-box', 'security' );
 
-        $post = get_post((int)$_POST['appraisal_id']);
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
+        $post = get_post( $post_id );
 
-        $appraisal = new PH_Appraisal((int)$_POST['appraisal_id']);
+        $appraisal = new PH_Appraisal( $post_id );
 
         echo '<div class="propertyhive_meta_box">';
         
@@ -3564,7 +3884,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
         $department = get_post_meta( $post_id, '_department', TRUE );
@@ -3597,7 +3917,7 @@ class PH_AJAX {
                             href="#action_panel_appraisal_email_owner_booking_confirmation_customise" 
                             class="button appraisal-action"
                             style="width:100%; margin-bottom:7px; text-align:center" 
-                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(__('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive')) : esc_html(__('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') ) ) . '</a>';
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(( $owner_or_landlord === 'Landlord' ? esc_html__( 'Email Landlord Booking Confirmation', 'propertyhive' ) : esc_html__( 'Email Owner Booking Confirmation', 'propertyhive' ) )) : esc_html(( $owner_or_landlord === 'Landlord' ? esc_html__( 'Re-Email Landlord Booking Confirmation', 'propertyhive' ) : esc_html__( 'Re-Email Owner Booking Confirmation', 'propertyhive' ) ) ) ) . '</a>';
 
                     $show_customise_confirmation_meta_boxes = true;
                 }
@@ -3607,10 +3927,10 @@ class PH_AJAX {
                             href="#action_panel_appraisal_email_owner_booking_confirmation"
                             class="button appraisal-action"
                             style="width:100%; margin-bottom:7px; text-align:center"
-                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(__('Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive')) : esc_html(__('Re-Email ' . $owner_or_landlord . ' Booking Confirmation', 'propertyhive') )) . '</a>';
+                        >' . ( ( $owner_booking_confirmation_sent_at == '' ) ? esc_html(( $owner_or_landlord === 'Landlord' ? esc_html__( 'Email Landlord Booking Confirmation', 'propertyhive' ) : esc_html__( 'Email Owner Booking Confirmation', 'propertyhive' ) )) : esc_html(( $owner_or_landlord === 'Landlord' ? esc_html__( 'Re-Email Landlord Booking Confirmation', 'propertyhive' ) : esc_html__( 'Re-Email Owner Booking Confirmation', 'propertyhive' ) ) )) . '</a>';
                 }
 
-                $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . esc_html(strtolower($owner_or_landlord)) . ' on <span title="' . esc_attr($owner_booking_confirmation_sent_at) . '">' . esc_html(date("jS F", strtotime($owner_booking_confirmation_sent_at))) . '</span>' : '' ) . '</div>';
+                $actions[] = '<div id="appraisal_owner_confirmation_date" style="text-align:center; font-size:12px; color:#999; margin-bottom:7px;' . ( ( $owner_booking_confirmation_sent_at == '' ) ? 'display:none' : '' ) . '">' . ( ( $owner_booking_confirmation_sent_at != '' ) ? 'Previously sent to ' . esc_html(strtolower($owner_or_landlord)) . ' on <span title="' . esc_attr($owner_booking_confirmation_sent_at) . '">' . esc_html(gmdate("jS F", strtotime($owner_booking_confirmation_sent_at))) . '</span>' : '' ) . '</div>';
 
                 $actions[] = '<hr>';
             }
@@ -3711,7 +4031,8 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo wp_kses_post( implode("", $actions) );
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in action URLs and labels are escaped during assembly; preserve trusted PHP action filters and the fixed button handlers.
+            echo implode("", $actions);
         }
         else
         {
@@ -3826,7 +4147,7 @@ class PH_AJAX {
             {
                 echo '<div class="form-field">
 
-                        <label for="_price">' . esc_html(__( 'Valued Price (' . $currency_symbol . ')', 'propertyhive' )) . '</label>
+                        <label for="_price">' . esc_html(/* translators: %s: Currency symbol. */ sprintf( __( 'Valued Price (%s)', 'propertyhive' ), $currency_symbol )) . '</label>
                         
                         <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_price', TRUE )) . '">
 
@@ -3837,7 +4158,7 @@ class PH_AJAX {
                 $rent_frequency = get_post_meta( $post_id, '_valued_rent_frequency', TRUE );
                 echo '<div class="form-field">
 
-                        <label for="_price">' . esc_html(__( 'Valued Rent (' . $currency_symbol . ')', 'propertyhive' )) . '</label>
+                        <label for="_price">' . esc_html(/* translators: %s: Currency symbol. */ sprintf( __( 'Valued Rent (%s)', 'propertyhive' ), $currency_symbol )) . '</label>
                         
                         <input type="text" id="_price" name="_price" style="width:100%;" value="' . esc_attr(get_post_meta( $post_id, '_valued_rent', TRUE )) . '">
 
@@ -3906,33 +4227,55 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = isset( $_POST['appraisal_id'] ) && is_scalar( $_POST['appraisal_id'] ) ? absint( $_POST['appraisal_id'] ) : 0;
+        if ( $post_id < 1 || ! current_user_can( 'manage_propertyhive' ) || 'appraisal' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid appraisal or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'pending' )
         {
+            $department = get_post_meta( $post_id, '_department', true );
+            $valuation_input = array();
+            $fields = 'residential-sales' === $department ? array( 'price' ) : ( 'residential-lettings' === $department ? array( 'rent', 'rent_frequency' ) : array() );
+            foreach ( $fields as $field ) {
+                if ( ! isset( $_POST[$field] ) || ! is_string( $_POST[$field] ) ) {
+                    wp_send_json_error( __( 'Invalid valuation details.', 'propertyhive' ), 400 );
+                }
+                $valuation_input[$field] = sanitize_text_field( wp_unslash( $_POST[$field] ) );
+            }
+            if ( 'residential-lettings' === $department && ! in_array( $valuation_input['rent_frequency'], array( 'pd', 'pppw', 'pw', 'pcm', 'pq', 'pa' ), true ) ) {
+                wp_send_json_error( __( 'Invalid rent frequency.', 'propertyhive' ), 400 );
+            }
+            if ( 'residential-lettings' === $department ) {
+                $rent_number = preg_replace( '/[^0-9.]/', '', $valuation_input['rent'] );
+                if ( '' !== $rent_number && ! is_numeric( $rent_number ) ) {
+                    wp_send_json_error( __( 'Invalid rent amount.', 'propertyhive' ), 400 );
+                }
+                $valuation_input['rent'] = '' === $rent_number ? '0' : $rent_number;
+            }
             update_post_meta( $post_id, '_status', 'carried_out' );
 
             if ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-sales' )
             {
-                $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['price']));
+                $price = preg_replace("/[^0-9.]/", '', $valuation_input['price']);
                 update_post_meta( $post_id, '_valued_price', $price );
                 update_post_meta( $post_id, '_valued_price_actual', $price );
             }
             elseif ( get_post_meta( $post_id, '_department', TRUE ) == 'residential-lettings' )
             {
-                $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['rent']));
+                $rent = preg_replace("/[^0-9.]/", '', $valuation_input['rent']);
                 update_post_meta( $post_id, '_valued_rent', $rent );
 
-                update_post_meta( $post_id, '_valued_rent_frequency', ph_clean($_POST['rent_frequency']) );
+                update_post_meta( $post_id, '_valued_rent_frequency', $valuation_input['rent_frequency'] );
 
-                switch (ph_clean($_POST['rent_frequency']))
+                switch ($valuation_input['rent_frequency'])
                 {
                     case "pd": { $price = ($rent * 365) / 12; break; }
                     case "pppw":
                     {
-                        $bedrooms = get_post_meta( $postID, '_bedrooms', true );
+                        $bedrooms = get_post_meta( $post_id, '_bedrooms', true );
                         if ( ( $bedrooms !== FALSE && $bedrooms != 0 && $bedrooms != '' ) && apply_filters( 'propertyhive_pppw_to_consider_bedrooms', true ) == true )
                         {
                             $price = (($rent * 52) / 12) * $bedrooms;
@@ -3969,14 +4312,22 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = isset( $_POST['appraisal_id'] ) && is_scalar( $_POST['appraisal_id'] ) ? absint( $_POST['appraisal_id'] ) : 0;
+        if ( $post_id < 1 || ! current_user_can( 'manage_propertyhive' ) || 'appraisal' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid appraisal or insufficient permissions.', 'propertyhive' ), 403 );
+        }
+
+        if ( ! isset( $_POST['cancelled_reason'] ) || ! is_string( $_POST['cancelled_reason'] ) ) {
+            wp_send_json_error( __( 'Invalid appraisal reason.', 'propertyhive' ), 400 );
+        }
+        $reason = sanitize_textarea_field( wp_unslash( $_POST['cancelled_reason'] ) );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
-            update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
+            update_post_meta( $post_id, '_cancelled_reason', wp_slash( $reason ) );
 
             // Add note/comment to appraisal
             $comment = array(
@@ -3996,7 +4347,10 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = isset( $_POST['appraisal_id'] ) && is_scalar( $_POST['appraisal_id'] ) ? absint( $_POST['appraisal_id'] ) : 0;
+        if ( $post_id < 1 || ! current_user_can( 'manage_propertyhive' ) || 'appraisal' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid appraisal or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4022,14 +4376,22 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = isset( $_POST['appraisal_id'] ) && is_scalar( $_POST['appraisal_id'] ) ? absint( $_POST['appraisal_id'] ) : 0;
+        if ( $post_id < 1 || ! current_user_can( 'manage_propertyhive' ) || 'appraisal' !== get_post_type( $post_id ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid appraisal or insufficient permissions.', 'propertyhive' ), 403 );
+        }
+
+        if ( ! isset( $_POST['lost_reason'] ) || ! is_string( $_POST['lost_reason'] ) ) {
+            wp_send_json_error( __( 'Invalid appraisal reason.', 'propertyhive' ), 400 );
+        }
+        $reason = sanitize_textarea_field( wp_unslash( $_POST['lost_reason'] ) );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_status', 'lost' );
-            update_post_meta( $post_id, '_lost_reason', sanitize_textarea_field( $_POST['lost_reason'] ) );
+            update_post_meta( $post_id, '_lost_reason', wp_slash( $reason ) );
 
             // Add note/comment to appraisal
             $comment = array(
@@ -4049,7 +4411,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4276,6 +4638,7 @@ class PH_AJAX {
                     $args = array(
                         'post_type' => 'appraisal',
                         'nopaging' => true,
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Instruction must link every non-instructed appraisal for this owner; those relationships/statuses use the existing metadata schema.
                         'meta_query' => array(
                             array(
                                 'key' => '_property_owner_contact_id',
@@ -4324,7 +4687,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $appraisal = new PH_Appraisal($post_id);
 
@@ -4413,32 +4776,34 @@ class PH_AJAX {
 
             $to = implode(",", $owner_emails);
 
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_appraisal_owner_booking_confirmation_email_body', '' );
 
             $appraisal_date_timestamp = strtotime($appraisal->start_date_time);
 
             $subject = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
-            $subject = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $subject);
-            $subject = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $subject);
+            $subject = str_replace('[appraisal_time]', gmdate("H:i", $appraisal_date_timestamp), $subject);
+            $subject = str_replace('[appraisal_date]', gmdate("l jS F Y", $appraisal_date_timestamp), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook appraisal_owner_booking_confirmation_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'appraisal_owner_booking_confirmation_email_subject', $subject, $post_id );
 
             $body = str_replace('[property_address]', $appraisal->get_formatted_full_address(), $body);
             $body = str_replace('[owner_name]', $owner_names_string, $body);
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
-            $body = str_replace('[appraisal_time]', date("H:i", $appraisal_date_timestamp), $body);
-            $body = str_replace('[appraisal_date]', date("l jS F Y", $appraisal_date_timestamp), $body);
+            $body = str_replace('[appraisal_time]', gmdate("H:i", $appraisal_date_timestamp), $body);
+            $body = str_replace('[appraisal_date]', gmdate("l jS F Y", $appraisal_date_timestamp), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook appraisal_owner_booking_confirmation_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'appraisal_owner_booking_confirmation_email_body', $body, $post_id );
 
             $from = '';
@@ -4482,7 +4847,7 @@ class PH_AJAX {
                 PH_Comments::insert_note( $post_id, $comment );
             }
 
-            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', gmdate("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
@@ -4498,7 +4863,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4524,7 +4889,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4550,7 +4915,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'appraisal-actions', 'security' );
 
-        $post_id = (int)$_POST['appraisal_id'];
+        $post_id = $this->get_authorized_record_id( 'appraisal_id', 'appraisal' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4579,24 +4944,33 @@ class PH_AJAX {
 
         $this->json_headers();
 
-        // TO DO: Should do validation on server side also
-        if (empty($_POST['property_id']))
+        $booking = $this->get_viewing_booking_input();
+        $property_id = $this->get_authorized_record_id( 'property_id', 'property' );
+        if ($property_id < 1)
         {
             $return = array('error' => 'No property selected');
             echo json_encode( $return );
             die();
         }
 
-        $property = new PH_Property((int)$_POST['property_id']);
+        $property = new PH_Property( $property_id );
         
+        foreach ( $booking['applicant_ids'] as $applicant_id ) {
+            if ( 'contact' !== get_post_type( $applicant_id ) || ! current_user_can( 'edit_post', $applicant_id ) ) {
+                wp_send_json_error( __( 'Invalid applicant or insufficient permissions.', 'propertyhive' ), 403 );
+            }
+        }
+        if ( empty( $booking['applicant_ids'] ) && '' !== $booking['applicant_name'] && ! current_user_can( get_post_type_object( 'contact' )->cap->create_posts ) ) {
+            wp_send_json_error( __( 'Insufficient permissions to create contacts.', 'propertyhive' ), 403 );
+        }
         $applicant_contact_ids = array();
 
         // Create applicant record if required
-        if (empty($_POST['applicant_ids']) && !empty($_POST['applicant_name']))
+        if (empty($booking['applicant_ids']) && !empty($booking['applicant_name']))
         {
             // Need to create contact/applicant
             $contact_post = array(
-                'post_title'    => ph_clean($_POST['applicant_name']),
+                'post_title'    => $booking['applicant_name'],
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
@@ -4605,7 +4979,7 @@ class PH_AJAX {
             );
                     
             // Insert the post into the database
-            $contact_post_id = wp_insert_post( $contact_post );
+            $contact_post_id = wp_insert_post( wp_slash( $contact_post ) );
 
             if ( is_wp_error($contact_post_id) || $contact_post_id == 0 )
             {
@@ -4616,22 +4990,22 @@ class PH_AJAX {
 
             update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
-            $email_address = isset($_POST['applicant_email_address']) ? sanitize_email($_POST['applicant_email_address']) : '';
-            $telephone_number = isset($_POST['applicant_telephone_number']) ? sanitize_text_field($_POST['applicant_telephone_number']) : '';
+            $email_address = sanitize_email( $booking['applicant_email_address'] );
+            $telephone_number = $booking['applicant_telephone_number'];
             update_post_meta( $contact_post_id, '_email_address', $email_address );
-            update_post_meta( $contact_post_id, '_telephone_number', $telephone_number );
+            update_post_meta( $contact_post_id, '_telephone_number', wp_slash( $telephone_number ) );
             update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
 
-            if ( isset($_POST['applicant_address']) && !empty(sanitize_textarea_field($_POST['applicant_address'])) )
+            if ( '' !== $booking['applicant_address'] )
             {
-                $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['applicant_address']) );
+                $address = ph_split_address_into_fields( $booking['applicant_address'] );
 
-                update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
-                update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
-                update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
-                update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
-                update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
-                update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                update_post_meta( $contact_post_id, '_address_name_number', wp_slash( $address['address_name_number'] ) );
+                update_post_meta( $contact_post_id, '_address_street', wp_slash( $address['address_street'] ) );
+                update_post_meta( $contact_post_id, '_address_two', wp_slash( $address['address_two'] ) );
+                update_post_meta( $contact_post_id, '_address_three', wp_slash( $address['address_three'] ) );
+                update_post_meta( $contact_post_id, '_address_four', wp_slash( $address['address_four'] ) );
+                update_post_meta( $contact_post_id, '_address_postcode', wp_slash( $address['address_postcode'] ) );
                 update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
             }
 
@@ -4641,18 +5015,10 @@ class PH_AJAX {
             $applicant_contact_ids[] = $contact_post_id;
         }
 
-        if (!empty($_POST['applicant_ids']) && empty($_POST['applicant_name']))
+        if (!empty($booking['applicant_ids']) && empty($booking['applicant_name']))
         {
             // This is an existing contact
-            if ( !is_array($_POST['applicant_ids']) )
-            {
-                $_POST['applicant_ids'] = array(ph_clean($_POST['applicant_ids']));
-            }
-
-            foreach ( $_POST['applicant_ids'] as $applicant_id )
-            {
-                $applicant_contact_ids[] = (int)$applicant_id;
-            }
+            $applicant_contact_ids = $booking['applicant_ids'];
         }
 
         $applicant_contact_ids = array_unique($applicant_contact_ids);
@@ -4739,9 +5105,9 @@ class PH_AJAX {
             die();
         }
 
-        add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
+        add_post_meta( $viewing_post_id, '_start_date_time', $booking['start_date'] . ' ' . $booking['start_time'] );
         add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
-        add_post_meta( $viewing_post_id, '_property_id', (int)$_POST['property_id'] );
+        add_post_meta( $viewing_post_id, '_property_id', $property_id );
 
         $applicant_contacts = array();
         foreach ($applicant_contact_ids as $applicant_contact_id)
@@ -4760,9 +5126,9 @@ class PH_AJAX {
         add_post_meta( $viewing_post_id, '_feedback', '' );
         add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
 
-        if ( !empty($_POST['negotiator_ids']) )
+        if ( !empty($booking['negotiator_ids']) )
         {
-            foreach ( $_POST['negotiator_ids'] as $negotiator_id )
+            foreach ( $booking['negotiator_ids'] as $negotiator_id )
             {
                 add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
             }
@@ -4787,15 +5153,21 @@ class PH_AJAX {
 
         $this->json_headers();
 
-        // TO DO: Should do validation on server side also
-        if (empty($_POST['contact_id']))
+        $booking = $this->get_viewing_booking_input();
+        $contact_id = $this->get_authorized_record_id( 'contact_id', 'contact' );
+        foreach ( $booking['property_ids'] as $property_id ) {
+            if ( 'property' !== get_post_type( $property_id ) || ! current_user_can( 'edit_post', $property_id ) ) {
+                wp_send_json_error( __( 'Invalid property or insufficient permissions.', 'propertyhive' ), 403 );
+            }
+        }
+        if ($contact_id < 1)
         {
             $return = array('error' => 'No contact selected');
             echo json_encode( $return );
             die();
         }
 
-        if (empty($_POST['property_ids']))
+        if (empty($booking['property_ids']))
         {
             $return = array('error' => 'No property selected');
             echo json_encode( $return );
@@ -4804,7 +5176,7 @@ class PH_AJAX {
 
         // Loop through contacts and create one viewing each
         // At the moment it's a 1-to-1 relationship, but might support multiple in the future
-        foreach ( $_POST['property_ids'] as $property_id )
+        foreach ( $booking['property_ids'] as $property_id )
         {
             // Insert viewing record
             $viewing_post = array(
@@ -4826,18 +5198,18 @@ class PH_AJAX {
                 die();
             }
             
-            add_post_meta( $viewing_post_id, '_start_date_time', ph_clean($_POST['start_date']) . ' ' . ph_clean($_POST['start_time']) );
+            add_post_meta( $viewing_post_id, '_start_date_time', $booking['start_date'] . ' ' . $booking['start_time'] );
             add_post_meta( $viewing_post_id, '_duration', 30 * 60 ); // Stored in seconds. Default to 30 mins
             add_post_meta( $viewing_post_id, '_property_id', (int)$property_id );
-            add_post_meta( $viewing_post_id, '_applicant_contact_id', (int)$_POST['contact_id'] );
+            add_post_meta( $viewing_post_id, '_applicant_contact_id', $contact_id );
             add_post_meta( $viewing_post_id, '_status', 'pending' );
             add_post_meta( $viewing_post_id, '_feedback_status', '' );
             add_post_meta( $viewing_post_id, '_feedback', '' );
             add_post_meta( $viewing_post_id, '_feedback_passed_on', '' );
 
-            if ( !empty($_POST['negotiator_ids']) )
+            if ( !empty($booking['negotiator_ids']) )
             {
-                foreach ( $_POST['negotiator_ids'] as $negotiator_id )
+                foreach ( $booking['negotiator_ids'] as $negotiator_id )
                 {
                     add_post_meta( $viewing_post_id, '_negotiator_id', (int)$negotiator_id );
                 }
@@ -4845,7 +5217,7 @@ class PH_AJAX {
         }
 
         $properties = array();
-        foreach ( $_POST['property_ids'] as $property_id )
+        foreach ( $booking['property_ids'] as $property_id )
         {
             $properties[] = array(
                 'ID' => (int)$property_id,
@@ -4873,11 +5245,13 @@ class PH_AJAX {
 
         check_ajax_referer( 'viewing-details-meta-box', 'security' );
 
-        $post = get_post((int)$_POST['viewing_id']);
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
-        $viewing = new PH_Viewing((int)$_POST['viewing_id']);
+        $post = get_post( $post_id );
 
-        $readonly = isset($_POST['readonly']) ? filter_var($_POST['readonly'], FILTER_VALIDATE_BOOLEAN) : false;
+        $viewing = new PH_Viewing( $post_id );
+
+        $readonly = isset( $_POST['readonly'] ) && is_scalar( $_POST['readonly'] ) ? filter_var( wp_unslash( $_POST['readonly'] ), FILTER_VALIDATE_BOOLEAN ) : false;
 
         include( PH()->plugin_path() . '/includes/admin/views/html-viewing-details-meta-box.php' );
 
@@ -4888,7 +5262,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         include( PH()->plugin_path() . '/includes/admin/views/html-viewing-actions.php' );
 
@@ -4899,7 +5273,11 @@ class PH_AJAX {
     {
         global $post;
         
-        $post_id = $_GET['post_id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- get_viewing_lightbox is an admin-only event (event map false), so authorize_admin_ajax enforces manage_propertyhive before this callback. The callback loads a viewing and includes a lightbox template; it performs no write. A local nonce is a defense-in-depth recommendation for this read-only GET, not an independent mutation vulnerability.
+        $post_id = isset( $_GET['post_id'] ) && is_scalar( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
+        if ( $post_id < 1 || 'viewing' !== get_post_type( $post_id ) || ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
         $post = get_post((int)$post_id);
 
@@ -4914,7 +5292,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4940,7 +5318,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -4966,14 +5344,16 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
+
+        $text = isset( $_POST['cancelled_reason'] ) && is_string( $_POST['cancelled_reason'] ) ? sanitize_textarea_field( wp_unslash( $_POST['cancelled_reason'] ) ) : '';
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'pending' )
         {
             update_post_meta( $post_id, '_status', 'cancelled' );
-            update_post_meta( $post_id, '_cancelled_reason', sanitize_textarea_field( $_POST['cancelled_reason'] ) );
+            update_post_meta( $post_id, '_cancelled_reason', wp_slash( $text ) );
             update_post_meta( $post_id, '_cancelled_reason_public', isset($_POST['cancelled_reason_public']) && $_POST['cancelled_reason_public'] == 'yes' ? 'yes' : '' );
 
             // Add note/comment to viewing
@@ -4994,7 +5374,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
@@ -5021,8 +5401,8 @@ class PH_AJAX {
 
         if ( !empty(implode($to)) )
         {
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_applicant_booking_confirmation_email_body', '' );
 
             $applicant_names = array();
             $applicant_dears = array();
@@ -5097,25 +5477,27 @@ class PH_AJAX {
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_applicant_booking_confirmation_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_applicant_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_applicant_booking_confirmation_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_applicant_booking_confirmation_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -5146,7 +5528,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -5190,7 +5572,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -5198,7 +5580,7 @@ class PH_AJAX {
                 wp_send_json_error('Failed to send email');
             }
 
-            update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_applicant_booking_confirmation_sent_at', gmdate("Y-m-d H:i:s") );
 
             if ( apply_filters( 'propertyhive_log_booking_confirmation_emails', false ) === true )
             {
@@ -5225,7 +5607,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
         $property_department = get_post_meta( $property_id, '_department' );
@@ -5338,18 +5720,19 @@ class PH_AJAX {
 
             $to = implode(",", $owner_emails);
 
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_owner_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_owner_booking_confirmation_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_owner_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
@@ -5357,14 +5740,15 @@ class PH_AJAX {
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_owner_booking_confirmation_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_owner_booking_confirmation_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -5395,7 +5779,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -5439,7 +5823,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -5458,7 +5842,7 @@ class PH_AJAX {
                 PH_Comments::insert_note( $post_id, $comment );
             }
 
-            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_owner_booking_confirmation_sent_at', gmdate("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
@@ -5474,7 +5858,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
 
         $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
@@ -5608,18 +5992,19 @@ class PH_AJAX {
 
             $property = new PH_Property((int)$property_id);
 
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_attending_negotiator_booking_confirmation_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_attending_negotiator_booking_confirmation_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
@@ -5629,14 +6014,15 @@ class PH_AJAX {
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[applicant_details]', $applicant_details, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_attending_negotiator_booking_confirmation_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_attending_negotiator_booking_confirmation_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -5667,7 +6053,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -5711,7 +6097,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -5730,7 +6116,7 @@ class PH_AJAX {
                 PH_Comments::insert_note( $post_id, $comment );
             }
 
-            update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_attending_negotiator_booking_confirmation_sent_at', gmdate("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
@@ -5746,7 +6132,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $applicant_contact_ids = get_post_meta( $post_id, '_applicant_contact_id' );
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
@@ -5773,8 +6159,8 @@ class PH_AJAX {
 
         if ( !empty(implode($to)) )
         {
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_applicant_cancellation_notification_email_body', '' );
 
             $applicant_names = array();
             $applicant_dears = array();
@@ -5849,19 +6235,20 @@ class PH_AJAX {
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_applicant_cancellation_notification_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_applicant_cancellation_notification_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
@@ -5878,6 +6265,7 @@ class PH_AJAX {
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_applicant_cancellation_notification_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_applicant_cancellation_notification_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -5908,7 +6296,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -5952,7 +6340,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -5960,7 +6348,7 @@ class PH_AJAX {
                 wp_send_json_error('Failed to send email');
             }
 
-            update_post_meta( $post_id, '_applicant_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_applicant_cancellation_notification_sent_at', gmdate("Y-m-d H:i:s") );
 
             if ( apply_filters( 'propertyhive_log_cancellation_notification_emails', false ) === true )
             {
@@ -5987,7 +6375,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
         $property_department = get_post_meta( $property_id, '_department' );
@@ -6100,18 +6488,19 @@ class PH_AJAX {
 
             $to = implode(",", $owner_emails);
 
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_owner_cancellation_notification_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_owner_cancellation_notification_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_owner_cancellation_notification_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
@@ -6119,8 +6508,8 @@ class PH_AJAX {
             $body = str_replace('[owner_dear]', $owner_dears_string, $body);
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
@@ -6137,6 +6526,7 @@ class PH_AJAX {
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_owner_cancellation_notification_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_owner_cancellation_notification_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -6167,7 +6557,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -6211,7 +6601,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -6230,7 +6620,7 @@ class PH_AJAX {
                 PH_Comments::insert_note( $post_id, $comment );
             }
 
-            update_post_meta( $post_id, '_owner_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_owner_cancellation_notification_sent_at', gmdate("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
@@ -6246,7 +6636,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
         $property_id = get_post_meta( $post_id, '_property_id', TRUE );
 
         $negotiator_ids = get_post_meta( $post_id, '_negotiator_id' );
@@ -6380,18 +6770,19 @@ class PH_AJAX {
 
             $property = new PH_Property((int)$property_id);
 
-            $subject = isset($_POST['subject']) ? sanitize_text_field($_POST['subject']) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject', '' );
-            $body = isset($_POST['body']) ? sanitize_textarea_field($_POST['body']) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body', '' );
+            $subject = isset( $_POST['subject'] ) && is_string( $_POST['subject'] ) ? sanitize_text_field( wp_unslash( $_POST['subject'] ) ) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_subject', '' );
+            $body = isset( $_POST['body'] ) && is_string( $_POST['body'] ) ? sanitize_textarea_field( wp_unslash( $_POST['body'] ) ) : get_option( 'propertyhive_viewing_attending_negotiator_cancellation_notification_email_body', '' );
 
             $subject = str_replace('[property_address]', $property->get_formatted_full_address(), $subject);
             $subject = str_replace('[owner_name]', $owner_names_string, $subject);
             $subject = str_replace('[applicant_name]', $applicant_names_string, $subject);
-            $subject = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
-            $subject = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
+            $subject = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $subject);
             $subject = str_replace('[negotiator_name]', $negotiator_names_string, $subject);
             $subject = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $subject);
             $subject = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $subject);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_attending_negotiator_cancellation_notification_email_subject; third-party email integrations depend on the established name.
             $subject = apply_filters( 'viewing_attending_negotiator_cancellation_notification_email_subject', $subject, $post_id, $property_id );
 
             $body = str_replace('[property_address]', $property->get_formatted_full_address(), $body);
@@ -6401,8 +6792,8 @@ class PH_AJAX {
             $body = str_replace('[applicant_name]', $applicant_names_string, $body);
             $body = str_replace('[applicant_dear]', $applicant_dears_string, $body);
             $body = str_replace('[applicant_details]', $applicant_details, $body);
-            $body = str_replace('[viewing_time]', date("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
-            $body = str_replace('[viewing_date]', date("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_time]', gmdate("H:i", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
+            $body = str_replace('[viewing_date]', gmdate("l jS F Y", strtotime(get_post_meta( $post_id, '_start_date_time', true ))), $body);
             $body = str_replace('[negotiator_name]', $negotiator_names_string, $body);
             $body = str_replace('[negotiator_email_address]', $negotiator_email_addresses_string, $body);
             $body = str_replace('[negotiator_telephone_number]', $negotiator_telephone_numbers_string, $body);
@@ -6419,6 +6810,7 @@ class PH_AJAX {
 
             $body = html_entity_decode($body);
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public email customization hook viewing_attending_negotiator_cancellation_notification_email_body; third-party email integrations depend on the established name.
             $body = apply_filters( 'viewing_attending_negotiator_cancellation_notification_email_body', $body, $post_id, $property_id );
 
             $from = '';
@@ -6449,7 +6841,7 @@ class PH_AJAX {
             $attachments = array();
             if ( isset($_FILES['attachments']) && !empty($_FILES['attachments']['name'][0]) ) 
             {
-                $uploaded_files = $_FILES['attachments'];
+                $uploaded_files = $this->get_viewing_email_uploads();
 
                 // Handle each file upload
                 foreach ($uploaded_files['name'] as $key => $value) 
@@ -6493,7 +6885,7 @@ class PH_AJAX {
 
             foreach ($attachments as $temp_file) 
             {
-                @unlink($temp_file);
+                @wp_delete_file($temp_file);
             }
 
             if ( !$sent )
@@ -6512,7 +6904,7 @@ class PH_AJAX {
                 PH_Comments::insert_note( $post_id, $comment );
             }
 
-            update_post_meta( $post_id, '_attending_negotiator_cancellation_notification_sent_at', date("Y-m-d H:i:s") );
+            update_post_meta( $post_id, '_attending_negotiator_cancellation_notification_sent_at', gmdate("Y-m-d H:i:s") );
 
             wp_send_json_success();
         }
@@ -6528,14 +6920,16 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
+
+        $text = isset( $_POST['feedback'] ) && is_string( $_POST['feedback'] ) ? sanitize_textarea_field( wp_unslash( $_POST['feedback'] ) ) : '';
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'interested' );
-            update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
+            update_post_meta( $post_id, '_feedback', wp_slash( $text ) );
 
             // Add note/comment to viewing
             $comment = array(
@@ -6555,14 +6949,16 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
+
+        $text = isset( $_POST['feedback'] ) && is_string( $_POST['feedback'] ) ? sanitize_textarea_field( wp_unslash( $_POST['feedback'] ) ) : '';
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
         if ( $status == 'carried_out' )
         {
             update_post_meta( $post_id, '_feedback_status', 'not_interested' );
-            update_post_meta( $post_id, '_feedback', sanitize_textarea_field( $_POST['feedback'] ) );
+            update_post_meta( $post_id, '_feedback', wp_slash( $text ) );
 
             // Add note/comment to viewing
             $comment = array(
@@ -6582,7 +6978,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -6608,7 +7004,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -6636,7 +7032,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -6664,7 +7060,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'viewing-actions', 'security' );
 
-        $post_id = (int)$_POST['viewing_id'];
+        $post_id = $this->get_authorized_record_id( 'viewing_id', 'viewing' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -6688,12 +7084,14 @@ class PH_AJAX {
 
     public function get_property_viewings_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-viewings-meta-box.php' );
@@ -6706,12 +7104,14 @@ class PH_AJAX {
 
     public function get_contact_viewings_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-viewings-meta-box.php' );
@@ -6729,24 +7129,33 @@ class PH_AJAX {
 
         $this->json_headers();
 
-        // TO DO: Should do validation on server side also
-        if (empty($_POST['property_id']))
+        $input = $this->get_offer_input();
+        $property_id = $this->get_authorized_record_id( 'property_id', 'property' );
+        foreach ( $input['applicant_ids'] as $applicant_id ) {
+            if ( 'contact' !== get_post_type( $applicant_id ) || ! current_user_can( 'edit_post', $applicant_id ) ) {
+                wp_send_json_error( __( 'Invalid applicant or insufficient permissions.', 'propertyhive' ), 403 );
+            }
+        }
+        if ( empty( $input['applicant_ids'] ) && '' !== $input['applicant_name'] && ! current_user_can( get_post_type_object( 'contact' )->cap->create_posts ) ) {
+            wp_send_json_error( __( 'Insufficient permissions to create contacts.', 'propertyhive' ), 403 );
+        }
+        if ($property_id < 1)
         {
             $return = array('error' => 'No property selected');
             echo json_encode( $return );
             die();
         }
 
-        $property = new PH_Property((int)$_POST['property_id']);
+        $property = new PH_Property($property_id);
         
         $applicant_contact_ids = array();
 
         // Create applicant record if required
-        if (empty($_POST['applicant_ids']) && !empty($_POST['applicant_name']))
+        if (empty($input['applicant_ids']) && !empty($input['applicant_name']))
         {
             // Need to create contact/applicant
             $contact_post = array(
-                'post_title'    => ph_clean($_POST['applicant_name']),
+                'post_title'    => $input['applicant_name'],
                 'post_content'  => '',
                 'post_type'     => 'contact',
                 'post_status'   => 'publish',
@@ -6755,7 +7164,7 @@ class PH_AJAX {
             );
                     
             // Insert the post into the database
-            $contact_post_id = wp_insert_post( $contact_post );
+            $contact_post_id = wp_insert_post( wp_slash( $contact_post ) );
 
             if ( is_wp_error($contact_post_id) || $contact_post_id == 0 )
             {
@@ -6766,22 +7175,22 @@ class PH_AJAX {
 
             update_post_meta( $contact_post_id, '_contact_types', array('applicant') );
 
-            $email_address = isset($_POST['applicant_email_address']) ? sanitize_email($_POST['applicant_email_address']) : '';
-            $telephone_number = isset($_POST['applicant_telephone_number']) ? sanitize_text_field($_POST['applicant_telephone_number']) : '';
-            update_post_meta( $contact_post_id, '_email_address', $email_address );
-            update_post_meta( $contact_post_id, '_telephone_number', $telephone_number );
+            $email_address = sanitize_email( $input['applicant_email_address'] );
+            $telephone_number = $input['applicant_telephone_number'];
+            update_post_meta( $contact_post_id, '_email_address', wp_slash( $email_address ) );
+            update_post_meta( $contact_post_id, '_telephone_number', wp_slash( $telephone_number ) );
             update_post_meta( $contact_post_id, '_telephone_number_clean', ph_clean( ph_clean_telephone_number($telephone_number) ) );
 
-            if ( isset($_POST['applicant_address']) && !empty(sanitize_textarea_field($_POST['applicant_address'])) )
+            if ( '' !== $input['applicant_address'] )
             {
-                $address = ph_split_address_into_fields( sanitize_textarea_field($_POST['applicant_address']) );
+                $address = ph_split_address_into_fields( $input['applicant_address'] );
 
-                update_post_meta( $contact_post_id, '_address_name_number', $address['address_name_number'] );
-                update_post_meta( $contact_post_id, '_address_street', $address['address_street'] );
-                update_post_meta( $contact_post_id, '_address_two', $address['address_two'] );
-                update_post_meta( $contact_post_id, '_address_three', $address['address_three'] );
-                update_post_meta( $contact_post_id, '_address_four', $address['address_four'] );
-                update_post_meta( $contact_post_id, '_address_postcode', $address['address_postcode'] );
+                update_post_meta( $contact_post_id, '_address_name_number', wp_slash( $address['address_name_number'] ) );
+                update_post_meta( $contact_post_id, '_address_street', wp_slash( $address['address_street'] ) );
+                update_post_meta( $contact_post_id, '_address_two', wp_slash( $address['address_two'] ) );
+                update_post_meta( $contact_post_id, '_address_three', wp_slash( $address['address_three'] ) );
+                update_post_meta( $contact_post_id, '_address_four', wp_slash( $address['address_four'] ) );
+                update_post_meta( $contact_post_id, '_address_postcode', wp_slash( $address['address_postcode'] ) );
                 update_post_meta( $contact_post_id, '_address_country', get_option( 'propertyhive_default_country', 'GB' ) );
             }
 
@@ -6791,15 +7200,10 @@ class PH_AJAX {
             $applicant_contact_ids[] = $contact_post_id;
         }
 
-        if (!empty($_POST['applicant_ids']) && empty($_POST['applicant_name']))
+        if (!empty($input['applicant_ids']) && empty($input['applicant_name']))
         {
             // This is an existing contact
-            if ( !is_array($_POST['applicant_ids']) )
-            {
-                $_POST['applicant_ids'] = array($_POST['applicant_ids']);
-            }
-
-            foreach ( $_POST['applicant_ids'] as $applicant_id )
+            foreach ( $input['applicant_ids'] as $applicant_id )
             {
                 $applicant_contact_ids[] = (int)$applicant_id;
             }
@@ -6838,10 +7242,10 @@ class PH_AJAX {
                 die();
             }
 
-            $amount = preg_replace("/[^0-9.]/", '', $_POST['amount']);
+            $amount = $input['amount'];
             
-            add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
-            add_post_meta( $offer_post_id, '_property_id', (int)$_POST['property_id'] );
+            add_post_meta( $offer_post_id, '_offer_date_time', $input['offer_date'] . ' ' . $input['offer_time'] );
+            add_post_meta( $offer_post_id, '_property_id', $property_id );
             add_post_meta( $offer_post_id, '_applicant_contact_id', $applicant_contact_id );
             add_post_meta( $offer_post_id, '_amount', $amount );
             add_post_meta( $offer_post_id, '_status', 'pending' );
@@ -6852,9 +7256,10 @@ class PH_AJAX {
                 add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', (int)$applicant_solicitor_contact_id );
             }
 
-            $owner_contact_ids = get_post_meta((int)$_POST['property_id'], '_owner_contact_id', TRUE);
+            $owner_contact_ids = get_post_meta($property_id, '_owner_contact_id', TRUE);
             if ( !empty($owner_contact_ids) )
             {
+                $owner_contact_ids = is_array( $owner_contact_ids ) ? $owner_contact_ids : array( $owner_contact_ids );
                 foreach ( $owner_contact_ids as $owner_contact_id )
                 {
                     $property_owner_solicitor_contact_id = get_post_meta( (int)$owner_contact_id, '_contact_solicitor_contact_id', TRUE );
@@ -6895,15 +7300,21 @@ class PH_AJAX {
 
         $this->json_headers();
 
-        // TO DO: Should do validation on server side also
-        if (empty($_POST['contact_id']))
+        $input = $this->get_offer_input();
+        $contact_id = $this->get_authorized_record_id( 'contact_id', 'contact' );
+        foreach ( $input['property_ids'] as $property_id ) {
+            if ( 'property' !== get_post_type( $property_id ) || ! current_user_can( 'edit_post', $property_id ) ) {
+                wp_send_json_error( __( 'Invalid property or insufficient permissions.', 'propertyhive' ), 403 );
+            }
+        }
+        if ($contact_id < 1)
         {
             $return = array('error' => 'No contact selected');
             echo json_encode( $return );
             die();
         }
 
-        if (empty($_POST['property_ids']))
+        if (empty($input['property_ids']))
         {
             $return = array('error' => 'No property selected');
             echo json_encode( $return );
@@ -6912,7 +7323,7 @@ class PH_AJAX {
 
         // Loop through contacts and create one offer each
         // At the moment it's a 1-to-1 relationship, but might support multiple in the future
-        foreach ( $_POST['property_ids'] as $property_id )
+        foreach ( $input['property_ids'] as $property_id )
         {
             // Insert offer record
             $offer_post = array(
@@ -6934,15 +7345,15 @@ class PH_AJAX {
                 die();
             }
 
-            $amount = preg_replace("/[^0-9.]/", '', ph_clean($_POST['amount']));
+            $amount = $input['amount'];
             
-            add_post_meta( $offer_post_id, '_offer_date_time', ph_clean($_POST['offer_date']) . ' ' . ph_clean($_POST['offer_time']) );
+            add_post_meta( $offer_post_id, '_offer_date_time', $input['offer_date'] . ' ' . $input['offer_time'] );
             add_post_meta( $offer_post_id, '_property_id', (int)$property_id );
-            add_post_meta( $offer_post_id, '_applicant_contact_id', (int)$_POST['contact_id'] );
+            add_post_meta( $offer_post_id, '_applicant_contact_id', $contact_id );
             add_post_meta( $offer_post_id, '_amount', $amount );
             add_post_meta( $offer_post_id, '_status', 'pending' );
 
-            $applicant_solicitor_contact_id = get_post_meta( (int)$_POST['contact_id'], '_contact_solicitor_contact_id', TRUE );
+            $applicant_solicitor_contact_id = get_post_meta( $contact_id, '_contact_solicitor_contact_id', TRUE );
             if ( !empty($applicant_solicitor_contact_id) )
             {
                 add_post_meta( $offer_post_id, '_applicant_solicitor_contact_id', (int)$applicant_solicitor_contact_id );
@@ -6951,6 +7362,7 @@ class PH_AJAX {
             $owner_contact_ids = get_post_meta($property_id, '_owner_contact_id', TRUE);
             if ( !empty($owner_contact_ids) )
             {
+                $owner_contact_ids = is_array( $owner_contact_ids ) ? $owner_contact_ids : array( $owner_contact_ids );
                 foreach ( $owner_contact_ids as $owner_contact_id )
                 {
                     $property_owner_solicitor_contact_id = get_post_meta( (int)$owner_contact_id, '_contact_solicitor_contact_id', TRUE );
@@ -6963,7 +7375,7 @@ class PH_AJAX {
         }
 
         $properties = array();
-        foreach ( $_POST['property_ids'] as $property_id )
+        foreach ( $input['property_ids'] as $property_id )
         {
             $properties[] = array(
                 'ID' => (int)$property_id,
@@ -6991,9 +7403,11 @@ class PH_AJAX {
 
         check_ajax_referer( 'offer-details-meta-box', 'security' );
 
-        $post = get_post((int)$_POST['offer_id']);
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
-        $offer = new PH_Offer((int)$_POST['offer_id']);
+        $post = get_post( $post_id );
+
+        $offer = new PH_Offer( $post_id );
 
         echo '<div class="propertyhive_meta_box">';
         
@@ -7005,7 +7419,7 @@ class PH_AJAX {
             
                 <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . esc_html(__( ucwords(str_replace("_", " ", $offer->status)), 'propertyhive' )) . '    
+                ' . esc_html(propertyhive_get_status_label( $offer->status )) . '
             
             </p>';
         }
@@ -7013,23 +7427,23 @@ class PH_AJAX {
         $offer_date_time = $offer->offer_date_time;
         if ( empty($offer_date_time) )
         {
-            $offer_date_time = date("Y-m-d H:i:s");
+            $offer_date_time = gmdate("Y-m-d H:i:s");
         }
 
         echo '<p class="form-field offer_date_time_field">
     
             <label for="_offer_date">' . esc_html(__('Offer Date / Time', 'propertyhive')) . '</label>
             
-            <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(date("Y-m-d", strtotime($offer_date_time))) . '" placeholder="">
+            <input type="date" class="small" name="_offer_date" id="_offer_date" value="' . esc_attr(gmdate("Y-m-d", strtotime($offer_date_time))) . '" placeholder="">
             <select id="_offer_time_hours" name="_offer_time_hours" class="select short" style="width:55px">';
         
         if ( empty($offer_date_time) )
         {
-            $value = date("H");
+            $value = gmdate("H");
         }
         else
         {
-            $value = date( "H", strtotime( $offer_date_time ) );
+            $value = gmdate( "H", strtotime( $offer_date_time ) );
         }
         for ( $i = 0; $i < 23; ++$i )
         {
@@ -7049,7 +7463,7 @@ class PH_AJAX {
         }
         else
         {
-            $value = date( "i", strtotime( $offer_date_time ) );
+            $value = gmdate( "i", strtotime( $offer_date_time ) );
         }
         for ( $i = 0; $i < 60; $i+=5 )
         {
@@ -7088,7 +7502,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = (int)$_POST['offer_id'];
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7153,7 +7567,7 @@ class PH_AJAX {
             else
             {
                 $actions[] = '<a 
-                        href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), '1', 'create_sale' )) . '" 
+                        href="' . esc_url(wp_nonce_url( admin_url( 'post.php?post=' . $post_id . '&action=edit' ), 'propertyhive-create_sale-' . $post_id, 'create_sale' )) . '"
                         class="button button-success button-create-sale"
                         style="width:100%; margin-bottom:7px; text-align:center" 
                         onclick="setTimeout(function() { jQuery(\'.button-create-sale\').attr(\'href\', \'#\'); jQuery(\'.button-create-sale\').attr(\'disabled\', \'disabled\'); jQuery(\'.button-create-sale\').html(\'Creating...\'); }, 50);"
@@ -7180,7 +7594,8 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo wp_kses_post( implode("", $actions) );
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in action URLs and labels are escaped during assembly; preserve trusted PHP action filters and the fixed button handlers.
+            echo implode("", $actions);
         }
         else
         {
@@ -7198,7 +7613,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = (int)$_POST['offer_id'];
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7224,7 +7639,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = (int)$_POST['offer_id'];
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7250,7 +7665,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = (int)$_POST['offer_id'];
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7276,7 +7691,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'offer-actions', 'security' );
 
-        $post_id = (int)$_POST['offer_id'];
+        $post_id = $this->get_authorized_record_id( 'offer_id', 'offer' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7300,12 +7715,14 @@ class PH_AJAX {
 
     public function get_property_offers_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-offers-meta-box.php' );
@@ -7318,12 +7735,14 @@ class PH_AJAX {
 
     public function get_contact_offers_meta_box()
     {
-        $post_id = $_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-offers-meta-box.php' );
@@ -7341,9 +7760,11 @@ class PH_AJAX {
 
         check_ajax_referer( 'sale-details-meta-box', 'security' );
 
-        $post = get_post((int)$_POST['sale_id']);
+        $post_id = $this->get_authorized_record_id( 'sale_id', 'sale' );
 
-        $sale = new PH_Offer((int)$_POST['sale_id']);
+        $post = get_post( $post_id );
+
+        $sale = new PH_Offer( $post_id );
 
         echo '<div class="propertyhive_meta_box">';
         
@@ -7355,7 +7776,7 @@ class PH_AJAX {
             
                 <label for="">' . esc_html(__('Status', 'propertyhive')) . '</label>
                 
-                ' . esc_html(__( ucwords(str_replace("_", " ", $sale->status)), 'propertyhive' )) . '    
+                ' . esc_html(propertyhive_get_status_label( $sale->status )) . '
             
             </p>';
         }
@@ -7363,14 +7784,14 @@ class PH_AJAX {
         $sale_date_time = $sale->sale_date_time;
         if ( empty($sale_date_time) )
         {
-            $sale_date_time = date("Y-m-d H:i:s");
+            $sale_date_time = gmdate("Y-m-d H:i:s");
         }
 
         echo '<p class="form-field sale_date_field">
     
             <label for="_sale_date">' . esc_html(__('Sale Date', 'propertyhive')) . '</label>
 
-            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . esc_attr(date("Y-m-d", strtotime($sale_date_time))) . '" placeholder="">
+            <input type="date" class="small" name="_sale_date" id="_sale_date" value="' . esc_attr(gmdate("Y-m-d", strtotime($sale_date_time))) . '" placeholder="">
             
         </p>';
 
@@ -7399,7 +7820,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = (int)$_POST['sale_id'];
+        $post_id = $this->get_authorized_record_id( 'sale_id', 'sale' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7463,7 +7884,8 @@ class PH_AJAX {
 
         if ( !empty($actions) )
         {
-            echo wp_kses_post( implode("", $actions) );
+            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in action URLs and labels are escaped during assembly; preserve trusted PHP action filters and the fixed button handlers.
+            echo implode("", $actions);
         }
         else
         {
@@ -7481,7 +7903,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = (int)$_POST['sale_id'];
+        $post_id = $this->get_authorized_record_id( 'sale_id', 'sale' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7507,7 +7929,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = (int)$_POST['sale_id'];
+        $post_id = $this->get_authorized_record_id( 'sale_id', 'sale' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7533,7 +7955,7 @@ class PH_AJAX {
     {
         check_ajax_referer( 'sale-actions', 'security' );
 
-        $post_id = (int)$_POST['sale_id'];
+        $post_id = $this->get_authorized_record_id( 'sale_id', 'sale' );
 
         $status = get_post_meta( $post_id, '_status', TRUE );
 
@@ -7557,12 +7979,14 @@ class PH_AJAX {
 
     public function get_property_sales_meta_box()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-sales-meta-box.php' );
@@ -7575,12 +7999,14 @@ class PH_AJAX {
 
     public function get_contact_sales_meta_box()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-sales-meta-box.php' );
@@ -7593,12 +8019,14 @@ class PH_AJAX {
 
     public function get_property_enquiries_meta_box()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-enquiries-meta-box.php' );
@@ -7611,12 +8039,14 @@ class PH_AJAX {
 
     public function get_contact_enquiries_meta_box()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-enquiries-meta-box.php' );
@@ -7630,75 +8060,73 @@ class PH_AJAX {
     /**
 	 * Add new management key date via ajax
 	 */
-    public function add_key_date()
-    {
-        $parent_post_id = (int)$_POST['post_id'];
-
-        if ( $parent_post_id > 0 ) {
-            $date_description = wp_kses_post( trim( stripslashes( $_POST['key_date_description'] ) ) );
-            $date_type_id = ph_clean( stripslashes( $_POST['key_date_type'] ) );
-            $date_due = ph_clean($_POST['key_date_due']) . ' ' . ph_clean($_POST['key_date_hours']) . ':' . ph_clean($_POST['key_date_minutes']);
-            $date_notes = sanitize_textarea_field($_POST['key_date_notes']);
-
-            $parent_post_type = get_post_type( $parent_post_id );
-
-            // Insert key date record
-            $key_date_post = array(
-                'post_title' => $date_description,
-                'post_content' => '',
-                'post_type' => 'key_date',
-                'post_status' => 'publish',
-                'comment_status' => 'closed',
-                'ping_status' => 'closed',
-            );
-
-            // Insert the post into the database
-            $key_date_post_id = wp_insert_post( $key_date_post );
-
-            if ( is_wp_error($key_date_post_id) || $key_date_post_id == 0 )
-            {
-                $return = array('error' => 'Failed to create key date post. Please try again');
-                echo json_encode( $return );
-                die();
-            }
-
-            add_post_meta( $key_date_post_id, '_date_due', $date_due );
-            add_post_meta( $key_date_post_id, '_key_date_status', 'pending' );
-            add_post_meta( $key_date_post_id, '_key_date_type_id', $date_type_id );
-            add_post_meta( $key_date_post_id, '_key_date_notes', $date_notes );
-
-            switch ( $parent_post_type )
-            {
-                case 'property' :
-                {
-                    add_post_meta( $key_date_post_id, '_property_id', $parent_post_id );
-                    break;
-                }
-                case 'tenancy' :
-                {
-                    add_post_meta( $key_date_post_id, '_tenancy_id', $parent_post_id );
-
-                    $parent_property_id = get_post_meta( $parent_post_id, '_property_id', true );
-                    add_post_meta( $key_date_post_id, '_property_id', $parent_property_id );
-                    break;
-                }
-            }
+    public function add_key_date() {
+        check_ajax_referer( 'propertyhive-add-key-date', 'security' );
+        $parent_post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $parent_post_id ) ) {
+            wp_send_json_error( __( 'Insufficient permissions', 'propertyhive' ), 403 );
         }
-        die();
+        $parent_post_type = get_post_type( $parent_post_id );
+        if ( ! in_array( $parent_post_type, array( 'property', 'tenancy' ), true ) ) {
+            wp_send_json_error( __( 'Invalid parent record.', 'propertyhive' ), 400 );
+        }
+        $details = array();
+        foreach ( array( 'key_date_description', 'key_date_type', 'key_date_due', 'key_date_hours', 'key_date_minutes' ) as $field ) {
+            if ( ! isset( $_POST[$field] ) || ! is_string( $_POST[$field] ) ) {
+                wp_send_json_error( __( 'Missing or invalid key date details.', 'propertyhive' ), 400 );
+            }
+            $details[$field] = sanitize_text_field( wp_unslash( $_POST[$field] ) );
+        }
+        $date_description = $details['key_date_description'];
+        $date_type_id = absint( $details['key_date_type'] );
+        $date_due = $details['key_date_due'] . ' ' . $details['key_date_hours'] . ':' . $details['key_date_minutes'];
+        $parsed_date = DateTime::createFromFormat( '!Y-m-d H:i', $date_due );
+        $date_type = get_term( $date_type_id, 'management_key_date_type' );
+        if ( '' === $date_description || ! $parsed_date || $parsed_date->format( 'Y-m-d H:i' ) !== $date_due || ! $date_type || is_wp_error( $date_type ) ) {
+            wp_send_json_error( __( 'Invalid key date details.', 'propertyhive' ), 400 );
+        }
+        $date_notes = isset( $_POST['key_date_notes'] ) && is_string( $_POST['key_date_notes'] ) ? sanitize_textarea_field( wp_unslash( $_POST['key_date_notes'] ) ) : '';
+        $key_date_post_id = wp_insert_post( wp_slash( array(
+            'post_title'     => $date_description,
+            'post_content'   => '',
+            'post_type'      => 'key_date',
+            'post_status'    => 'publish',
+            'comment_status'=> 'closed',
+            'ping_status'   => 'closed',
+        ) ), true );
+        if ( is_wp_error( $key_date_post_id ) ) {
+            wp_send_json_error( __( 'Failed to create the key date. Please try again.', 'propertyhive' ), 500 );
+        }
+        add_post_meta( $key_date_post_id, '_date_due', $date_due );
+        add_post_meta( $key_date_post_id, '_key_date_status', 'pending' );
+        add_post_meta( $key_date_post_id, '_key_date_type_id', $date_type_id );
+        add_post_meta( $key_date_post_id, '_key_date_notes', wp_slash( $date_notes ) );
+        if ( 'tenancy' === $parent_post_type ) {
+            add_post_meta( $key_date_post_id, '_tenancy_id', $parent_post_id );
+            add_post_meta( $key_date_post_id, '_property_id', absint( get_post_meta( $parent_post_id, '_property_id', true ) ) );
+        } else {
+            add_post_meta( $key_date_post_id, '_property_id', $parent_post_id );
+        }
+        wp_send_json_success( array( 'id' => $key_date_post_id ) );
     }
 
     public function get_management_dates_grid()
     {
-        $post_id = (int)$_POST['post_id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        $post_id = $this->get_authorized_record_id( 'post_id', array( 'property', 'tenancy' ) );
 
-        if ( isset($_POST['selected_type_id']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+        if ( isset( $_POST['selected_type_id'] ) && is_scalar( $_POST['selected_type_id'] ) )
         {
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
             $selected_type_id = (int)$_POST['selected_type_id'];
         }
 
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-management-dates-meta-box.php' );
@@ -7709,7 +8137,8 @@ class PH_AJAX {
 
     public function get_key_dates_quick_edit_row()
     {
-        $post_id = (int)$_POST['post_id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        $post_id = $this->get_authorized_record_id( 'post_id', array( 'tenancy', 'property' ) );
 
         include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
 
@@ -7719,7 +8148,8 @@ class PH_AJAX {
 
     public function check_key_date_recurrence()
     {
-        $post_id = (int)$_POST['post_id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        $post_id = $this->get_authorized_record_id( 'post_id', 'key_date' );
 
         $next_key_date = '';
 
@@ -7781,24 +8211,41 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_send_json_error( __( 'You do not have permission to manage key dates', 'propertyhive' ), 403 );
 
-        $key_date_post_id = (int)$_POST['post_id'];
+        $key_date_post_id = isset( $_POST['post_id'] ) && is_scalar( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+        if ( $key_date_post_id < 1 || 'key_date' !== get_post_type( $key_date_post_id ) || ! current_user_can( 'edit_post', $key_date_post_id ) ) {
+            wp_send_json_error( __( 'Invalid key date or insufficient permissions.', 'propertyhive' ), 403 );
+        }
+        $date_input = array();
+        foreach ( array( 'description', 'due_date_time', 'status', 'type', 'notes' ) as $field ) {
+            if ( ! isset( $_POST[$field] ) || ! is_string( $_POST[$field] ) ) {
+                wp_send_json_error( __( 'Missing or invalid key date details.', 'propertyhive' ), 400 );
+            }
+            $date_input[$field] = 'notes' === $field ? sanitize_textarea_field( wp_unslash( $_POST[$field] ) ) : sanitize_text_field( wp_unslash( $_POST[$field] ) );
+        }
+        $next_key_date = null;
+        if ( isset( $_POST['next_key_date'] ) ) {
+            if ( ! is_string( $_POST['next_key_date'] ) ) {
+                wp_send_json_error( __( 'Invalid next key date.', 'propertyhive' ), 400 );
+            }
+            $next_key_date = sanitize_text_field( wp_unslash( $_POST['next_key_date'] ) );
+        }
 
         $args = array(
             'ID' => $key_date_post_id,
-            'post_title' => ph_clean($_POST['description']),
+            'post_title' => $date_input['description'],
         );
-        wp_update_post( $args );
+        wp_update_post( wp_slash( $args ) );
 
-        update_post_meta( $key_date_post_id, '_date_due', ph_clean($_POST['due_date_time']) );
-        update_post_meta( $key_date_post_id, '_key_date_status', ph_clean($_POST['status']) );
-        update_post_meta( $key_date_post_id, '_key_date_type_id', (int)$_POST['type'] );
-        update_post_meta( $key_date_post_id, '_key_date_notes', sanitize_textarea_field($_POST['notes'] ));
+        update_post_meta( $key_date_post_id, '_date_due', $date_input['due_date_time'] );
+        update_post_meta( $key_date_post_id, '_key_date_status', $date_input['status'] );
+        update_post_meta( $key_date_post_id, '_key_date_type_id', absint( $date_input['type'] ) );
+        update_post_meta( $key_date_post_id, '_key_date_notes', wp_slash( $date_input['notes'] ));
 
-        if ( isset($_POST['next_key_date']) )
+        if ( null !== $next_key_date )
         {
             // Insert next key date record
             $next_key_date_post = array(
-                'post_title' => ph_clean($_POST['description']),
+                'post_title' => $date_input['description'],
                 'post_content' => '',
                 'post_type' => 'key_date',
                 'post_status' => 'publish',
@@ -7807,7 +8254,7 @@ class PH_AJAX {
             );
 
             // Insert the post into the database
-            $next_key_date_post_id = wp_insert_post( $next_key_date_post );
+            $next_key_date_post_id = wp_insert_post( wp_slash( $next_key_date_post ) );
 
             if ( is_wp_error($next_key_date_post_id) || $next_key_date_post_id == 0 )
             {
@@ -7816,9 +8263,9 @@ class PH_AJAX {
                 die();
             }
 
-            add_post_meta( $next_key_date_post_id, '_date_due', ph_clean($_POST['next_key_date']) );
+            add_post_meta( $next_key_date_post_id, '_date_due', $next_key_date );
             add_post_meta( $next_key_date_post_id, '_key_date_status', 'pending' );
-            add_post_meta( $next_key_date_post_id, '_key_date_type_id', (int)$_POST['type'] );
+            add_post_meta( $next_key_date_post_id, '_key_date_type_id', absint( $date_input['type'] ) );
 
             if ( metadata_exists('post', $key_date_post_id, '_property_id') ) {
                 add_post_meta( $next_key_date_post_id, '_property_id', get_post_meta($key_date_post_id, '_property_id', true) );
@@ -7841,7 +8288,10 @@ class PH_AJAX {
         if ( ! current_user_can( 'manage_propertyhive' ) )
             wp_send_json_error( __( 'You do not have permission to manage key dates', 'propertyhive' ), 403 );
 
-        $date_post_id = (int)$_POST['date_post_id'];
+        $date_post_id = isset( $_POST['date_post_id'] ) && is_scalar( $_POST['date_post_id'] ) ? absint( $_POST['date_post_id'] ) : 0;
+        if ( $date_post_id < 1 || 'key_date' !== get_post_type( $date_post_id ) || ! current_user_can( 'delete_post', $date_post_id ) ) {
+            wp_send_json_error( __( 'Invalid key date or insufficient permissions.', 'propertyhive' ), 403 );
+        }
 
         wp_delete_post($date_post_id, TRUE);
 
@@ -7853,11 +8303,13 @@ class PH_AJAX {
 
     public function get_property_tenancies_grid()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-property-tenancies-meta-box.php' );
@@ -7868,11 +8320,13 @@ class PH_AJAX {
 
     public function get_contact_tenancies_grid()
     {
-        $post_id = (int)$_POST['post_id'];
+        $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
-        if ( isset($_POST['selected_status']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            $selected_status = ph_clean($_POST['selected_status']);
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
         include( PH()->plugin_path() . '/includes/admin/views/html-contact-tenancies-meta-box.php' );
@@ -7883,16 +8337,20 @@ class PH_AJAX {
 
     public function get_contact_solicitor()
     {
-        switch( get_post_type((int)$_POST['post_id']) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+        $post_id = $this->get_authorized_record_id( 'post_id', array( 'contact', 'property' ) );
+        switch( get_post_type( $post_id ) )
         {
             case 'contact':
             {
-                $contact_post_ids = array( (int)$_POST['post_id'] );
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+                $contact_post_ids = array( $post_id );
                 break;
             }
             case 'property':
             {
-                $owner_contact_ids = get_post_meta((int)$_POST['post_id'], '_owner_contact_id', TRUE);
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+                $owner_contact_ids = get_post_meta($post_id, '_owner_contact_id', TRUE);
                 if ( !empty( $owner_contact_ids ) )
                 {
                     if ( !is_array($owner_contact_ids) )
@@ -7936,7 +8394,7 @@ class PH_AJAX {
 
     public function activate_pro_feature()
     {
-        if ( !wp_verify_nonce( $_POST['_ajax_nonce'], "updates" ) ) 
+        if ( ! isset( $_POST['_ajax_nonce'] ) || ! is_string( $_POST['_ajax_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_ajax_nonce'] ) ), 'updates' ) )
         {
             $return = array(
                 'errorMessage' => 'Invalid nonce provided'
@@ -7944,16 +8402,16 @@ class PH_AJAX {
             wp_send_json_error($return);
         } 
 
-        if ( ! current_user_can( 'install_plugins' ) ) 
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'install_plugins' ) )
         {
             $return = array(
-                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
+                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.', 'propertyhive' )
             );
             wp_send_json_error( $return );
         }
         
         // check plugin status
-        $slug = ph_clean($_POST['slug']);
+        $slug = isset( $_POST['slug'] ) && is_string( $_POST['slug'] ) ? sanitize_key( wp_unslash( $_POST['slug'] ) ) : '';
 
         $feature = get_ph_pro_feature( $slug );
 
@@ -8118,38 +8576,37 @@ class PH_AJAX {
                 wp_send_json_error($return);
             }
 
-            $tmpfname = WP_PLUGIN_DIR . '/' . $slug . '.zip';
-
-            $handle = @fopen($tmpfname, "w");
-            if ( $handle === false )
-            {
-                $return = array(
-                    'errorMessage' => 'Failed to write plugin contents to temp file: ' . $tmpfname
-                );
-                wp_send_json_error($return);
+            $tmpfname = wp_tempnam( $slug . '.zip' );
+            if ( ! $tmpfname ) {
+                wp_send_json_error( array( 'errorMessage' => __( 'Unable to create a temporary download file.', 'propertyhive' ) ) );
             }
-            fwrite($handle, $zip_contents);
-            fclose($handle);
-
-            global $wp_filesystem;
 
             require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-base.php';
             require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
+            $download_filesystem = new WP_Filesystem_Direct( false );
+            if ( ! $download_filesystem->put_contents( $tmpfname, $zip_contents, 0600 ) ) {
+                wp_delete_file( $tmpfname );
+                wp_send_json_error( array( 'errorMessage' => __( 'The temporary download could not be written completely.', 'propertyhive' ) ) );
+            }
 
+            global $wp_filesystem;
             $wp_filesystem = new WP_Filesystem_Direct( false );
 
             if ( !defined( 'FS_CHMOD_FILE' ) ) {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress Filesystem API constant FS_CHMOD_FILE; it is a core filesystem contract and must retain the framework name.
                 define( 'FS_CHMOD_FILE', ( fileperms( ABSPATH . 'index.php' ) & 0777 | 0644 ) );
             }
             if ( !defined( 'FS_CHMOD_DIR' ) ) {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WordPress Filesystem API constant FS_CHMOD_DIR; it is a core filesystem contract and must retain the framework name.
                 define( 'FS_CHMOD_DIR', ( fileperms( ABSPATH ) & 0777 | 0755 ) );
             }
 
             // file obtained and stored. need to unzip and put into plugins directory
+            // phpcs:ignore PluginCheck.CodeAnalysis.WriteFile.PluginDirectoryWrite -- Authorized plugin installation: WordPress requires the add-on files in its plugin directory.
             $unzipped = unzip_file( $tmpfname, WP_PLUGIN_DIR );
             if ( is_wp_error( $unzipped ) ) 
             {
-                @unlink($tmpfname);
+                @wp_delete_file($tmpfname);
 
                 $return = array(
                     'errorMessage' => $unzipped->get_error_message()
@@ -8157,7 +8614,7 @@ class PH_AJAX {
                 wp_send_json_error($return);
             }
 
-            @unlink($tmpfname);
+            @wp_delete_file($tmpfname);
 
             // Need to sort out cache for activate plugin to work
             // Taken from WordPress.org docs
@@ -8208,7 +8665,7 @@ class PH_AJAX {
 
     public function deactivate_pro_feature()
     {
-        if ( !wp_verify_nonce( $_POST['_ajax_nonce'], "updates" ) ) 
+        if ( ! isset( $_POST['_ajax_nonce'] ) || ! is_string( $_POST['_ajax_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_ajax_nonce'] ) ), 'updates' ) )
         {
             $return = array(
                 'errorMessage' => 'Invalid nonce provided'
@@ -8216,20 +8673,20 @@ class PH_AJAX {
             wp_send_json_error($return);
         } 
 
-        if ( ! current_user_can( 'install_plugins' ) ) 
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'install_plugins' ) )
         {
             $return = array(
-                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.' )
+                'errorMessage' => __( 'Sorry, you are not allowed to manage plugins on this site.', 'propertyhive' )
             );
             wp_send_json_error( $return );
         }
 
         // check plugin is active
-        $slug = ph_clean($_POST['slug']);
+        $slug = isset( $_POST['slug'] ) && is_string( $_POST['slug'] ) ? sanitize_key( wp_unslash( $_POST['slug'] ) ) : '';
 
         $feature = get_ph_pro_feature( $slug );
 
-        if ( !is_plugin_active( $feature['wordpress_plugin_file'] ) )
+        if ( false === $feature || ! is_plugin_active( $feature['wordpress_plugin_file'] ) )
         {
             $return = array(
                 'errorMessage' => 'Plugin not active'

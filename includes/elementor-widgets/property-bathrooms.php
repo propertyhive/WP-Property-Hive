@@ -166,12 +166,12 @@ class Elementor_Property_Bathrooms_Widget extends \Elementor\Widget_Base {
 	        }
 	        if ( isset($settings['before']) && !empty($settings['before']) )
 	        {
-	        	echo wp_kses_post($settings['before']) . ' ';
+                echo wp_kses_post( $settings['before'] ) . ' ';
 	        }
 	        echo esc_html($property->bathrooms);
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
-	        	echo ' ' . wp_kses_post($settings['after']);
+                echo ' ' . wp_kses_post( $settings['after'] );
 	        }
 	        echo '</div>';
 	    }

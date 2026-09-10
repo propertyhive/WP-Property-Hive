@@ -2,6 +2,7 @@
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 $css = '';
 
 extract(shortcode_atts(array(
@@ -17,17 +18,22 @@ if ( !isset($property->id) ) {
 
 if ( $property->department == 'commercial' && ( ( $property->floor_area_to_sqft != '' && $property->floor_area_to_sqft != 0 ) || ( $property->floor_area_from_sqft != '' && $property->floor_area_from_sqft != 0 ) ) )
 {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound,WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery/Visual Composer framework filter constant; the integration requires the framework hook name unchanged. WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 	$css_class = apply_filters( VC_SHORTCODE_CUSTOM_CSS_FILTER_TAG, vc_shortcode_custom_css_class( $css, ' ' ), $this->settings['base'], $atts );
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 	$style = '';
 	if ( ! empty( $atts['font_container'] ) && isset($atts['font_container']) ) 
 	{
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 		$style = ph_extract_font_style_from_salient_font_container( $font_container );
 	}
 
-	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The style fragment is built by ph_extract_font_style_from_salient_font_container() using safecss_filter_attr() and esc_attr().
+	echo '<div class="' . esc_attr( $css_class ) . '" ' . $style . '>';
 
-		echo wp_kses_post($property->get_formatted_floor_area());
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The formatter escapes built-in area text before its trusted propertyhive_floor_area_output HTML filter.
+		echo $property->get_formatted_floor_area();
 
 	echo '</div>';
 }

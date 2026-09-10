@@ -148,9 +148,9 @@ class Elementor_Back_To_Search_Widget extends \Elementor\Widget_Base {
 		}
 
 		echo '<div class="back-to-search">';
-			if ( isset($_SESSION['last_search']) && $_SESSION['last_search'] != '' ) 
+            if ( isset($_SESSION['last_search']) && is_string( $_SESSION['last_search'] ) && $_SESSION['last_search'] != '' )
 			{
-				echo '<a href="' . esc_url($_SESSION['last_search']) . '">';
+				echo '<a href="' . esc_url( esc_url_raw( $_SESSION['last_search'] ) ) . '">';
 			}
 			else
 			{

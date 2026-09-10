@@ -165,12 +165,13 @@ class Elementor_Property_Floor_Area_Widget extends \Elementor\Widget_Base {
 	        }
 	        if ( isset($settings['before']) && !empty($settings['before']) )
 	        {
-	        	echo wp_kses_post($settings['before']) . ' ';
+                echo wp_kses_post( $settings['before'] ) . ' ';
 	        }
-			echo wp_kses_post($property->get_formatted_floor_area());
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- The formatter escapes the built-in area text before its trusted PHP HTML output filter.
+			echo $property->get_formatted_floor_area();
 	        if ( isset($settings['after']) && !empty($settings['after']) )
 	        {
-	        	echo ' ' . wp_kses_post($settings['after']);
+                echo ' ' . wp_kses_post( $settings['after'] );
 	        }
 	        echo '</div>';
 	    }

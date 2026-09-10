@@ -23,6 +23,7 @@ if ( isset($atts['show_title']) && $atts['show_title'] != 'yes' )
 
 if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
 {
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
     $floorplan_urls = $property->_floorplan_urls;
     if ( is_array($floorplan_urls) && !empty( $floorplan_urls ) )
     {
@@ -30,6 +31,7 @@ if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
 
             echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>';
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
             foreach ($floorplan_urls as $floorplan)
             {
             	echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
@@ -40,6 +42,7 @@ if ( get_option('propertyhive_floorplans_stored_as', '') == 'urls' )
 }
 else
 {
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 	$floorplan_attachment_ids = $property->get_floorplan_attachment_ids();
 
 	if ( !empty($floorplan_attachment_ids) )
@@ -48,6 +51,7 @@ else
 
 			echo '<h4>' . esc_html(__( 'Floorplans', 'propertyhive' )) . '</h4>';
 
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- WPBakery html_template local variable; this file is a framework-rendered view receiving $atts/$this, and PrefixAllGlobals sees it outside the framework render scope.
 			foreach ( $floorplan_attachment_ids as $attachment_id )
 			{
 				if ( wp_attachment_is_image($attachment_id) )

@@ -1,11 +1,15 @@
 <?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Underscore.js template.
  *
  * @package fusion-builder
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
 ?>
 <script type="text/template" id="fusion-builder-block-module-property-embedded-virtual-tours-preview-template">
 

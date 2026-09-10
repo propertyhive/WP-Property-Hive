@@ -61,9 +61,9 @@ class Salient_Property_Price_Qualifier_Widget {
 				),
          		array(
   					'type' => 'css_editor',
-  					'heading' => __( 'CSS box', 'propertyhive' ),
+                    'heading' => __( 'CSS box', 'propertyhive' ),
   					'param_name' => 'css',
-  					'group' => __( 'Design Options', 'propertyhive' ),
+                    'group' => __( 'Design Options', 'propertyhive' ),
   				),
       		)
    		));

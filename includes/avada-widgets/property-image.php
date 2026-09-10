@@ -1,9 +1,12 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit;
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 
 fusion_builder_map( array(
-    'name'        => esc_attr__( $widget, 'propertyhive' ),
+    'name'        => esc_attr__( 'Property Image', 'propertyhive' ),
     'shortcode'   => 'avada_' . str_replace("-", "_", sanitize_title($widget)),
     'icon'        => 'fusiona-image', // Use a Fusion icon
     //'preview'    => dirname( PH_PLUGIN_FILE ) . '/includes/avada-widgets/' . sanitize_title($widget) . '-preview.php',
@@ -11,14 +14,14 @@ fusion_builder_map( array(
     'params'      => array(
     	[
 		    'type'        => 'textfield',
-		    'heading'     => esc_attr__( 'Image #', 'fusion-builder' ),
+		    'heading'     => esc_attr__( 'Image #', 'propertyhive' ),
 		    'param_name'  => 'image_number',
 		    'input_type'  => 'number',
 		    'value'       => '1',
 		],
 		[
 			'type'        => 'radio_button_set',
-			'heading'     => esc_attr__( 'Image Size', 'fusion-builder' ),
+			'heading'     => esc_attr__( 'Image Size', 'propertyhive' ),
 			'param_name'  => 'image_size',
 			'value'       => [
 				'thumbnail' => __( 'Thumbnail', 'propertyhive' ),
@@ -30,7 +33,7 @@ fusion_builder_map( array(
 		],
 		[
 			'type'        => 'radio_button_set',
-			'heading'     => esc_attr__( 'Output Ratio', 'fusion-builder' ),
+			'heading'     => esc_attr__( 'Output Ratio', 'propertyhive' ),
 			'param_name'  => 'output_ratio',
 			'value'       => [
 				'' => __( 'Uploaded Ratio', 'propertyhive' ),

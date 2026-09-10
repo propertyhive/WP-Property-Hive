@@ -21,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Enquiry' ) ) :
 /**
  * PH_Admin_CPT_Enquiry Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Enquiry; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
 
     /**
@@ -66,9 +67,11 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
     {
         $screen = get_current_screen();
 
-        if ( $screen->id == 'enquiry' && isset($_GET['post']) && get_post_type($_GET['post']) == 'enquiry' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only enquiry screen context; no submitted mutation.
+        $enquiry_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        if ( $screen && $screen->id == 'enquiry' && $enquiry_id > 0 && get_post_type( $enquiry_id ) == 'enquiry' && current_user_can( 'edit_post', $enquiry_id ) )
         {
-            $enquiry = new PH_Enquiry((int)$_GET['post']);
+            $enquiry = new PH_Enquiry( $enquiry_id );
 
             // Get associated property_id(s), from either meta_key
             $property_ids = get_post_meta( $enquiry->id, '_property_id' );
@@ -110,6 +113,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                             'post_status' => 'any',
                             'nopaging'    => true,
                             'fields'      => 'ids',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Enquiry association must find every matching email contact in existing metadata; retrieve IDs only.
                             'meta_query'  => array(
                                 array(
                                     'key' => '_email_address',
@@ -131,6 +135,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                         'nopaging'    => true,
                         'fields'      => 'ids',
                         'post_status' => 'publish',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- The notice must link all existing viewings for the enquiry's contacts/properties using their stored relationships; IDs only.
                         'meta_query'  => array(
                             array(
                                 'key'     => '_property_id',
@@ -148,26 +153,27 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                     $viewing_ids = $viewings_query->posts;
                     wp_reset_postdata();
 
-                    if ( count($viewing_ids) > 0 )
+                    $viewing_count = count( $viewing_ids );
+                    if ( $viewing_count > 0 )
                     {
                         if ( 1 === $viewing_count ) 
                         {
-                            $message = __( '<p>There is an existing viewing for this applicant at this property.</p>', 'propertyhive' );
+                            $message = '<p>' . esc_html__( 'There is an existing viewing for this applicant at this property.', 'propertyhive' ) . '</p>';
                         }
                         else
                         {
-                            $message = sprintf(
+                            $message = '<p>' . sprintf(
                                 /* translators: %s: number of existing viewings */
-                                __( '<p>There are %s existing viewings for this applicant at this property.</p>', 'propertyhive' ),
-                                number_format_i18n( $viewing_count )
-                            );
+                                esc_html__( 'There are %s existing viewings for this applicant at this property.', 'propertyhive' ),
+                                esc_html( number_format_i18n( $viewing_count ) )
+                            ) . '</p>';
                         }
 
                         foreach( $viewing_ids as $viewing_id )
                         {
                             $message .= '<p><a href="' . esc_url(get_edit_post_link( $viewing_id )) . '" class="button">' . esc_html(__( 'Edit viewing', 'propertyhive' )) . '</a></p>';
                         }
-                        echo "<div class=\"notice notice-info\">" . wp_kses_post($message) . "</div>";
+                        echo '<div class="notice notice-info">' . wp_kses_post( $message ) . '</div>';
                     }
                 }
             }
@@ -179,18 +185,15 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
      * @return boolean
      */
     private function is_editing_enquiry() {
-        if ( ! empty( $_GET['post_type'] ) && 'enquiry' == $_GET['post_type'] ) {
-            return true;
-        }
-        if ( ! empty( $_GET['post'] ) && 'enquiry' == get_post_type( (int)$_GET['post'] ) ) {
-            return true;
-        }
-        if ( ! empty( $_REQUEST['post_id'] ) && 'enquiry' == get_post_type( (int)$_REQUEST['post_id'] ) ) {
-            return true;
-        }
-        return false;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'enquiry' === $post_type || ( $post_id > 0 && 'enquiry' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'enquiry' === get_post_type( $request_id ) );
     }
-    
+
     /**
      * Change title boxes in admin.
      * @param  string $text
@@ -262,8 +265,9 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
     public function custom_columns( $column ) {
         global $post, $propertyhive, $the_enquiry;
 
-        if ( empty( $the_enquiry ) || $the_enquiry->ID != $post->ID ) 
+        if ( empty( $the_enquiry ) || $the_enquiry->ID != $post->ID )
         {
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
             $the_enquiry = new PH_Enquiry( $post->ID );
         }
 
@@ -276,7 +280,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                 
                 break;
             case 'status' :
-                echo esc_html($the_enquiry->status);
+                echo esc_html( $the_enquiry->status );
                 break;
             case 'source' :
 
@@ -319,7 +323,7 @@ class PH_Admin_CPT_Enquiry extends PH_Admin_CPT {
                     {
                         $properties_text_array[] = $the_enquiry->get_list_property_display_text( $property_id );
                     }
-                    echo wp_kses_post(implode( '<br>', array_filter($properties_text_array) ));
+                    echo wp_kses_post( implode( '<br>', array_filter( $properties_text_array ) ) );
                 }
                 else
                 {

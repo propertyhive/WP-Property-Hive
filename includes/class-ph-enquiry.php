@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Enquiry; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Enquiry {
 
     /** @public int Enquiry (post) ID */

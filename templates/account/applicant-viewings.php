@@ -30,28 +30,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<th>' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
 				</tr>
 			';
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 			foreach ($upcoming_viewings as $viewing)
 			{
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$property = new PH_Property( (int)$viewing->property_id );
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . esc_url(get_permalink( $viewing->property_id )) . '">' : '' );
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . esc_html(__( 'Cancelled', 'propertyhive' )) . ')' : '' );
 
 				if ( $viewing->status == 'cancelled' && $viewing->cancelled_reason_public == 'yes' && $viewing->cancelled_reason != '' )
 				{
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 					$date_suffix .= '<br>' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . ':<br>' . nl2br(esc_html($viewing->cancelled_reason));
 				}
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$image = $property->get_main_photo_src();
 
-				echo wp_kses_post( '<tr>
-					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . $link_suffix . '</td>
-					<td>' . $date_prefix . esc_html(date( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . $date_suffix . '</td>
-					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
-				</tr>' );
+				echo '<tr>
+					<td>' . ( ( $image !== false ) ? wp_kses_post( $link_prefix ) . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . wp_kses_post( $link_suffix ) . '</td>
+					<td>' . wp_kses_post( $date_prefix ) . esc_html(gmdate( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . wp_kses_post( $date_suffix ) . '</td>
+					<td>' . wp_kses_post( $link_prefix ) . esc_html(get_the_title( $viewing->property_id )) . wp_kses_post( $link_suffix ) . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
+				</tr>';
 			}
 			echo '</table>';
 		}
@@ -74,28 +82,36 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<th>' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
 				</tr>
 			';
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 			foreach ($past_viewings as $viewing)
 			{
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$property = new PH_Property( (int)$viewing->property_id );
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$link_prefix = ( ( $property->on_market == 'yes' ) ? '<a href="' . esc_url(get_permalink( $viewing->property_id )) . '">' : '' );
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$link_suffix = ( ( $property->on_market == 'yes' ) ? '</a>' : '' );
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$date_prefix = ( ( $viewing->status == 'cancelled' ) ? '<span style="text-decoration:line-through">' : '' );
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$date_suffix = ( ( $viewing->status == 'cancelled' ) ? '</span> (' . esc_html(__( 'Cancelled', 'propertyhive' )) . ')' : '' );
 
 				if ( $viewing->status == 'cancelled' && $viewing->cancelled_reason_public == 'yes' && $viewing->cancelled_reason != '' )
 				{
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 					$date_suffix .= '<br>' . esc_html(__( 'Reason Cancelled', 'propertyhive' )) . ':<br>' . nl2br(esc_html($viewing->cancelled_reason));
 				}
 
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 				$image = $property->get_main_photo_src();
 
-				echo wp_kses_post( '<tr>
-					<td>' . ( ( $image !== false ) ? $link_prefix . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . $link_suffix . '</td>
-					<td>' . $date_prefix . esc_html(date( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . $date_suffix . '</td>
-					<td>' . $link_prefix . esc_html(get_the_title( $viewing->property_id )) . $link_suffix . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
-				</tr>' );
+				echo '<tr>
+					<td>' . ( ( $image !== false ) ? wp_kses_post( $link_prefix ) . '<img src="' . esc_url($image) . '" width="75" alt="' . esc_attr(get_the_title( $viewing->property_id )) . '">' : '' ) . wp_kses_post( $link_suffix ) . '</td>
+					<td>' . wp_kses_post( $date_prefix ) . esc_html(gmdate( "H:i jS M Y", strtotime( $viewing->start_date_time ) )) . wp_kses_post( $date_suffix ) . '</td>
+					<td>' . wp_kses_post( $link_prefix ) . esc_html(get_the_title( $viewing->property_id )) . wp_kses_post( $link_suffix ) . '<br>' . wp_kses_post( $property->get_formatted_price() ) . '</td>
+				</tr>';
 			}
 			echo '</table>';
 		}

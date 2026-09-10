@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -12,6 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @package     PropertyHive/Admin/Reports
  * @version     1.0.0
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Report_Incomplete_Properties; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 
 	/**
@@ -39,13 +43,27 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			<label for="missing">Show Properties Missing:</label>
 			<select name="missing" id="missing" style="width:100%;">
 				<option value="">One or more items</option>
-				<option value="_photos"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_photos' ) { echo ' selected'; } ?>>Photos</option>
-				<option value="_floorplans"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_floorplans' ) { echo ' selected'; } ?>>Floorplans</option>
-				<option value="_epcs"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_epcs' ) { echo ' selected'; } ?>>EPCS</option>
-				<option value="_brochures"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_brochures' ) { echo ' selected'; } ?>>Brochures</option>
-				<option value="_virtual_tours"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_virtual_tours' ) { echo ' selected'; } ?>>Virtual Tours</option>
-				<option value="summary"<?php if ( isset($_POST['missing']) && $_POST['missing'] == 'summary' ) { echo ' selected'; } ?>>Summary Description</option>
-				<option value="_latitude"<?php if ( isset($_POST['missing']) && $_POST['missing'] == '_latitude' ) { echo ' selected'; } ?>>Map Co-ordinates</option>
+				<option value="_photos"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_photos' ) { echo ' selected'; } ?>>Photos</option>
+				<option value="_floorplans"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_floorplans' ) { echo ' selected'; } ?>>Floorplans</option>
+				<option value="_epcs"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_epcs' ) { echo ' selected'; } ?>>EPCS</option>
+				<option value="_brochures"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_brochures' ) { echo ' selected'; } ?>>Brochures</option>
+				<option value="_virtual_tours"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_virtual_tours' ) { echo ' selected'; } ?>>Virtual Tours</option>
+				<option value="summary"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == 'summary' ) { echo ' selected'; } ?>>Summary Description</option>
+				<option value="_latitude"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['missing']) && $_POST['missing'] == '_latitude' ) { echo ' selected'; } ?>>Map Co-ordinates</option>
 			</select>
 
 			<br><br>
@@ -62,6 +80,7 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 			            if ( get_option( 'propertyhive_active_departments_' . str_replace("residential-", "", $key) ) == 'yes' )
 			            {
 			            	echo '<option value="' . esc_attr($key) . '"';
+                            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 			            	if ( isset($_POST['department']) && $_POST['department'] == $key ) { echo ' selected'; }
 			            	echo '>' . esc_html($value) . '</option>';
 			           	}
@@ -73,8 +92,12 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 
 			<label for="on_market">Market Status:</label>
 			<select name="on_market" id="on_market" style="width:100%;">
-				<option value=""<?php if ( isset($_POST['on_market']) && $_POST['on_market'] == '' ) { echo ' selected'; } ?>>On Market Properties Only</option>
-				<option value="all"<?php if ( isset($_POST['on_market']) && $_POST['on_market'] == 'all' ) { echo ' selected'; } ?>>All Properties</option>
+				<option value=""<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['on_market']) && $_POST['on_market'] == '' ) { echo ' selected'; } ?>>On Market Properties Only</option>
+				<option value="all"<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ if ( isset($_POST['on_market']) && $_POST['on_market'] == 'all' ) { echo ' selected'; } ?>>All Properties</option>
 			</select>
 
 			<br><br>
@@ -98,7 +121,9 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 						{
 							$office_query->the_post();
 					?>
-					<option value="<?php echo esc_attr(get_the_ID()); ?>"<?php if ( isset($_POST['office_id']) && ($_POST['office_id'] == get_the_ID()) ) { echo ' selected'; } ?>><?php echo esc_html(get_the_title(get_the_ID())); ?></option>
+					<option value="<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+ echo esc_attr(get_the_ID()); ?>"<?php if ( isset($_POST['office_id']) && ($_POST['office_id'] == get_the_ID()) ) { echo ' selected'; } ?>><?php echo esc_html(get_the_title(get_the_ID())); ?></option>
 					<?php 
 						} 
 					}
@@ -125,6 +150,7 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 
 			$meta_query = array('relation' => 'AND');
 
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 			if ( isset($_POST['on_market']) && $_POST['on_market'] == 'all' )
 			{
 
@@ -137,22 +163,27 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 				);
 			}
 
-			if ( isset($_POST['department']) && $_POST['department'] != '' )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+			if ( isset($_POST['department']) && is_string( $_POST['department'] ) && $_POST['department'] != '' )
 			{
 				$meta_query[] = array(
 					'key' => '_department',
-					'value' => ph_clean($_POST['department']),
+					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+					'value' => ph_clean( wp_unslash( $_POST['department'] ) ),
 				);
 			}
 
-			if ( isset($_POST['office_id']) && $_POST['office_id'] != '' )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
+			if ( isset($_POST['office_id']) && is_scalar( $_POST['office_id'] ) && $_POST['office_id'] != '' )
 			{
 				$meta_query[] = array(
 					'key' => '_office_id',
+					// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 					'value' => (int)$_POST['office_id']
 				);
 			}
 
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Incomplete-property report must filter existing department, office and market metadata before inspecting all matching properties; the query retrieves IDs only.
 			$args['meta_query'] = $meta_query;
 
 			$property_query = new WP_Query( $args );
@@ -173,8 +204,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					$missing = array();
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_photos') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -186,8 +220,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_floorplans') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -214,8 +251,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_epcs') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -242,8 +282,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_brochures') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -270,8 +313,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_virtual_tours') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -283,8 +329,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == 'summary') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{
@@ -296,8 +345,11 @@ class PH_Report_Incomplete_Properties extends PH_Admin_Report {
 					}
 
 					if ( 
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '_latitude') ||  
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						(isset($_POST['missing']) && $_POST['missing'] == '') ||
+						// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only report filters and form display on the authorized CRM reports screen.
 						!isset($_POST['missing'])
 					)
 					{

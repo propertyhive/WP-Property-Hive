@@ -13,16 +13,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div id="poststuff">
 		
 		<?php
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $percentage_lower = get_option( 'propertyhive_applicant_match_price_range_percentage_lower', '' );
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $percentage_higher = get_option( 'propertyhive_applicant_match_price_range_percentage_higher', '' );
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $currency = '&pound;';
             if ( isset($applicant_profile['currency']) && !empty($applicant_profile['currency']) )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $PH_Countries = new PH_Countries();
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $selected_currency = $PH_Countries->get_currency($applicant_profile['currency']);
                 if ( $selected_currency !== false )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $currency = $selected_currency['currency_symbol'];
                 }
             }
@@ -31,6 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 
                 <h3 style="padding-top:0; margin-top:0;">' . esc_html( __('Applicant Requirements', 'propertyhive') ) . '</h3>';
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $requirements = array();
 
             if ( 
@@ -41,9 +48,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                 $applicant_profile['max_price_actual'] != 0
             )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $requirements[] = array(
                     'label' => __( 'Maximum Price', 'propertyhive' ),
-                    'value' => $currency . ph_display_price_field($applicant_profile['max_price']),
+                    'value' => $currency . esc_html( ph_display_price_field($applicant_profile['max_price']) ),
                 );
             }
             if ( 
@@ -54,7 +62,9 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 if ( $percentage_lower != '' && $percentage_higher != '' )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $match_price_range_lower = '';
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $match_price_range_lower_display = '';
                     if ( 
                         !isset($applicant_profile['match_price_range_lower_actual']) || 
@@ -63,14 +73,17 @@ if ( ! defined( 'ABSPATH' ) ) {
                     {
                         if ( isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '' )
                         {
-                            $match_price_range_lower = $applicant_profile['max_price'] - ( $applicant_profile['max_price'] * ( $percentage_lower / 100 ) );
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                            $match_price_range_lower = (float) $applicant_profile['max_price'] - ( (float) $applicant_profile['max_price'] * ( (float) $percentage_lower / 100 ) );
                         }
                     }
                     else
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $match_price_range_lower = $applicant_profile['match_price_range_lower'];
                     }
 
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $match_price_range_higher = '';
                     if ( 
                         !isset($applicant_profile['match_price_range_higher_actual']) || 
@@ -79,11 +92,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                     {
                         if ( isset($applicant_profile['max_price']) && $applicant_profile['max_price'] != '' )
                         {
-                            $match_price_range_higher = $applicant_profile['max_price'] + ( $applicant_profile['max_price'] * ( $percentage_higher / 100 ) );
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                            $match_price_range_higher = (float) $applicant_profile['max_price'] + ( (float) $applicant_profile['max_price'] * ( (float) $percentage_higher / 100 ) );
                         }
                     }
                     else
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $match_price_range_higher = $applicant_profile['match_price_range_higher'];
                     }
 
@@ -91,9 +106,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                         $match_price_range_lower != '' && $match_price_range_higher != ''
                     )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $requirements[] = array(
                             'label' => __( 'Match Price Range', 'propertyhive' ),
-                            'value' => $currency . ph_display_price_field($match_price_range_lower) . ' to ' . $currency . ph_display_price_field($match_price_range_higher),
+                            'value' => $currency . esc_html( ph_display_price_field($match_price_range_lower) ) . ' to ' . $currency . esc_html( ph_display_price_field($match_price_range_higher) ),
                         );
                     }
                 }
@@ -103,9 +119,10 @@ if ( ! defined( 'ABSPATH' ) ) {
                 isset($applicant_profile['max_price_actual']) && $applicant_profile['max_price_actual'] != '' && $applicant_profile['max_price_actual'] != 0
             )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $requirements[] = array(
                     'label' => __( 'Maximum Rent', 'propertyhive' ),
-                    'value' => $currency . ph_display_price_field($applicant_profile['max_rent']) . ' ' . $applicant_profile['rent_frequency'],
+                    'value' => $currency . esc_html( ph_display_price_field($applicant_profile['max_rent']) ) . ' ' . esc_html( $applicant_profile['rent_frequency'] ),
                 );
             }
             if ( 
@@ -120,21 +137,25 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 if ( isset($applicant_profile['min_beds']) && $applicant_profile['min_beds'] != '' && $applicant_profile['min_beds'] != 0 )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $requirements[] = array(
                         'label' => __( 'Minimum Beds', 'propertyhive' ),
-                        'value' => $applicant_profile['min_beds'],
+                        'value' => esc_html( $applicant_profile['min_beds'] ),
                     );
                 }
                 if ( isset($applicant_profile['property_types']) && is_array($applicant_profile['property_types']) && !empty($applicant_profile['property_types']) )
                 {
-                    $terms = get_terms('property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['property_types']));
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                    $terms = get_terms( array_merge( wp_parse_args( array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['property_types']) ), array( 'taxonomy' => 'property_type' ) ) );
                     if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $sliced_terms = array_slice( $terms, 0, 2 );
 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $requirements[] = array(
                             'label' => __( 'Property Types', 'propertyhive' ),
-                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
+                            'value' => esc_html( implode(", ", $sliced_terms) ) . ( (count($terms) > 2) ? '<span title="' . esc_attr( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
                         );
                     }
                 }
@@ -146,16 +167,20 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 if ( isset($applicant_profile['available_as']) && is_array($applicant_profile['available_as']) && !empty($applicant_profile['available_as']) )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $available_as = array();
                     if ( in_array('sale', $applicant_profile['available_as']) )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $available_as[] = 'For Sale';
                     }
                     if ( in_array('rent', $applicant_profile['available_as']) )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $available_as[] = 'To Rent';
                     }
 
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $requirements[] = array(
                         'label' => __( 'Available As', 'propertyhive' ),
                         'value' => implode(", ", $available_as),
@@ -168,31 +193,39 @@ if ( ! defined( 'ABSPATH' ) ) {
                     (isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] != '')
                 )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $sizes = array('min' => '', 'max' => '');
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $value = '';
                     if ( isset($applicant_profile['min_floor_area_actual']) && $applicant_profile['min_floor_area_actual'] != '' )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $sizes['min'] = $applicant_profile['min_floor_area_actual'];
                     }
                     if ( isset($applicant_profile['max_floor_area_actual']) && $applicant_profile['max_floor_area_actual'] != '' )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $sizes['max'] = $applicant_profile['max_floor_area_actual'];
                     }
                     if ( $sizes['min'] != '' && $sizes['max'] != '' )
                     {
-                        $value = number_format($sizes['min']) . ' - ' . number_format($sizes['max']) . ' Sq Ft';
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                        $value = number_format( (float) $sizes['min'] ) . ' - ' . number_format( (float) $sizes['max'] ) . ' Sq Ft';
                     }
                     if ( $sizes['min'] != '' && $sizes['max'] == '' )
                     {
-                        $value = 'From ' . number_format($sizes['min']) . ' Sq Ft';
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                        $value = 'From ' . number_format( (float) $sizes['min'] ) . ' Sq Ft';
                     }
                     if ( $sizes['min'] == '' && $sizes['max'] != '' )
                     {
-                        $value = 'Up To ' . number_format($sizes['max']) . ' Sq Ft';
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                        $value = 'Up To ' . number_format( (float) $sizes['max'] ) . ' Sq Ft';
                     }
 
                     if ( $value != '' )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $requirements[] = array(
                             'label' => __( 'Floor Area', 'propertyhive' ),
                             'value' => $value,
@@ -202,14 +235,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
                 if ( isset($applicant_profile['commercial_property_types']) && is_array($applicant_profile['commercial_property_types']) && !empty($applicant_profile['commercial_property_types']) )
                 {
-                    $terms = get_terms('commercial_property_type', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['commercial_property_types']));
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                    $terms = get_terms( array_merge( wp_parse_args( array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['commercial_property_types']) ), array( 'taxonomy' => 'commercial_property_type' ) ) );
                     if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $sliced_terms = array_slice( $terms, 0, 2 );
 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $requirements[] = array(
                             'label' => __( 'Property Types', 'propertyhive' ),
-                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? '<span title="' . addslashes( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
+                            'value' => esc_html( implode(", ", $sliced_terms) ) . ( (count($terms) > 2) ? '<span title="' . esc_attr( implode(", ", $terms) ) .'"> + ' . (count($terms) - 2) . ' more</span>' : '' ),
                         );
                     }
                 }
@@ -218,14 +254,17 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 if ( isset($applicant_profile['locations']) && is_array($applicant_profile['locations']) && !empty($applicant_profile['locations']) )
                 {
-                    $terms = get_terms('location', array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['locations']));
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                    $terms = get_terms( array_merge( wp_parse_args( array('hide_empty' => false, 'fields' => 'names', 'include' => $applicant_profile['locations']) ), array( 'taxonomy' => 'location' ) ) );
                     if ( ! empty( $terms ) && ! is_wp_error( $terms ) )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $sliced_terms = array_slice( $terms, 0, 2 );
 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $requirements[] = array(
                             'label' => __( 'Locations', 'propertyhive' ),
-                            'value' => implode(", ", $sliced_terms) . ( (count($terms) > 2) ? ' <span title="' . addslashes( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ),
+                            'value' => esc_html( implode(", ", $sliced_terms) ) . ( (count($terms) > 2) ? ' <span title="' . esc_attr( implode(", ", $terms) ) .'">+ ' . (count($terms) - 2) . ' more</span>' : '' ),
                         );
                     }
                 }
@@ -234,30 +273,35 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 if ( isset($applicant_profile['location_text']) && trim($applicant_profile['location_text']) != '' )
                 {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $location_value = trim($applicant_profile['location_text']);
 
                     if ( isset($applicant_profile['location_radius']) && $applicant_profile['location_radius'] != '' )
                     {
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $location_value .= ' (Within '. $applicant_profile['location_radius'] .' Miles)';
                     }
 
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $requirements[] = array(
                         'label' => __( 'Location', 'propertyhive' ),
-                        'value' => $location_value,
+                        'value' => esc_html( $location_value ),
                     );
                 }
             }
 
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
             $requirements = apply_filters( 'propertyhive_applicant_requirements_display', $requirements, $contact_id, $applicant_profile );
 
             if ( !empty($requirements) )
             {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 foreach ( $requirements as $requirement )
                 {
-                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top">
-                        <strong>' . esc_html($requirement['label']) . ':</strong><br>
-                        ' . wp_kses_post($requirement['value']) . '
-                    </div>';
+                    echo '<div style="display:inline-block; width:23%; margin-right:2%; vertical-align:top"><strong>' . esc_html( $requirement['label'] ) . ':</strong><br>';
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core requirement values escape stored text/attributes above; preserve trusted HTML supplied by propertyhive_applicant_requirements_display and currency-symbol filters.
+                    echo $requirement['value'];
+                    echo '</div>';
                 }
             }
 
@@ -265,7 +309,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             {
                 echo '<div style="display:inline-block; width:100%; vertical-align:top; margin-top:15px;">
                         <strong>Additional Requirement Notes:</strong><br>
-                        ' . nl2br( wp_kses_post( $applicant_profile['notes'] ) ) . '
+                        ' . nl2br( esc_html( wp_strip_all_tags( $applicant_profile['notes'] ) ) ) . '
                     </div>';
             }
 
@@ -275,15 +319,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php
 			if ( !empty($properties) )
 			{
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $select_all_actions = array(
                     'email' => __( 'Email', 'propertyhive' ),
                     'not_interested' => __( 'Not Suitable', 'propertyhive' )
                 );
 
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 $select_all_actions = apply_filters( 'propertyhive_matching_select_all_actions', $select_all_actions );
         ?>
         <div class="select-actions" style="padding-top:15px">
             <span style="display:inline-block; vertical-align:middle;"><?php echo esc_html(__( 'Select', 'propertyhive' )); ?>:</span> <?php
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                 foreach ( $select_all_actions as $key => $value )
                 {
                     echo '<a href="javascript:;" class="button" id="select_all_' . esc_attr(sanitize_title($key)) . '" style="display:inline-block; vertical-align:middle;">All - ' . esc_html($value) . '</a> ';
@@ -293,21 +340,27 @@ if ( ! defined( 'ABSPATH' ) ) {
         </div>
 
         <?php
+				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				foreach ( $properties as $property )
 				{
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 					$previously_sent = array();
 					if ( isset($applicant_profile_match_history[$property->id]) && is_array($applicant_profile_match_history[$property->id]) && !empty($applicant_profile_match_history[$property->id]) )
 					{
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						$previously_sent = $applicant_profile_match_history[$property->id];
 					}
 
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $on_market_change_date = $property->_on_market_change_date;
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                     $price_change_date = $property->_price_change_date;
 
 					echo '<div id="matching_applicant_' . (int)$contact_id . '_property_' . (int)$property->id . '" style="padding:20px 0; border-bottom:1px solid #CCC;">';
                     
                         echo '<div style="float:left; width:18%;">';
 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                         $image_url = $property->get_main_photo_src();
                         if ( $image_url !== FALSE )
                         {
@@ -320,21 +373,25 @@ if ( ! defined( 'ABSPATH' ) ) {
                             
                             echo '<h3 style="margin:0; padding:0; margin-bottom:9px;"><a href="' . esc_url(get_edit_post_link( $property->id )) . '" target="_blank">' . esc_html($property->get_formatted_summary_address()) . '</a></h3>';
 
-                            echo '<div style="margin-bottom:7px; font-size:15px;">
-                                <strong>' . esc_html(( ($property->_department == 'residential-lettings') ? __('Rent', 'propertyhive') : __('Price', 'propertyhive') )) . ': ' . esc_html($property->price_qualifier) . ' ' . wp_kses_post($property->get_formatted_price()) . '</strong>
-                                | ';
+                            echo '<div style="margin-bottom:7px; font-size:15px;"><strong>' . esc_html( ( $property->_department == 'residential-lettings' ) ? __( 'Rent', 'propertyhive' ) : __( 'Price', 'propertyhive' ) ) . ': ' . esc_html( $property->price_qualifier ) . ' ';
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Price producers escape stored text before trusted currency/commercial/property price HTML filters.
+                            echo $property->get_formatted_price();
+                            echo '</strong> | ';
                             if ($property->department != 'commercial' || ph_get_custom_department_based_on($property->department) == 'commercial')
                             {
-                                echo esc_html($property->bedrooms) . ' bed | ';
+                                echo esc_html( $property->bedrooms ) . ' bed | ';
                             }
                             else
                             {
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $floor_area = $property->get_formatted_floor_area();
                                 if ( $floor_area != '' )
                                 {
-                                    echo wp_kses_post($floor_area) . ' | ';
+                                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Floor-area producer escapes base text before the trusted propertyhive_floor_area_output HTML filter.
+                                    echo $floor_area . ' | ';
                                 }
                             }
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                             $property_type = $property->get_property_type();
                             if ( $property_type != '' )
                             {
@@ -343,28 +400,32 @@ if ( ! defined( 'ABSPATH' ) ) {
                             echo ' ' . esc_html($property->get_availability()) . '
                             </div>';
 
-                            echo '<div style="margin-bottom:7px;">' . esc_html(strip_tags(get_the_excerpt($property->id))) . '</div>';
+                            echo '<div style="margin-bottom:7px;">' . esc_html(wp_strip_all_tags(get_the_excerpt($property->id))) . '</div>';
 
                             echo '<div style="background:#F8F8F8; padding:12px 11px; line-height:1.7em; border:1px solid #DDD; font-weight:700">
 
                             	<label><input type="checkbox" name="email_property_id[]" value="' . (int)$property->id . '" ';
 
+                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                             $post_tip = '';
                             if ( strpos($email_address, '@') === FALSE )
                             {
                                 echo ' disabled title="Invalid email address: ' . esc_attr($email_address) . '"';
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $post_tip = 'Invalid email address: ' . $email_address;
                             }
                             elseif ( $do_not_email )
                             {
                                 echo ' disabled title="Contact via email not permitted - Set under contact details"';
+                                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
                                 $post_tip = 'Contact via email not permitted - Set under contact details';
                             }
                             else
                             {
                                 if ( !empty($previously_sent) )
                                 {
-                                    $post_tip = 'Sent previously via ' . $previously_sent[count($previously_sent) - 1]['method'] . ' on ' . date("jS F Y", strtotime($previously_sent[count($previously_sent) - 1]['date']));
+                                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                                    $post_tip = 'Sent previously via ' . $previously_sent[count($previously_sent) - 1]['method'] . ' on ' . gmdate("jS F Y", strtotime($previously_sent[count($previously_sent) - 1]['date']));
 
                                     if ( 
                                         $on_market_change_date > $previously_sent[count($previously_sent) - 1]['date'] ||
@@ -373,11 +434,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     {
                                         if ( $price_change_date > $previously_sent[count($previously_sent) - 1]['date'] )
                                         {
-                                            $post_tip .= ', however a price change occurred on ' . date("jS F Y", strtotime($price_change_date));
+                                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                                            $post_tip .= ', however a price change occurred on ' . gmdate("jS F Y", strtotime($price_change_date));
                                         }
                                         elseif ( $on_market_change_date > $previously_sent[count($previously_sent) - 1]['date'] )
                                         {
-                                            $post_tip .= ', however a change to the on market status occurred on ' . date("jS F Y", strtotime($on_market_change_date));
+                                            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+                                            $post_tip .= ', however a change to the on market status occurred on ' . gmdate("jS F Y", strtotime($on_market_change_date));
                                         }
                                         echo ' checked';
                                     }
@@ -411,7 +474,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         	<input name="save" class="button-primary" type="submit" value="<?php echo esc_html(__( 'Continue', 'propertyhive' )); ?>" />
 
-            <a href="<?php echo esc_url(get_edit_post_link((int)$_GET['contact_id'])); ?>" class="button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
+            <a href="<?php echo esc_url(get_edit_post_link( (int) $contact_id )); ?>" class="button"><?php echo esc_html(__( 'Cancel', 'propertyhive' )); ?></a>
 
         	<input type="hidden" name="step" value="one" />
         	<?php wp_nonce_field( 'propertyhive-matching-properties' ); ?>

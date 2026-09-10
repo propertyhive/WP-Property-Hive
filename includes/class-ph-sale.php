@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Sale; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Sale {
 
     /** @public int Sale (post) ID */
@@ -125,7 +126,7 @@ class PH_Sale {
             $applicants = array();
             foreach ( $applicant_contact_ids as $applicant_contact_id )
             {
-                $applicant_name = get_the_title($applicant_contact_id);
+                $applicant_name = esc_html( get_the_title( $applicant_contact_id ) );
                 if ( $add_hyperlinks )
                 {
                     $edit_link = get_edit_post_link( $applicant_contact_id );
@@ -137,13 +138,13 @@ class PH_Sale {
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
-                        $contact_details[] = 'T: ' . $telephone_number;
+                        $contact_details[] = 'T: ' . esc_html( $telephone_number );
                     }
 
                     $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
                     if( !empty($email_address) )
                     {
-                        $contact_details[] = 'E: ' . $email_address;
+                        $contact_details[] = 'E: ' . esc_html( $email_address );
                     }
 
                     $contact_details = apply_filters( 'propertyhive_sale_applicant_contact_details', $contact_details, $applicant_contact_id );
@@ -176,7 +177,7 @@ class PH_Sale {
         if ( !empty($property_id) )
         {
             $property = new PH_Property( $property_id );
-            return '<a href="' . get_edit_post_link( $property_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>';
+            return '<a href="' . esc_url( get_edit_post_link( $property_id, '' ) ) . '" target="' . esc_attr( apply_filters('propertyhive_subgrid_link_target', '') ) . '">' . esc_html( $property->get_formatted_full_address() ) . '</a>';
         }
         else
         {
@@ -230,24 +231,25 @@ class PH_Sale {
     {
         if ( $add_edit_link )
         {
-            $contact_text = '<a href="' . get_edit_post_link( $contact_post_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . get_the_title($contact_post_id) . '</a>';
+            $contact_text = '<a href="' . esc_url( get_edit_post_link( $contact_post_id, '' ) ) . '" target="' . esc_attr( apply_filters('propertyhive_subgrid_link_target', '') ) . '">' . esc_html( get_the_title($contact_post_id) ) . '</a>';
         }
         else
         {
-            $contact_text = get_the_title($contact_post_id);
+            $contact_text = esc_html( get_the_title($contact_post_id) );
         }
 
+        $contact_details = '';
         $telephone_number = get_post_meta( $contact_post_id, '_telephone_number', true );
         if( !empty($telephone_number) )
         {
-            $contact_details = 'T: ' . $telephone_number;
+            $contact_details = 'T: ' . esc_html($telephone_number);
         }
 
         $email_address = get_post_meta( $contact_post_id, '_email_address', true );
         if( !empty($email_address) )
         {
             $contact_details .= ( $contact_details != '' ) ? '<br>' : '';
-            $contact_details .= 'E: ' . $email_address;
+            $contact_details .= 'E: ' . esc_html($email_address);
         }
 
         if ( $contact_details != '' )

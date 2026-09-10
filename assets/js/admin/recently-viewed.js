@@ -2,7 +2,7 @@ jQuery( function ( $ ) {
 
 	if ($('#contextual-help-link-wrap .show-recently-viewed').length == 0)
 	{
-		$("#screen-meta-links").append('<div id="contextual-help-link-wrap" class="hide-if-no-js screen-meta-toggle" style="z-index:2;"><button class="show-settings show-recently-viewed" style="cursor:pointer">Recently Viewed</button></div>');
+		$("#screen-meta-links").append('<div id="contextual-help-link-wrap" class="hide-if-no-js screen-meta-toggle" style="z-index:2;"><button class="button button-compact show-settings show-recently-viewed" style="cursor:pointer">Recently Viewed</button></div>');
 
 		var html = '';
 

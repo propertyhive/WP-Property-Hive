@@ -26,9 +26,9 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
     <?php do_action( 'propertyhive_account_details_form_start' ); ?>
 
-    <?php foreach ( $form_controls as $key => $field ) : ?>
+    <?php foreach ( $form_controls as $propertyhive_key => $propertyhive_field ) : ?>
 
-        <?php ph_form_field( $key, $field ); ?>
+        <?php ph_form_field( $propertyhive_key, $propertyhive_field ); ?>
 
     <?php endforeach; ?>
 

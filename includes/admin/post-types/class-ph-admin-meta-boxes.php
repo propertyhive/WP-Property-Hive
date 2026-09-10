@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Meta Boxes
  *
@@ -18,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_Meta_Boxes' ) )
 /**
  * PH_Admin_Meta_Boxes
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Meta_Boxes; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Meta_Boxes {
 
 	private static $meta_box_errors = array();
@@ -60,6 +64,8 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_property_meta', 'PH_Meta_Box_Property_Virtual_Tours::save', 75, 2 );
         
         // Save Contact Meta Boxes
+        // These checks only select the save callback; save_meta_boxes() verifies the post nonce and capability before dispatching it.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only callback selection; the actual save is gated by save_meta_boxes().
         if ( isset($_POST['_contact_type_new']) )
         {
             add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_New_Relationship::save', 1, 2 );
@@ -67,6 +73,7 @@ class PH_Admin_Meta_Boxes {
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Correspondence_Address::save', 10, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Contact_Details::save', 15, 2 );
         add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Solicitor::save', 20, 2 );
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only callback selection; the actual save is gated by save_meta_boxes().
         if ( !isset($_POST['_contact_type_new']) )
         {
             add_action( 'propertyhive_process_contact_meta', 'PH_Meta_Box_Contact_Relationships::save', 25, 2 );
@@ -158,32 +165,82 @@ class PH_Admin_Meta_Boxes {
 
     public function redirect_to_tab( $url, $post_id )
     {
-        if ( isset($_POST['propertyhive_selected_metabox_tab']) )
+        // The selected tab is only a redirect fragment; save_meta_boxes() verifies the nonce before processing the form.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only redirect-fragment selection; state-changing form handling verifies the save nonce.
+        if ( isset( $_POST['propertyhive_selected_metabox_tab'] ) && is_string( $_POST['propertyhive_selected_metabox_tab'] ) )
         {
-            $url .= '#' . $_POST['propertyhive_selected_metabox_tab'];
+            $posted_tab = $_POST['propertyhive_selected_metabox_tab']; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only redirect-fragment value is unslashed and sanitized immediately below; state-changing form handling verifies the save nonce.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only redirect-fragment selection; state-changing form handling verifies the save nonce.
+            $selected_tab = sanitize_text_field(
+                str_ireplace(
+                    array( '%7C', '|' ),
+                    '__PROPERTYHIVE_TAB_SEPARATOR__',
+                    wp_unslash( $posted_tab )
+                )
+            );
+            $selected_tabs = preg_split( '/__PROPERTYHIVE_TAB_SEPARATOR__/', $selected_tab );
+            $selected_tabs = array_filter( array_map( 'sanitize_key', $selected_tabs ) );
+            if ( ! empty( $selected_tabs ) ) {
+                // Keep the encoded separator used by the tab JavaScript while restricting each identifier to a safe HTML ID token.
+                $url .= '#' . implode( '%7C', $selected_tabs );
+            }
         }
 
         return $url;
     }
 
+    /**
+     * Read one scalar administrative request value.
+     *
+     * Action handlers call authorize_record_action() before changing any record.
+     *
+     * @param string $key Request key.
+     * @return string|false
+     */
+    private function get_request_value( $key ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This helper only reads a routing or nonce value; each mutating caller verifies its nonce and capability before changing data.
+        if ( ! isset( $_GET[ $key ] ) || ! is_scalar( $_GET[ $key ] ) ) {
+            return false;
+        }
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This helper only reads a routing or nonce value; each mutating caller verifies its nonce and capability before changing data.
+        return sanitize_text_field( wp_unslash( (string) $_GET[ $key ] ) );
+    }
+
+    /** Require CRM and record access before processing a direct administrative action. */
+    private function authorize_record_action( $action, $verify_nonce = true ) {
+        $post_id = absint( $this->get_request_value( 'post' ) );
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! $post_id || ! current_user_can( 'edit_post', $post_id ) ) {
+            wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+        }
+        if ( $verify_nonce ) {
+            check_admin_referer( 'propertyhive-' . $action . '-' . $post_id, $action );
+        }
+
+        return $post_id;
+    }
+
     public function check_contact_create_relationship()
     {
-        if ( isset($_GET['add_applicant_relationship']) && wp_verify_nonce($_GET['add_applicant_relationship'], '1') && isset($_GET['post']) ) 
+        $post_request = $this->get_request_value( 'post' );
+
+        if ( false !== $this->get_request_value( 'add_applicant_relationship' ) && false !== $post_request )
         {
+            $post_id = $this->authorize_record_action( 'add_applicant_relationship' );
             // Need to add blank applicant
-            if ( get_post_type((int)$_GET['post']) != 'contact' )
+            if ( get_post_type( $post_id ) != 'contact' )
                 return;
 
-            $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
+            $num_applicant_profiles = get_post_meta( $post_id, '_applicant_profiles', TRUE );
             if ( $num_applicant_profiles == '' )
             {
                 $num_applicant_profiles = 0;
             }
 
-            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . $num_applicant_profiles, '' );
-            update_post_meta( (int)$_GET['post'], '_applicant_profiles', $num_applicant_profiles + 1 );
+            update_post_meta( $post_id, '_applicant_profile_' . $num_applicant_profiles, '' );
+            update_post_meta( $post_id, '_applicant_profiles', $num_applicant_profiles + 1 );
 
-            $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
+            $existing_contact_types = get_post_meta( $post_id, '_contact_types', TRUE );
             if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
             {
                 $existing_contact_types = array();
@@ -191,29 +248,30 @@ class PH_Admin_Meta_Boxes {
             if ( !in_array( 'applicant', $existing_contact_types ) )
             {
                 $existing_contact_types[] = 'applicant';
-                update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
+                update_post_meta( $post_id, '_contact_types', $existing_contact_types );
             }
 
             // Do redirect
-            wp_redirect( admin_url( 'post.php?post=' . (int)$_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+            wp_safe_redirect( admin_url( 'post.php?post=' . $post_id . '&action=edit#propertyhive-contact-relationships' ) );
             exit();
         }
 
-        if ( isset($_GET['add_third_party_relationship']) && wp_verify_nonce($_GET['add_third_party_relationship'], '1') && isset($_GET['post']) ) 
+        if ( false !== $this->get_request_value( 'add_third_party_relationship' ) && false !== $post_request )
         {
+            $post_id = $this->authorize_record_action( 'add_third_party_relationship' );
             // Need to add blank third party relationship
-            if ( get_post_type((int)$_GET['post']) != 'contact' )
+            if ( get_post_type( $post_id ) != 'contact' )
                 return;
 
-            $existing_third_party_categories = get_post_meta( (int)$_GET['post'], '_third_party_categories', TRUE );
+            $existing_third_party_categories = get_post_meta( $post_id, '_third_party_categories', TRUE );
             if ( !is_array($existing_third_party_categories) )
             {
                 $existing_third_party_categories = array();
             }
             $existing_third_party_categories[] = 0;
-            update_post_meta( $_GET['post'], '_third_party_categories', $existing_third_party_categories );
+            update_post_meta( $post_id, '_third_party_categories', $existing_third_party_categories );
 
-            $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
+            $existing_contact_types = get_post_meta( $post_id, '_contact_types', TRUE );
             if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
             {
                 $existing_contact_types = array();
@@ -221,20 +279,24 @@ class PH_Admin_Meta_Boxes {
             if ( !in_array( 'thirdparty', $existing_contact_types ) )
             {
                 $existing_contact_types[] = 'thirdparty';
-                update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
+                update_post_meta( $post_id, '_contact_types', $existing_contact_types );
             }
         }
     }
 
     public function check_contact_delete_relationship()
     {
-        if ( isset($_GET['delete_applicant_relationship']) && isset($_GET['post']) )
+        $post_request = $this->get_request_value( 'post' );
+        $delete_nonce = $this->get_request_value( 'delete_applicant_relationship' );
+
+        if ( false !== $delete_nonce && false !== $post_request )
         {
+            $post_id = $this->authorize_record_action( 'delete_applicant_relationship', false );
             // Need to add blank applicant
-            if ( get_post_type((int)$_GET['post']) != 'contact' )
+            if ( get_post_type( $post_id ) != 'contact' )
                 return;
 
-            $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
+            $num_applicant_profiles = get_post_meta( $post_id, '_applicant_profiles', TRUE );
             if ( $num_applicant_profiles == '' )
             {
                 $num_applicant_profiles = 0;
@@ -242,28 +304,28 @@ class PH_Admin_Meta_Boxes {
 
             for ( $i = 0; $i < $num_applicant_profiles; ++$i )
             {
-                if ( wp_verify_nonce($_GET['delete_applicant_relationship'], $i) ) 
+                if ( wp_verify_nonce( $delete_nonce, 'propertyhive-delete-applicant-' . $post_id . '-' . $i ) )
                 {
                     $deleting_applicant_profile = $i;
 
                     // We're deleting this one
-                    delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $i );
+                    delete_post_meta( $post_id, '_applicant_profile_' . $i );
 
                     // Now need to rename any that are higher than $deleting_applicant_profile
                     for ( $j = 0; $j < $num_applicant_profiles; ++$j )
                     {
                        if ( $j > $deleting_applicant_profile )
                         {
-                            $this_applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j, true );
-                            update_post_meta( (int)$_GET['post'], '_applicant_profile_' . ($j - 1), $this_applicant_profile );
-                            delete_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j );
+                            $this_applicant_profile = get_post_meta( $post_id, '_applicant_profile_' . $j, true );
+                            update_post_meta( $post_id, '_applicant_profile_' . ($j - 1), $this_applicant_profile );
+                            delete_post_meta( $post_id, '_applicant_profile_' . $j );
                         }
                     }
 
                     // remove from _contact_types if no more profiles left
                     if ( $num_applicant_profiles == 1 )
                     {
-                        $existing_contact_types = get_post_meta( (int)$_GET['post'], '_contact_types', TRUE );
+                        $existing_contact_types = get_post_meta( $post_id, '_contact_types', TRUE );
                         if ( $existing_contact_types == '' || !is_array($existing_contact_types) )
                         {
                             $existing_contact_types = array();
@@ -272,16 +334,16 @@ class PH_Admin_Meta_Boxes {
                         {
                             unset($existing_contact_types[$key]);
                         }
-                        update_post_meta( (int)$_GET['post'], '_contact_types', $existing_contact_types );
+                        update_post_meta( $post_id, '_contact_types', $existing_contact_types );
                     }
 
-                    update_post_meta( (int)$_GET['post'], '_applicant_profiles', $num_applicant_profiles - 1 );
+                    update_post_meta( $post_id, '_applicant_profiles', $num_applicant_profiles - 1 );
 
                     // update applicant departments
                     $hot_applicant = '';
                     $applicant_departments = array();
 
-                    $num_applicant_profiles = get_post_meta( (int)$_GET['post'], '_applicant_profiles', TRUE );
+                    $num_applicant_profiles = get_post_meta( $post_id, '_applicant_profiles', TRUE );
                     if ( $num_applicant_profiles == '' )
                     {
                         $num_applicant_profiles = 0;
@@ -289,7 +351,7 @@ class PH_Admin_Meta_Boxes {
 
                     for ( $j = 0; $j < $num_applicant_profiles; ++$j )
                     {
-                        $applicant_profile = get_post_meta( (int)$_GET['post'], '_applicant_profile_' . $j, true );
+                        $applicant_profile = get_post_meta( $post_id, '_applicant_profile_' . $j, true );
 
                         if ( isset($applicant_profile['department']) && !empty($applicant_profile['department']) )
                         {
@@ -302,17 +364,17 @@ class PH_Admin_Meta_Boxes {
                         }
                     }
 
-                    update_post_meta( (int)$_GET['post'], '_hot_applicant', $hot_applicant );
+                    update_post_meta( $post_id, '_hot_applicant', $hot_applicant );
 
                     if ( !empty($applicant_departments) )
                     {
                         $applicant_departments = array_filter($applicant_departments);
                         $applicant_departments = array_unique($applicant_departments);
                     }
-                    update_post_meta( (int)$_GET['post'], '_applicant_departments', $applicant_departments );
+                    update_post_meta( $post_id, '_applicant_departments', $applicant_departments );
 
                     // Do redirect
-                    wp_redirect( admin_url( 'post.php?post=' . (int)$_GET['post'] . '&action=edit#propertyhive-contact-relationships' ) );
+                    wp_safe_redirect( admin_url( 'post.php?post=' . $post_id . '&action=edit#propertyhive-contact-relationships' ) );
                     exit();
                 }
             }
@@ -321,39 +383,51 @@ class PH_Admin_Meta_Boxes {
 
     public function check_remove_solicitor()
     {
-        if ( isset($_GET['remove_contact_solicitor']) && isset($_GET['post']) )
+        $post_request = $this->get_request_value( 'post' );
+
+        if ( false !== $this->get_request_value( 'remove_contact_solicitor' ) && false !== $post_request )
         {
-            if ( get_post_type((int)$_GET['post']) != 'contact' )
+            $post_id = $this->authorize_record_action( 'remove_contact_solicitor' );
+            if ( get_post_type( $post_id ) != 'contact' )
                 return;
 
-            update_post_meta( (int)$_GET['post'], '_contact_solicitor_contact_id', '' );
+            update_post_meta( $post_id, '_contact_solicitor_contact_id', '' );
         }
 
-        if ( isset($_GET['remove_property_owner_solicitor']) && isset($_GET['post']) )
+        if ( false !== $this->get_request_value( 'remove_property_owner_solicitor' ) && false !== $post_request )
         {
-            if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
+            $post_id = $this->authorize_record_action( 'remove_property_owner_solicitor' );
+            if ( get_post_type( $post_id ) != 'offer' && get_post_type( $post_id ) != 'sale' )
                 return;
 
-            update_post_meta( (int)$_GET['post'], '_property_owner_solicitor_contact_id', '' );
+            update_post_meta( $post_id, '_property_owner_solicitor_contact_id', '' );
         }
 
-        if ( isset($_GET['remove_applicant_solicitor']) && isset($_GET['post']) )
+        if ( false !== $this->get_request_value( 'remove_applicant_solicitor' ) && false !== $post_request )
         {
-            if ( get_post_type((int)$_GET['post']) != 'offer' && get_post_type((int)$_GET['post']) != 'sale' )
+            $post_id = $this->authorize_record_action( 'remove_applicant_solicitor' );
+            if ( get_post_type( $post_id ) != 'offer' && get_post_type( $post_id ) != 'sale' )
                 return;
 
-            update_post_meta( (int)$_GET['post'], '_applicant_solicitor_contact_id', '' );
+            update_post_meta( $post_id, '_applicant_solicitor_contact_id', '' );
         }
     }
 
     public function check_create_offer()
     {
-        if ( isset($_GET['create_offer']) && isset($_GET['post']) )
+        $post_request = $this->get_request_value( 'post' );
+
+        if ( false !== $this->get_request_value( 'create_offer' ) && false !== $post_request )
         {
-            if ( get_post_type((int)$_GET['post']) != 'viewing')
+            $post_id = $this->authorize_record_action( 'create_offer' );
+            $existing_id = absint( get_post_meta( $post_id, '_offer_id', true ) );
+            if ( 'offer' === get_post_type( $existing_id ) && 'trash' !== get_post_status( $existing_id ) ) {
+                wp_die( esc_html__( 'This record has already been created.', 'propertyhive' ), '', array( 'response' => 409 ) );
+            }
+            if ( get_post_type( $post_id ) != 'viewing')
                 return;
 
-            $viewing = new PH_Viewing((int)$_GET['post']);
+            $viewing = new PH_Viewing( $post_id );
 
             $viewing_applicant_ids = $viewing->get_applicant_ids();
 
@@ -414,10 +488,10 @@ class PH_Admin_Meta_Boxes {
             }
             add_post_meta( $offer_post_id, '_property_owner_solicitor_contact_id', $property_owner_solicitor_contact_id );
 
-            add_post_meta( $offer_post_id, '_offer_date_time', date("Y-m-d H:i:s") );
+            add_post_meta( $offer_post_id, '_offer_date_time', gmdate("Y-m-d H:i:s") );
 
-            update_post_meta( (int)$_GET['post'], '_offer_id', $offer_post_id );
-            update_post_meta( (int)$_GET['post'], '_status', 'offer_made' );
+            update_post_meta( $post_id, '_offer_id', $offer_post_id );
+            update_post_meta( $post_id, '_status', 'offer_made' );
 
             $current_user = wp_get_current_user();
 
@@ -428,11 +502,11 @@ class PH_Admin_Meta_Boxes {
             );
 
             $data = array(
-                'comment_post_ID'      => (int)$_GET['post'],
+                'comment_post_ID'      => $post_id,
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_date'         => gmdate("Y-m-d H:i:s"),
                 'comment_content'      => serialize($comment),
                 'comment_approved'     => 1,
                 'comment_type'         => 'propertyhive_note',
@@ -440,7 +514,7 @@ class PH_Admin_Meta_Boxes {
             $comment_id = wp_insert_comment( $data );
 
             // Do redirect
-            wp_redirect( admin_url( 'post.php?post=' . $offer_post_id . '&action=edit' ) );
+            wp_safe_redirect( admin_url( 'post.php?post=' . $offer_post_id . '&action=edit' ) );
             exit();
         }
 
@@ -448,12 +522,19 @@ class PH_Admin_Meta_Boxes {
 
     public function check_create_sale()
     {
-        if ( isset($_GET['create_sale']) && isset($_GET['post']) )
+        $post_request = $this->get_request_value( 'post' );
+
+        if ( false !== $this->get_request_value( 'create_sale' ) && false !== $post_request )
         {
-            if ( get_post_type((int)$_GET['post']) != 'offer')
+            $post_id = $this->authorize_record_action( 'create_sale' );
+            $existing_id = absint( get_post_meta( $post_id, '_sale_id', true ) );
+            if ( 'sale' === get_post_type( $existing_id ) && 'trash' !== get_post_status( $existing_id ) ) {
+                wp_die( esc_html__( 'This record has already been created.', 'propertyhive' ), '', array( 'response' => 409 ) );
+            }
+            if ( get_post_type( $post_id ) != 'offer')
                 return;
 
-            $offer = new PH_Offer((int)$_GET['post']);
+            $offer = new PH_Offer( $post_id );
 
             $offer_applicant_ids = $offer->get_applicant_ids();
 
@@ -480,9 +561,9 @@ class PH_Admin_Meta_Boxes {
             add_post_meta( $sale_post_id, '_applicant_solicitor_contact_id', $offer->applicant_solicitor_contact_id );
             add_post_meta( $sale_post_id, '_property_id', $offer->property_id );
             add_post_meta( $sale_post_id, '_property_owner_solicitor_contact_id', $offer->property_owner_solicitor_contact_id );
-            add_post_meta( $sale_post_id, '_sale_date_time', date("Y-m-d H:i:s") );
+            add_post_meta( $sale_post_id, '_sale_date_time', gmdate("Y-m-d H:i:s") );
 
-            update_post_meta( (int)$_GET['post'], '_sale_id', $sale_post_id );
+            update_post_meta( $post_id, '_sale_id', $sale_post_id );
 
             $current_user = wp_get_current_user();
 
@@ -493,11 +574,11 @@ class PH_Admin_Meta_Boxes {
             );
 
             $data = array(
-                'comment_post_ID'      => (int)$_GET['post'],
+                'comment_post_ID'      => $post_id,
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
-                'comment_date'         => date("Y-m-d H:i:s"),
+                'comment_date'         => gmdate("Y-m-d H:i:s"),
                 'comment_content'      => serialize($comment),
                 'comment_approved'     => 1,
                 'comment_type'         => 'propertyhive_note',
@@ -505,19 +586,26 @@ class PH_Admin_Meta_Boxes {
             $comment_id = wp_insert_comment( $data );
 
             // Do redirect
-            wp_redirect( admin_url( 'post.php?post=' . $sale_post_id . '&action=edit' ) );
+            wp_safe_redirect( admin_url( 'post.php?post=' . $sale_post_id . '&action=edit' ) );
             exit();
         }
 
     }
 
     public function check_create_tenancy() {
-        if ( isset( $_GET['create_tenancy'] ) && isset( $_GET['post'] ) ) {
-            if ( get_post_type( (int) $_GET['post'] ) != 'viewing' ) {
+        $post_request = $this->get_request_value( 'post' );
+
+        if ( false !== $this->get_request_value( 'create_tenancy' ) && false !== $post_request ) {
+            $post_id = $this->authorize_record_action( 'create_tenancy' );
+            $existing_id = absint( get_post_meta( $post_id, '_tenancy_id', true ) );
+            if ( 'tenancy' === get_post_type( $existing_id ) && 'trash' !== get_post_status( $existing_id ) ) {
+                wp_die( esc_html__( 'This record has already been created.', 'propertyhive' ), '', array( 'response' => 409 ) );
+            }
+            if ( get_post_type( $post_id ) != 'viewing' ) {
                 return;
             }
 
-            $viewing = new PH_Viewing( (int) $_GET['post'] );
+            $viewing = new PH_Viewing( $post_id );
 
             $viewing_applicant_ids = $viewing->get_applicant_ids();
 
@@ -549,8 +637,8 @@ class PH_Admin_Meta_Boxes {
 
             add_post_meta( $tenancy_post_id, '_deposit', get_post_meta( $property_id, '_deposit', true ) );
 
-            update_post_meta( (int) $_GET['post'], '_tenancy_id', $tenancy_post_id );
-            update_post_meta( (int) $_GET['post'], '_status', 'offer_made' );
+            update_post_meta( $post_id, '_tenancy_id', $tenancy_post_id );
+            update_post_meta( $post_id, '_status', 'offer_made' );
 
             $current_user = wp_get_current_user();
 
@@ -561,11 +649,11 @@ class PH_Admin_Meta_Boxes {
             );
 
             $data = array(
-                'comment_post_ID'      => (int) $_GET['post'],
+                'comment_post_ID'      => $post_id,
                 'comment_author'       => $current_user->display_name,
                 'comment_author_email' => 'propertyhive@noreply.com',
                 'comment_author_url'   => '',
-                'comment_date'         => date( "Y-m-d H:i:s" ),
+                'comment_date'         => gmdate( "Y-m-d H:i:s" ),
                 'comment_content'      => serialize( $comment ),
                 'comment_approved'     => 1,
                 'comment_type'         => 'propertyhive_note',
@@ -573,7 +661,7 @@ class PH_Admin_Meta_Boxes {
             $comment_id = wp_insert_comment( $data );
 
             // Do redirect
-            wp_redirect( admin_url( 'post.php?post=' . $tenancy_post_id . '&action=edit' ) );
+            wp_safe_redirect( admin_url( 'post.php?post=' . $tenancy_post_id . '&action=edit' ) );
             exit();
         }
 
@@ -639,6 +727,7 @@ class PH_Admin_Meta_Boxes {
                 'type' => 'propertyhive_note',
                 'fields' => 'ids',
                 'search' => '"pinned";s:1:"1"',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Pinned notes store related post IDs in serialized note metadata; this admin panel requires the exact relationship filter.
                 'meta_query' => array(
                     array(
                         'key' => 'related_to',
@@ -1006,9 +1095,11 @@ class PH_Admin_Meta_Boxes {
                 {
                     $args = array(
                         'post_type'   => 'viewing',
-                        'nopaging'    => true,
+                        'posts_per_page' => 1,
+                        'no_found_rows' => false,
                         'fields'      => 'ids',
                         'post_status' => 'publish',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- One-ID query retains found_rows to count all viewings for the current property.
                         'meta_query'  => array(
                             array(
                                 'key'   => '_property_id',
@@ -1078,6 +1169,7 @@ class PH_Admin_Meta_Boxes {
                             'nopaging'    => true,
                             'fields'      => 'ids',
                             'post_status' => 'publish',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property offer tab counts query the legacy relationship meta key and use found_posts to preserve the displayed count.
                             'meta_query'  => array(
                                 array(
                                     'key'   => '_property_id',
@@ -1128,6 +1220,7 @@ class PH_Admin_Meta_Boxes {
                             'nopaging'    => true,
                             'fields'      => 'ids',
                             'post_status' => 'publish',
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property sale tab counts query the legacy relationship meta key and use found_posts to preserve the displayed count.
                             'meta_query'  => array(
                                 array(
                                     'key'   => '_property_id',
@@ -1184,6 +1277,7 @@ class PH_Admin_Meta_Boxes {
                         'post_type' => 'enquiry',
                         'nopaging'    => true,
                         'fields' => 'ids',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Property enquiry counts must include both legacy property relationship meta keys for existing records.
                         'meta_query' => array(
                             'relation' => 'OR',
                             array(
@@ -1390,6 +1484,7 @@ class PH_Admin_Meta_Boxes {
                     'post_type' => 'viewing',
                     'posts_per_page' => 1,
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact tabs use posts_per_page=1 and fields=ids to test whether related records exist while found_posts supplies the count. Single _applicant_contact_id equality and posts_per_page=1 at every site; found_rows is intentionally retained.
                     'meta_query' => array(
                         array(
                             'key' => '_applicant_contact_id',
@@ -1432,6 +1527,7 @@ class PH_Admin_Meta_Boxes {
                     'post_type' => 'offer',
                     'posts_per_page' => 1,
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact tabs use posts_per_page=1 and fields=ids to test whether related records exist while found_posts supplies the count. Single _applicant_contact_id equality and posts_per_page=1 at every site; found_rows is intentionally retained.
                     'meta_query' => array(
                         array(
                             'key' => '_applicant_contact_id',
@@ -1447,6 +1543,7 @@ class PH_Admin_Meta_Boxes {
                     'post_type' => 'sale',
                     'posts_per_page' => 1,
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact tabs use posts_per_page=1 and fields=ids to test whether related records exist while found_posts supplies the count. Single _applicant_contact_id equality and posts_per_page=1 at every site; found_rows is intentionally retained.
                     'meta_query' => array(
                         array(
                             'key' => '_applicant_contact_id',
@@ -1535,6 +1632,7 @@ class PH_Admin_Meta_Boxes {
                     'post_type' => 'tenancy',
                     'posts_per_page' => 1,
                     'fields' => 'ids',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact tabs use posts_per_page=1 and fields=ids to test whether related records exist while found_posts supplies the count. Single _applicant_contact_id equality and posts_per_page=1 at every site; found_rows is intentionally retained.
                     'meta_query' => array(
                         array(
                             'key' => '_applicant_contact_id',
@@ -1646,6 +1744,7 @@ class PH_Admin_Meta_Boxes {
                         'post_type' => 'enquiry',
                         'nopaging'    => true,
                         'fields' => 'ids',
+                        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Contact enquiry counts must include the legacy contact and email relationship keys for existing records.
                         'meta_query' => $meta_query,
                     );
                     $enquiry_query = new WP_Query( $args );
@@ -2478,7 +2577,7 @@ class PH_Admin_Meta_Boxes {
             {
                 if (isset($tab['post_type']) && $post->post_type == $tab['post_type'])
                 {
-                    echo '<a href="#' . esc_attr(implode("|#", $tab['metabox_ids'])) . '" id="' . esc_attr($tab_id) . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
+                    echo '<a href="' . esc_attr( '#' . implode( '|#', $tab['metabox_ids'] ) ) . '" id="' . esc_attr($tab_id) . '" class="button' . ( ($i == 0) ? ' button-primary' : '') . '"';
                     if ( isset($tab['ajax_actions']) )
                     {
                         echo ' data-ajax-actions="' . esc_attr(implode("|", $tab['ajax_actions'])) . '"';
@@ -2691,7 +2790,7 @@ class PH_Admin_Meta_Boxes {
 		}
 
 		// Check the nonce
-		if ( empty( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( $_POST['propertyhive_meta_nonce'], 'propertyhive_save_data' ) ) {
+		if ( empty( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
 			return;
 		}
         
@@ -2701,7 +2800,7 @@ class PH_Admin_Meta_Boxes {
 		}
 
 		// Check user has permission to edit
-		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
 			return;
 		}
 
@@ -2719,6 +2818,7 @@ class PH_Admin_Meta_Boxes {
         {
             global $wpdb;
 
+            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Updating post_parent here avoids recursively re-entering save_post; the save flow already owns this post and WordPress refreshes its post cache after the save.
             $wpdb->update( $wpdb->posts, array( 'post_parent' => (int)$_POST['post_parent'] ), array( 'ID' => $post_id ) );
         }
 

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Virtual Tours
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Virtual_Tours
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Virtual_Tours; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Virtual_Tours {
 
 	/**
@@ -119,13 +123,27 @@ class PH_Meta_Box_Property_Virtual_Tours {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
+        // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only check rejects nested values before the separately sanitized text or integer conversion below.
+        if ( ! isset( $_POST['virtual_tour'], $_POST['virtual_tour_label'] ) || ! is_array( $_POST['virtual_tour'] ) || ! is_array( $_POST['virtual_tour_label'] ) || count( $_POST['virtual_tour'] ) !== count( $_POST['virtual_tour_label'] ) || count( array_filter( $_POST['virtual_tour'], 'is_string' ) ) !== count( $_POST['virtual_tour'] ) || count( array_filter( $_POST['virtual_tour_label'], 'is_string' ) ) !== count( $_POST['virtual_tour_label'] ) ) {
+            return;
+        }
+        $virtual_tours = array_values( array_map( 'sanitize_url', wp_unslash( $_POST['virtual_tour'] ) ) );
+        $virtual_tour_labels = array_values( ph_clean( wp_unslash( $_POST['virtual_tour_label'] ) ) );
         // Get existing number of virtual tours to see if we need to remove any
         $existing_num_property_virtual_tours = get_post_meta($post_id, '_virtual_tours', TRUE);
         if ($existing_num_property_virtual_tours == '') { $existing_num_property_virtual_tours = 0; }
         
-        $new_num_property_virtual_tours = count($_POST['virtual_tour']) - 1; // Minus one because of the template virtual tour. Don't want to include this
+        $new_num_property_virtual_tours = max( 0, count($virtual_tours) - 1 ); // Minus one because of the template virtual tour. Don't want to include this
         
         if ($new_num_property_virtual_tours < $existing_num_property_virtual_tours)
         {
@@ -142,8 +160,8 @@ class PH_Meta_Box_Property_Virtual_Tours {
         
         for ($i = 0; $i < $new_num_property_virtual_tours; ++$i)
         {
-            update_post_meta($post_id, '_virtual_tour_' . $i, sanitize_url($_POST['virtual_tour'][$i]));
-            update_post_meta($post_id, '_virtual_tour_label_' . $i, ph_clean($_POST['virtual_tour_label'][$i]));
+            update_post_meta($post_id, '_virtual_tour_' . $i, wp_slash( $virtual_tours[$i] ));
+            update_post_meta($post_id, '_virtual_tour_label_' . $i, wp_slash( $virtual_tour_labels[$i] ));
         }
     }
 }

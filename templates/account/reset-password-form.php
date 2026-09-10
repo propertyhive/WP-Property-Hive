@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 <form name="ph_reset_password_form" class="propertyhive-form reset-password-form" action="" method="post">
 
-    <p><?php echo esc_html(__( 'Enter a new password below.', 'propertyhive' )); ?></p>
+    <p><?php echo esc_html__( 'Enter a new password below.', 'propertyhive' ); ?></p>
  	
     <div id="resetPasswordError" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'The passwords entered must match', 'propertyhive' )); ?>

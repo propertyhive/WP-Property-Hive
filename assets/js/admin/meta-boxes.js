@@ -395,6 +395,7 @@ jQuery( function($){
 
         var data = {
             action:               'propertyhive_add_key_date',
+            security:             propertyhive_admin_meta_boxes.add_key_date_nonce,
             post_id:              propertyhive_admin_meta_boxes.post_id,
             key_date_type:        $('#_add_key_date_type').val(),
             key_date_description: $('#_add_key_date_description').val(),
@@ -859,7 +860,13 @@ jQuery( function($){
         new_location = new_location.split("#");
         new_location = new_location[0];
 
-        window.location.href = new_location + '&sub_grid=' + $(this).attr('id').replace("export-", "") + '&record_ids=' + record_ids.join("|")
+        if ( record_ids.length == 0 )
+        {
+            alert('No records to export');
+            return;
+        }
+
+        window.location.href = new_location + '&sub_grid=' + encodeURIComponent($(this).attr('id').replace("export-", "")) + '&record_ids=' + encodeURIComponent(record_ids.join("|")) + '&ph_export_nonce=' + encodeURIComponent(propertyhive_admin_meta_boxes.export_sub_grid_nonce);
     });
     
     // Multiselect

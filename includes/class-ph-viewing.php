@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category    Class
  * @author      PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Viewing; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Viewing {
 
     /** @public int Viewing (post) ID */
@@ -134,7 +135,9 @@ class PH_Viewing {
             'post_type' => 'viewing',
             'nopaging'  => true,
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Related viewings require matching this property and every applicant while excluding cancelled/no-show statuses in the existing metadata schema.
             'meta_query' => $meta_query,
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Excludes one current viewing ID so the related-viewing lists cannot contain themselves; this is not an unbounded exclusion list.
             'post__not_in' => array($this->id),
             'orderby' => 'none'
         );
@@ -195,7 +198,7 @@ class PH_Viewing {
             $applicant_contacts = array();
             foreach ($applicant_contact_ids as $applicant_contact_id)
             {
-                $applicant_name = get_the_title($applicant_contact_id);
+                $applicant_name = esc_html( get_the_title($applicant_contact_id) );
                 if ( $add_hyperlinks )
                 {
                     $edit_link = get_edit_post_link( $applicant_contact_id );
@@ -207,13 +210,13 @@ class PH_Viewing {
                     $telephone_number = get_post_meta( $applicant_contact_id, '_telephone_number', true );
                     if( !empty($telephone_number) )
                     {
-                        $contact_details[] = 'T: ' . $telephone_number;
+                        $contact_details[] = 'T: ' . esc_html($telephone_number);
                     }
 
                     $email_address = get_post_meta( $applicant_contact_id, '_email_address', true );
                     if( !empty($email_address) )
                     {
-                        $contact_details[] = 'E: ' . $email_address;
+                        $contact_details[] = 'E: ' . esc_html($email_address);
                     }
 
                     $contact_details = apply_filters( 'propertyhive_viewing_applicant_contact_details', $contact_details, $applicant_contact_id );
@@ -274,7 +277,7 @@ class PH_Viewing {
     public function get_status()
     {
         $status = $this->_status;
-        $status_items = array( __( ucwords(str_replace("_", " ", $status)), 'propertyhive' ) );
+        $status_items = array( propertyhive_get_status_label( $status ) );
 
         if ( $status == 'pending' )
         {
@@ -313,7 +316,7 @@ class PH_Viewing {
             $status_items[] = ph_ordinal_suffix(count($related_viewings['previous'])+1) . ' ' . __( 'Viewing', 'propertyhive' );
         }
 
-        return implode('<br>', $status_items);
+        return implode('<br>', array_map( 'esc_html', $status_items ));
     }
 
     /**
@@ -329,7 +332,7 @@ class PH_Viewing {
         if ( !empty($property_id) )
         {
             $property = new PH_Property( $property_id );
-            return '<a href="' . get_edit_post_link( $property_id, '' ) . '" target="' . apply_filters('propertyhive_subgrid_link_target', '') . '">' . $property->get_formatted_full_address() . '</a>';
+            return '<a href="' . esc_url( get_edit_post_link( $property_id, '' ) ) . '" target="' . esc_attr( apply_filters('propertyhive_subgrid_link_target', '') ) . '">' . esc_html( $property->get_formatted_full_address() ) . '</a>';
         }
         else
         {

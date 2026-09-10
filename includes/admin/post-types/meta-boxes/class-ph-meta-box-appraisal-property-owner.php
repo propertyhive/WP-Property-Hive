@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Appraisal Property Owner Details
  *
@@ -11,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Appraisal_Property_Owner
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Appraisal_Property_Owner; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Appraisal_Property_Owner {
 
 	/**
@@ -31,7 +35,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 
             echo '<p class="form-field">
             
-                <label>' . esc_html(__('Name', 'propertyhive')) . '</label>
+                <label>' . esc_html__('Name', 'propertyhive') . '</label>
                 
                 <a 
                     href="' . esc_url(get_edit_post_link($property_owner_contact_id, '')) . '" 
@@ -44,7 +48,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
                     data-appraisal-property-owner-address-four="' . esc_attr( $contact->address_four ) . '" 
                     data-appraisal-property-owner-address-postcode="' . esc_attr( $contact->address_postcode ) . '" 
                     data-appraisal-property-owner-address-country="' . esc_attr( $contact->address_country ) . '" 
-                >' . esc_html(get_the_title($property_owner_contact_id)) . '</a>
+                >' . esc_html( get_the_title($property_owner_contact_id) ) . '</a>
                 
             </p>';
 
@@ -68,7 +72,7 @@ class PH_Meta_Box_Appraisal_Property_Owner {
             
                 <label>' . esc_html(__('Correspondence Address', 'propertyhive')) . '</label>
                 
-                ' . wp_kses_post($contact->get_formatted_full_address('<br>')) . '
+                ' . wp_kses( $contact->get_formatted_full_address('<br>'), array( 'br' => array() ) ) . '
                 
             </p>';
         }
@@ -197,8 +201,11 @@ class PH_Meta_Box_Appraisal_Property_Owner {
 <script>
 
 var appraisal_selected_property_owners = [];
-<?php if (isset($_GET['property_owner_contact_id']) && $_GET['property_owner_contact_id'] != '') { ?>
-appraisal_selected_property_owners.push({ id: <?php echo (int)$_GET['property_owner_contact_id']; ?>, post_title: '<?php echo esc_js(get_the_title((int)$_GET['property_owner_contact_id'])); ?>' });
+<?php
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only contact prefill; submission is guarded separately.
+$prefill_contact = isset( $_GET['property_owner_contact_id'] ) && is_string( $_GET['property_owner_contact_id'] ) ? absint( $_GET['property_owner_contact_id'] ) : 0;
+if ( $prefill_contact > 0 && 'contact' === get_post_type( $prefill_contact ) && current_user_can( 'edit_post', $prefill_contact ) ) { ?>
+appraisal_selected_property_owners.push(<?php echo wp_json_encode( array( 'id' => $prefill_contact, 'post_title' => get_the_title( $prefill_contact ) ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
 <?php } ?>
 
 jQuery(document).ready(function($)
@@ -232,7 +239,7 @@ jQuery(document).ready(function($)
         var keyCode = e.charCode || e.keyCode || e.which;
         if (keyCode == 13)
         {
-            event.preventDefault();
+            e.preventDefault();
             return false;
         }
     });
@@ -264,14 +271,21 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#appraisal_search_property_owner_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                $('#appraisal_search_property_owner_results').empty().append($('<div>').css('padding', '10px').text(<?php echo wp_json_encode( __( 'No results found for', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + " '" + keyword + "'"));
             }
             else
             {
                 $('#appraisal_search_property_owner_results').html('<ul style="margin:0; padding:0;"></ul>');
                 for ( var i in response )
                 {
-                    $('#appraisal_search_property_owner_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-appraisal-property-owner-name="' + response[i].post_title + '" data-appraisal-property-owner-address-name-number="' + response[i].address_name_number + '" data-appraisal-property-owner-address-street="' + response[i].address_street + '" data-appraisal-property-owner-address-two="' + response[i].address_two + '" data-appraisal-property-owner-address-three="' + response[i].address_three + '" data-appraisal-property-owner-address-four="' + response[i].address_four + '" data-appraisal-property-owner-address-postcode="' + response[i].address_postcode + '" data-appraisal-property-owner-address-country="' + response[i].address_country + '"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                    var owner_link = $('<a>').attr('href', response[i].ID).css({color:'#666', display:'block', padding:'7px 10px', background:'#FFF', borderBottom:'1px solid #DDD', textDecoration:'none'});
+                    owner_link.attr('data-appraisal-property-owner-name', response[i].post_title);
+                    ['name_number', 'street', 'two', 'three', 'four', 'postcode', 'country'].forEach(function(part) { owner_link.attr('data-appraisal-property-owner-address-' + part.replace('_', '-'), response[i]['address_' + part]); });
+                    owner_link.append($('<strong>').text(response[i].post_title));
+                    var owner_summary = $('<small>').css({color:'#999', paddingTop:'1px', display:'block', lineHeight:'1.5em'});
+                    [response[i].address_full_formatted, response[i].telephone_number, response[i].email_address].forEach(function(value) { if (value) { if (owner_summary.contents().length) { owner_summary.append('<br>'); } owner_summary.append(document.createTextNode(value)); } });
+                    owner_link.append(owner_summary);
+                    $('#appraisal_search_property_owner_results ul').append($('<li>').css({margin:0,padding:0}).append(owner_link));
                 }
             }
             $('#appraisal_search_property_owner_results').show();
@@ -294,7 +308,6 @@ jQuery(document).ready(function($)
             address_postcode: $(this).attr('data-appraisal-property-owner-address-postcode'), 
             address_country: $(this).attr('data-appraisal-property-owner-address-country'), 
         } );
-        console.log(appraisal_selected_property_owners);
         $('#appraisal_search_property_owner_results').html('');
         $('#appraisal_search_property_owner_results').hide();
 
@@ -330,7 +343,10 @@ function appraisal_update_selected_property_owners()
         jQuery('#appraisal_selected_property_owners').html('<ul></ul>');
         for ( var i in appraisal_selected_property_owners )
         {
-            jQuery('#appraisal_selected_property_owners ul').append('<li><a href="' + appraisal_selected_property_owners[i].id + '" class="appraisal-remove-property-owner" data-appraisal-property-owner-id="' + appraisal_selected_property_owners[i].id + '" data-appraisal-property-owner-name="' + appraisal_selected_property_owners[i].post_title + '" data-appraisal-property-owner-address-name-number="' + appraisal_selected_property_owners[i].address_name_number + '" data-appraisal-property-owner-address-street="' + appraisal_selected_property_owners[i].address_street + '" data-appraisal-property-owner-address-two="' + appraisal_selected_property_owners[i].address_two + '" data-appraisal-property-owner-address-three="' + appraisal_selected_property_owners[i].address_three + '" data-appraisal-property-owner-address-four="' + appraisal_selected_property_owners[i].address_four + '" data-appraisal-property-owner-address-postcode="' + appraisal_selected_property_owners[i].address_postcode + '" data-appraisal-property-owner-address-country="' + appraisal_selected_property_owners[i].address_country + '" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + appraisal_selected_property_owners[i].post_title + '</li>');
+            var selected_owner = appraisal_selected_property_owners[i];
+            var remove_owner = jQuery('<a>').attr({href:selected_owner.id, 'data-appraisal-property-owner-id':selected_owner.id, 'data-appraisal-property-owner-name':selected_owner.post_title}).addClass('appraisal-remove-property-owner').css({color:'inherit',textDecoration:'none'}).append(jQuery('<span>').addClass('dashicons dashicons-no-alt'));
+            ['name_number', 'street', 'two', 'three', 'four', 'postcode', 'country'].forEach(function(part) { remove_owner.attr('data-appraisal-property-owner-address-' + part.replace('_', '-'), selected_owner['address_' + part]); });
+            jQuery('#appraisal_selected_property_owners ul').append(jQuery('<li>').append(remove_owner).append(document.createTextNode(' ' + selected_owner.post_title)));
 
             jQuery('#_property_owner_contact_ids').val(appraisal_selected_property_owners[i].id);
         }
@@ -361,16 +377,39 @@ function appraisal_update_selected_property_owners()
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
+        $request_post = wp_unslash( $_POST );
+        $input = array();
+        foreach ( array( '_appraisal_property_owner_create_new', '_property_owner_contact_ids', '_property_owner_name', '_property_owner_telephone_number', '_property_owner_email_address', '_property_owner_address_name_number', '_property_owner_address_street', '_property_owner_address_two', '_property_owner_address_three', '_property_owner_address_four', '_property_owner_address_postcode' ) as $key )
+        {
+            if ( isset( $request_post[ $key ] ) && ! is_string( $request_post[ $key ] ) ) { return; }
+            $input[ $key ] = isset( $request_post[ $key ] ) ? sanitize_text_field( $request_post[ $key ] ) : '';
+        }
+        $selected_contact = absint( $input['_property_owner_contact_ids'] );
+        if ( empty( $input['_appraisal_property_owner_create_new'] ) && ! empty( $input['_property_owner_contact_ids'] ) && ( ! ctype_digit( $input['_property_owner_contact_ids'] ) || 'contact' !== get_post_type( $selected_contact ) || ! current_user_can( 'edit_post', $selected_contact ) ) ) { return; }
+        if ( ! empty( $input['_appraisal_property_owner_create_new'] ) )
+        {
+            $contact_type = get_post_type_object( 'contact' );
+            if ( ! $contact_type || ! current_user_can( $contact_type->cap->create_posts ) ) { return; }
+        }
+
         global $wpdb;
 
-        if ( isset($_POST['_appraisal_property_owner_create_new']) && !empty($_POST['_appraisal_property_owner_create_new']) )
+        if ( isset($input['_appraisal_property_owner_create_new']) && !empty($input['_appraisal_property_owner_create_new']) )
         {
             // we're created a new property owner on submission
-            if (!empty($_POST['_property_owner_name']))
+            if (!empty($input['_property_owner_name']))
             {
                 // Need to create contact
                 $contact_post = array(
-                    'post_title'    => ph_clean($_POST['_property_owner_name']),
+                    'post_title'    => wp_slash( $input['_property_owner_name'] ),
                     'post_content'  => '',
                     'post_type'     => 'contact',
                     'post_status'   => 'publish',
@@ -394,17 +433,19 @@ function appraisal_update_selected_property_owners()
                     // Successfully added contact post
                     update_post_meta( $contact_post_id, '_contact_types', array('potentialowner') );
 
-                    update_post_meta( $contact_post_id, '_telephone_number', ph_clean($_POST['_property_owner_telephone_number']) );
-                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean(ph_clean_telephone_number($_POST['_property_owner_telephone_number'])) );
+                    $ph_contact_telephone_value = ( isset( $input['_property_owner_telephone_number'] ) && is_string( $input['_property_owner_telephone_number'] ) ) ? sanitize_text_field( $input['_property_owner_telephone_number'] ) : '';
+                    update_post_meta( $contact_post_id, '_telephone_number', wp_slash( $ph_contact_telephone_value ) );
+                    update_post_meta( $contact_post_id, '_telephone_number_clean',  ph_clean(ph_clean_telephone_number($ph_contact_telephone_value)) );
 
-                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", ph_clean($_POST['_property_owner_email_address'])) );
+                    $ph_contact_email_value = ( isset( $input['_property_owner_email_address'] ) && is_string( $input['_property_owner_email_address'] ) ) ? sanitize_text_field( $input['_property_owner_email_address'] ) : '';
+                    update_post_meta( $contact_post_id, '_email_address', str_replace(" ", "", wp_slash( $ph_contact_email_value )) );
 
-                    update_post_meta( $contact_post_id, '_address_name_number', ph_clean($_POST['_property_owner_address_name_number']) );
-                    update_post_meta( $contact_post_id, '_address_street', ph_clean($_POST['_property_owner_address_street']) );
-                    update_post_meta( $contact_post_id, '_address_two', ph_clean($_POST['_property_owner_address_two']) );
-                    update_post_meta( $contact_post_id, '_address_three', ph_clean($_POST['_property_owner_address_three']) );
-                    update_post_meta( $contact_post_id, '_address_four', ph_clean($_POST['_property_owner_address_four']) );
-                    update_post_meta( $contact_post_id, '_address_postcode', ph_clean($_POST['_property_owner_address_postcode']) );
+                    update_post_meta( $contact_post_id, '_address_name_number', wp_slash( isset( $input['_property_owner_address_name_number'] ) && is_string( $input['_property_owner_address_name_number'] ) ? sanitize_text_field( $input['_property_owner_address_name_number'] ) : '' ) );
+                    update_post_meta( $contact_post_id, '_address_street', wp_slash( isset( $input['_property_owner_address_street'] ) && is_string( $input['_property_owner_address_street'] ) ? sanitize_text_field( $input['_property_owner_address_street'] ) : '' ) );
+                    update_post_meta( $contact_post_id, '_address_two', wp_slash( isset( $input['_property_owner_address_two'] ) && is_string( $input['_property_owner_address_two'] ) ? sanitize_text_field( $input['_property_owner_address_two'] ) : '' ) );
+                    update_post_meta( $contact_post_id, '_address_three', wp_slash( isset( $input['_property_owner_address_three'] ) && is_string( $input['_property_owner_address_three'] ) ? sanitize_text_field( $input['_property_owner_address_three'] ) : '' ) );
+                    update_post_meta( $contact_post_id, '_address_four', wp_slash( isset( $input['_property_owner_address_four'] ) && is_string( $input['_property_owner_address_four'] ) ? sanitize_text_field( $input['_property_owner_address_four'] ) : '' ) );
+                    update_post_meta( $contact_post_id, '_address_postcode', wp_slash( isset( $input['_property_owner_address_postcode'] ) && is_string( $input['_property_owner_address_postcode'] ) ? sanitize_text_field( $input['_property_owner_address_postcode'] ) : '' ) );
 
                     update_post_meta( $post_id, '_property_owner_contact_id', $contact_post_id );
                 }
@@ -413,11 +454,11 @@ function appraisal_update_selected_property_owners()
         }
         else
         {
-            if ( isset($_POST['_property_owner_contact_ids']) && !empty($_POST['_property_owner_contact_ids']) )
+            if ( isset($input['_property_owner_contact_ids']) && !empty($input['_property_owner_contact_ids']) )
             {
-                update_post_meta( $post_id, '_property_owner_contact_id', ph_clean($_POST['_property_owner_contact_ids']) );
+                update_post_meta( $post_id, '_property_owner_contact_id', ph_clean($input['_property_owner_contact_ids']) );
 
-                $existing_contact_types = get_post_meta( $_POST['_property_owner_contact_ids'], '_contact_types', TRUE );
+                $existing_contact_types = get_post_meta( $input['_property_owner_contact_ids'], '_contact_types', TRUE );
                 if ( !is_array($existing_contact_types) && ($existing_contact_types == '' || $existing_contact_types === FALSE) )
                 {
                     $existing_contact_types = array();
@@ -430,7 +471,7 @@ function appraisal_update_selected_property_owners()
                 {
                     $existing_contact_types[] = 'potentialowner';
                 }
-                update_post_meta( $_POST['_property_owner_contact_ids'], '_contact_types', $existing_contact_types );
+                update_post_meta( $input['_property_owner_contact_ids'], '_contact_types', $existing_contact_types );
             }
         }
     }

@@ -14,12 +14,50 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public PH_Post_types class; preserve its existing name for plugin and extension compatibility.
 class PH_Post_types {
+
+
+    /**
+     * Keep native CRM screens separate from ordinary WordPress post access.
+     * Existing post permissions remain required, alongside Property Hive access.
+     *
+     * @return array Dedicated primitive capabilities.
+     */
+    public static function record_capabilities() {
+        $capabilities = array();
+        foreach ( array( 'edit_posts', 'create_posts', 'edit_others_posts', 'edit_private_posts', 'edit_published_posts', 'publish_posts', 'delete_posts', 'delete_others_posts', 'delete_private_posts', 'delete_published_posts', 'read_private_posts' ) as $capability ) {
+            $capabilities[$capability] = 'propertyhive_' . $capability;
+        }
+        return $capabilities;
+    }
+
+    /**
+     * Resolve both direct checks and capabilities produced by core's post mapper.
+     * This preserves custom roles' existing edit/publish/delete restrictions.
+     *
+     * @param array $caps Required primitive capabilities.
+     * @return array Required capabilities.
+     */
+    public static function map_record_capabilities( $caps ) {
+        $mapped = array();
+        $record_caps = array_flip( self::record_capabilities() );
+        foreach ( $caps as $capability ) {
+            if ( isset( $record_caps[$capability] ) ) {
+                $mapped[] = 'manage_propertyhive';
+                $mapped[] = 'create_posts' === $record_caps[$capability] ? 'edit_posts' : $record_caps[$capability];
+            } else {
+                $mapped[] = $capability;
+            }
+        }
+        return array_values( array_unique( $mapped ) );
+    }
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
+        add_filter( 'map_meta_cap', array( __CLASS__, 'map_record_capabilities' ) );
 	    add_action( 'init', array( __CLASS__, 'register_taxonomies' ), 5 );
 		add_action( 'init', array( __CLASS__, 'register_post_types' ), 5 );
         add_action( 'init', array( __CLASS__, 'register_post_statuses' ), 5 );
@@ -68,8 +106,8 @@ class PH_Post_types {
                 'exclude_from_search'       => true,
                 'show_in_admin_all_list'    => false,
                 'show_in_admin_status_list' => true,
+                /* translators: %s: Number of archived posts. */
                 'label_count'               => _n_noop(
-                    /* translators: %s: number of posts in "Archived" status */
                     'Archived <span class="count">(%s)</span>', 
                     'Archived <span class="count">(%s)</span>', 
                     'propertyhive'
@@ -137,6 +175,7 @@ class PH_Post_types {
             // Find all properties linked to this contact
             $args = array(
                 'post_type' => 'property',
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Owner search metadata must be refreshed on properties linked through the existing serialized owner IDs; retain the relationship match.
                 'meta_query' => array(
                     array(
                         'key' => '_owner_contact_id',
@@ -518,6 +557,7 @@ class PH_Post_types {
             )
 		);
 			
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Existing public Property Hive extension hook do_action_after_register_taxonomies; changing the established name would detach installed callbacks.
 		do_action( 'do_action_after_register_taxonomies' );
 	}
 
@@ -557,6 +597,7 @@ class PH_Post_types {
 					'public' 				=> true,
 					'show_ui' 				=> true,
 					'capability_type' 		=> 'post',
+                    'capabilities' => self::record_capabilities(),
 					'map_meta_cap'			=> true,
 					'publicly_queryable' 	=> true,
 					'exclude_from_search' 	=> false,
@@ -596,6 +637,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -630,6 +672,7 @@ class PH_Post_types {
                     'public'                => true,
                     'show_ui'               => false,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -665,6 +708,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -700,6 +744,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -734,6 +779,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -768,6 +814,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -802,9 +849,9 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
-                    'capabilities' => array(
+                    'capabilities' => array_merge( self::record_capabilities(), array(
                         'create_posts' => false
-                    ),
+                    ) ),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -839,6 +886,7 @@ class PH_Post_types {
                     'public'                => false,
                     'show_ui'               => true,
                     'capability_type'       => 'post',
+                    'capabilities' => self::record_capabilities(),
                     'map_meta_cap'          => true,
                     'publicly_queryable'    => false,
                     'exclude_from_search'   => true,
@@ -881,9 +929,9 @@ class PH_Post_types {
 					'supports'              => false,
 					'show_in_nav_menus'     => false,
 					'show_in_menu'          => false,
-					'capabilities' => array(
+					'capabilities' => array_merge( self::record_capabilities(), array(
 						'create_posts' => 'do_not_allow'
-					),
+					) ),
 				)
 			)
 		);
@@ -926,6 +974,7 @@ class PH_Post_types {
                 'post_type' => 'enquiry',
                 'nopaging' => true,
                 'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future', 'trash'),
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Both legacy and current property relationship metadata must match when the explicit enquiry-trash option is enabled.
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -986,7 +1035,9 @@ class PH_Post_types {
                     'fields' => 'ids',
                     'suppress_filters' => TRUE,
                     'posts_per_page' => 1,
+                    // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Excludes only the property being deleted so its own media reference cannot prevent attachment cleanup.
                     'post__not_in' => array( $post_id ),
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Before deleting an attachment, check all four serialized property media relationships; the query stops at one matching property to preserve shared media.
                     'meta_query' => array(
                         'relation' => 'OR',
                         array(
@@ -1079,6 +1130,7 @@ class PH_Post_types {
                 'post_type' => 'enquiry',
                 'nopaging' => true,
                 'post_status' => array('publish', 'pending', 'private', 'draft', 'auto-draft', 'future', 'trash'),
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Both legacy and current property relationship metadata must match when the explicit enquiry-delete option is enabled.
                 'meta_query' => array(
                     'relation' => 'OR',
                     array(
@@ -1136,6 +1188,7 @@ class PH_Post_types {
         $args = array(
             'post_type' => 'contact',
             'nopaging' => true,
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Remove only contacts linked to the deleted user through their stored user ID.
             'meta_query' => array(
                 array(
                     'key' => '_user_id',
@@ -1258,6 +1311,8 @@ class PH_Post_types {
             'post_type' => 'property',
             'fields' => 'ids',
             'post_status' => array( 'publish', 'draft'),
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- This maintenance backfill must select records missing the destination metadata; removing the predicate would overwrite existing values.
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Owner search metadata must be refreshed on properties linked through the existing serialized owner IDs; retain the relationship match.
             'meta_query' => array(
                 array(
                     'key' => '_address_concatenated',
@@ -1266,6 +1321,7 @@ class PH_Post_types {
             ),
             'nopaging' => true,
             'orderby' => 'rand',
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- Maintenance must cover every language; front-end language filters would omit records from this backfill.
             'suppress_filters' => true,
         );
         $property_query =  new WP_Query($args);
@@ -1289,6 +1345,8 @@ class PH_Post_types {
             'post_type' => 'contact',
             'fields' => 'ids',
             'post_status' => 'publish',
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- This maintenance backfill must select records missing the destination metadata; removing the predicate would overwrite existing values.
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Owner search metadata must be refreshed on properties linked through the existing serialized owner IDs; retain the relationship match.
             'meta_query' => array(
                 array(
                     'key' => '_address_concatenated',
@@ -1297,6 +1355,7 @@ class PH_Post_types {
             ),
             'nopaging' => true,
             'orderby' => 'rand',
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.SuppressFilters_suppress_filters -- Maintenance must cover every language; front-end language filters would omit records from this backfill.
             'suppress_filters' => true,
         );
         $contact_query =  new WP_Query($args);
@@ -1360,6 +1419,7 @@ class PH_Post_types {
                     'post_type' => 'viewing',
                     'nopaging' => true,
                     'post_status' => 'publish',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Recompute related-viewing metadata only for viewings linked to the changed property or applicant; retain existing relationship and status semantics.
                     'meta_query' => $meta_query,
                     'orderby' => 'none'
                 );
@@ -1394,6 +1454,7 @@ class PH_Post_types {
                     'post_type' => 'viewing',
                     'nopaging' => true,
                     'post_status' => 'publish',
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Recompute related-viewing metadata only for viewings linked to the changed property or applicant; retain existing relationship and status semantics.
                     'meta_query' => $meta_query,
                     'orderby' => 'none'
                 );

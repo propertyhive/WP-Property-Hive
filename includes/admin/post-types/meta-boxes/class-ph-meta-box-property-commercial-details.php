@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Property Commercial Details
  *
@@ -13,6 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Commercial_Details
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Commercial_Details; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Commercial_Details {
 
     /**
@@ -21,11 +25,14 @@ class PH_Meta_Box_Property_Commercial_Details {
     public static function output( $post ) {
 
         $parent_post = false;
-        if ( isset($_GET['post_parent']) && $_GET['post_parent'] != '' )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only parent defaults; the parent must be an editable property and saving uses the metabox nonce.
+        $requested_parent = isset( $_GET['post_parent'] ) && is_scalar( $_GET['post_parent'] ) ? absint( $_GET['post_parent'] ) : 0;
+        if ( $requested_parent && get_post_type( $requested_parent ) === 'property' && current_user_can( 'manage_propertyhive' ) && current_user_can( 'edit_post', $requested_parent ) )
         {
-            $parent_post = (int)$_GET['post_parent'];
+            $parent_post = $requested_parent;
         }
         
+        echo '<input type="hidden" name="propertyhive_commercial_details_present" value="1">';
         echo '<div class="propertyhive_meta_box">';
         
         echo '<div class="options_group">';
@@ -146,7 +153,7 @@ class PH_Meta_Box_Property_Commercial_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'sale_by', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'sale_by' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -182,7 +189,7 @@ class PH_Meta_Box_Property_Commercial_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'commercial_tenure', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_tenure' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -281,7 +288,7 @@ class PH_Meta_Box_Property_Commercial_Details {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'price_qualifier', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'price_qualifier' ) ) );
         
         $selected_value = '';
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
@@ -321,7 +328,7 @@ class PH_Meta_Box_Property_Commercial_Details {
                     'hide_empty' => false,
                     'parent' => 0
                 );
-                $terms = get_terms( 'commercial_property_type', $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
 
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
@@ -333,7 +340,7 @@ class PH_Meta_Box_Property_Commercial_Details {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subterms = get_terms( 'commercial_property_type', $args );
+                        $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
 
                         if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                         {
@@ -345,7 +352,7 @@ class PH_Meta_Box_Property_Commercial_Details {
                                     'hide_empty' => false,
                                     'parent' => $subterm->term_id
                                 );
-                                $subsubterms = get_terms( 'commercial_property_type', $args );
+                                $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
 
                                 if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                 {
@@ -481,6 +488,14 @@ class PH_Meta_Box_Property_Commercial_Details {
      * Save meta box data
      */
     public static function save( $post_id, $post ) {
+        // Verify the form boundary here as well as in the central save dispatcher.
+        if ( ! isset( $_POST['propertyhive_meta_nonce'] ) || ! is_string( $_POST['propertyhive_meta_nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['propertyhive_meta_nonce'] ) ), 'propertyhive_save_data' ) ) {
+            return;
+        }
+        if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) || ! isset( $_POST['post_ID'] ) || ! is_scalar( $_POST['post_ID'] ) || absint( $_POST['post_ID'] ) !== (int) $post_id ) {
+            return;
+        }
+
         global $wpdb;
         
         // Only save meta info if department is 'commercial'
@@ -488,38 +503,85 @@ class PH_Meta_Box_Property_Commercial_Details {
         
         if ( $department == 'commercial' || ph_get_custom_department_based_on( $department ) == 'commercial' )
         {
+            // Validate the complete submitted shape before changing any saved values.
+            $input = array();
+            $has_input = isset( $_POST['propertyhive_commercial_details_present'] );
+            $stored_keys = array( '_commercial_price_poa' => '_price_poa', '_commercial_rent_poa' => '_rent_poa' );
+            $term_fields = array( 'commercial_sale_by_id' => 'sale_by', 'commercial_tenure_id' => 'commercial_tenure', 'commercial_price_qualifier_id' => 'price_qualifier' );
+            foreach ( array( '_commercial_price_currency', '_commercial_price_poa', '_commercial_rent_currency', '_commercial_rent_poa', '_floor_area_from', '_floor_area_to', '_floor_area_units', '_price_from', '_price_to', '_price_units', '_rent_from', '_rent_to', '_rent_units', '_site_area_from', '_site_area_to', '_site_area_units', 'commercial_sale_by_id', 'commercial_tenure_id', 'commercial_price_qualifier_id' ) as $input_key ) {
+                if ( isset( $_POST[$input_key] ) && ! is_string( $_POST[$input_key] ) ) {
+                    return;
+                }
+                if ( isset( $_POST[$input_key] ) ) {
+                    $has_input = true;
+                    $input[$input_key] = sanitize_text_field( wp_unslash( $_POST[$input_key] ) );
+                } elseif ( isset( $term_fields[$input_key] ) ) {
+                    $term_ids = wp_get_object_terms( $post_id, $term_fields[$input_key], array( 'fields' => 'ids' ) );
+                    $input[$input_key] = ! is_wp_error( $term_ids ) && ! empty( $term_ids ) ? (string) reset( $term_ids ) : '';
+                } elseif ( isset( $_POST['propertyhive_commercial_details_present'] ) && isset( $stored_keys[$input_key] ) ) {
+                    $input[$input_key] = ''; // An unchecked POA box is absent from the complete form.
+                } else {
+                    $input[$input_key] = (string) get_post_meta( $post_id, isset( $stored_keys[$input_key] ) ? $stored_keys[$input_key] : $input_key, true );
+                }
+            }
+            $lists = array();
+            foreach ( array( '_available_as', 'property_type_ids' ) as $input_key ) {
+                if ( isset( $_POST[$input_key] ) && ! is_array( $_POST[$input_key] ) ) {
+                    return;
+                }
+                $lists[$input_key] = array();
+                if ( isset( $_POST[$input_key] ) ) {
+                    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Shape-only check rejects nested values before the separately sanitized text or integer conversion below.
+                    if ( count( array_filter( $_POST[$input_key], 'is_string' ) ) !== count( $_POST[$input_key] ) ) {
+                        return;
+                    }
+                    $has_input = true;
+                    $lists[$input_key] = array_values( array_map( 'sanitize_text_field', wp_unslash( $_POST[$input_key] ) ) );
+                } elseif ( ! isset( $_POST['propertyhive_commercial_details_present'] ) ) {
+                    if ( $input_key === '_available_as' ) {
+                        if ( get_post_meta( $post_id, '_for_sale', true ) === 'yes' ) { $lists[$input_key][] = 'sale'; }
+                        if ( get_post_meta( $post_id, '_to_rent', true ) === 'yes' ) { $lists[$input_key][] = 'rent'; }
+                    } else {
+                        $term_ids = wp_get_object_terms( $post_id, 'commercial_property_type', array( 'fields' => 'ids' ) );
+                        $lists[$input_key] = is_wp_error( $term_ids ) ? array() : array_map( 'strval', $term_ids );
+                    }
+                }
+            }
+
+            if ( ! $has_input ) { return; }
+
             update_post_meta( $post_id, '_for_sale', '' );
             update_post_meta( $post_id, '_to_rent', '' );
 
-            if ( isset($_POST['_available_as']) && !empty($_POST['_available_as']) )
+            if ( ! empty( $lists['_available_as'] ) )
             {
-                if ( in_array('sale', $_POST['_available_as']) )
+                if ( in_array( 'sale', $lists['_available_as'], true ) )
                 {
                     update_post_meta( $post_id, '_for_sale', 'yes' );
 
-                    update_post_meta( $post_id, '_commercial_price_currency', ph_clean($_POST['_commercial_price_currency']) );
+                    update_post_meta( $post_id, '_commercial_price_currency', wp_slash( $input['_commercial_price_currency'] ) );
 
-                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_from']));
+                    $price = preg_replace("/[^0-9.]/", '', $input['_price_from']);
                     if ( $price == '' )
                     {
-                        $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_to']));
+                        $price = preg_replace("/[^0-9.]/", '', $input['_price_to']);
                     }
                     update_post_meta( $post_id, '_price_from', $price );
 
-                    $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_to']));
+                    $price = preg_replace("/[^0-9.]/", '', $input['_price_to']);
                     if ( $price == '' )
                     {
-                        $price = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_price_from']));
+                        $price = preg_replace("/[^0-9.]/", '', $input['_price_from']);
                     }
                     update_post_meta( $post_id, '_price_to', $price );
 
-                    update_post_meta( $post_id, '_price_units', ph_clean($_POST['_price_units']) );
+                    update_post_meta( $post_id, '_price_units', wp_slash( $input['_price_units'] ) );
 
-                    update_post_meta( $post_id, '_price_poa', ( isset($_POST['_commercial_price_poa']) ? ph_clean($_POST['_commercial_price_poa']) : '' ) );
+                    update_post_meta( $post_id, '_price_poa', ( wp_slash( $input['_commercial_price_poa'] ) !== '' ? wp_slash( $input['_commercial_price_poa'] ) : '' ) );
 
-                    if ( !empty($_POST['commercial_sale_by_id']) )
+                    if ( $input['commercial_sale_by_id'] !== '' )
                     {
-                        wp_set_post_terms( $post_id, (int)$_POST['commercial_sale_by_id'], 'sale_by' );
+                        wp_set_post_terms( $post_id, (int) $input['commercial_sale_by_id'], 'sale_by' );
                     }
                     else
                     {
@@ -527,9 +589,9 @@ class PH_Meta_Box_Property_Commercial_Details {
                         wp_delete_object_term_relationships( $post_id, 'sale_by' );
                     }
                     
-                    if ( !empty($_POST['commercial_tenure_id']) )
+                    if ( $input['commercial_tenure_id'] !== '' )
                     {
-                        wp_set_post_terms( $post_id, (int)$_POST['commercial_tenure_id'], 'commercial_tenure' );
+                        wp_set_post_terms( $post_id, (int) $input['commercial_tenure_id'], 'commercial_tenure' );
                     }
                     else
                     {
@@ -537,35 +599,35 @@ class PH_Meta_Box_Property_Commercial_Details {
                         wp_delete_object_term_relationships( $post_id, 'commercial_tenure' );
                     }
                 }
-                if ( in_array('rent', $_POST['_available_as']) )
+                if ( in_array( 'rent', $lists['_available_as'], true ) )
                 {
                     update_post_meta( $post_id, '_to_rent', 'yes' );
 
-                    update_post_meta( $post_id, '_commercial_rent_currency', ph_clean($_POST['_commercial_rent_currency']) );
+                    update_post_meta( $post_id, '_commercial_rent_currency', wp_slash( $input['_commercial_rent_currency'] ) );
 
-                    $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_from']));
+                    $rent = preg_replace("/[^0-9.]/", '', $input['_rent_from']);
                     if ( $rent == '' )
                     {
-                        $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_to']));
+                        $rent = preg_replace("/[^0-9.]/", '', $input['_rent_to']);
                     }
                     update_post_meta( $post_id, '_rent_from', $rent );
 
-                    $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_to']));
+                    $rent = preg_replace("/[^0-9.]/", '', $input['_rent_to']);
                     if ( $rent == '' )
                     {
-                        $rent = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_rent_from']));
+                        $rent = preg_replace("/[^0-9.]/", '', $input['_rent_from']);
                     }
                     update_post_meta( $post_id, '_rent_to', $rent );
 
-                    update_post_meta( $post_id, '_rent_units', ph_clean($_POST['_rent_units']) );
+                    update_post_meta( $post_id, '_rent_units', wp_slash( $input['_rent_units'] ) );
 
-                    update_post_meta( $post_id, '_rent_poa', ( isset($_POST['_commercial_rent_poa']) ? ph_clean($_POST['_commercial_rent_poa']) : '' ) );
+                    update_post_meta( $post_id, '_rent_poa', ( wp_slash( $input['_commercial_rent_poa'] ) !== '' ? wp_slash( $input['_commercial_rent_poa'] ) : '' ) );
                 }
             }
 
-            if ( !empty($_POST['commercial_price_qualifier_id']) )
+            if ( $input['commercial_price_qualifier_id'] !== '' )
             {
-                wp_set_post_terms( $post_id, (int)$_POST['commercial_price_qualifier_id'], 'price_qualifier' );
+                wp_set_post_terms( $post_id, (int) $input['commercial_price_qualifier_id'], 'price_qualifier' );
             }
             else
             {
@@ -578,9 +640,9 @@ class PH_Meta_Box_Property_Commercial_Details {
             $ph_countries->update_property_price_actual( $post_id );
 
             $property_types = array();
-            if ( isset( $_POST['property_type_ids'] ) && !empty( $_POST['property_type_ids'] ) )
+            if ( ! empty( $lists['property_type_ids'] ) )
             {
-                foreach ( $_POST['property_type_ids'] as $property_type_id )
+                foreach ( $lists['property_type_ids'] as $property_type_id )
                 {
                     $property_types[] = (int)$property_type_id;
                 }
@@ -594,45 +656,45 @@ class PH_Meta_Box_Property_Commercial_Details {
                 wp_delete_object_term_relationships( $post_id, 'commercial_property_type' );
             }
 
-            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_from']));
+            $size = preg_replace("/[^0-9.]/", '', $input['_floor_area_from']);
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_to']));
+                $size = preg_replace("/[^0-9.]/", '', $input['_floor_area_to']);
             }
             update_post_meta( $post_id, '_floor_area_from', $size );
 
-            update_post_meta( $post_id, '_floor_area_from_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_floor_area_units']) ) );
+            update_post_meta( $post_id, '_floor_area_from_sqft', convert_size_to_sqft( $size, wp_slash( $input['_floor_area_units'] ) ) );
 
-            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_to']));
+            $size = preg_replace("/[^0-9.]/", '', $input['_floor_area_to']);
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_floor_area_from']));
+                $size = preg_replace("/[^0-9.]/", '', $input['_floor_area_from']);
             }
             update_post_meta( $post_id, '_floor_area_to', $size );
 
-            update_post_meta( $post_id, '_floor_area_to_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_floor_area_units']) ) );
+            update_post_meta( $post_id, '_floor_area_to_sqft', convert_size_to_sqft( $size, wp_slash( $input['_floor_area_units'] ) ) );
 
-            update_post_meta( $post_id, '_floor_area_units', ph_clean($_POST['_floor_area_units']) );
+            update_post_meta( $post_id, '_floor_area_units', wp_slash( $input['_floor_area_units'] ) );
 
-            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_from']));
+            $size = preg_replace("/[^0-9.]/", '', $input['_site_area_from']);
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_to']));
+                $size = preg_replace("/[^0-9.]/", '', $input['_site_area_to']);
             }
             update_post_meta( $post_id, '_site_area_from', $size );
 
-            update_post_meta( $post_id, '_site_area_from_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_site_area_units']) ) );
+            update_post_meta( $post_id, '_site_area_from_sqft', convert_size_to_sqft( $size, wp_slash( $input['_site_area_units'] ) ) );
 
-            $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_to']));
+            $size = preg_replace("/[^0-9.]/", '', $input['_site_area_to']);
             if ( $size == '' )
             {
-                $size = preg_replace("/[^0-9.]/", '', ph_clean($_POST['_site_area_from']));
+                $size = preg_replace("/[^0-9.]/", '', $input['_site_area_from']);
             }
             update_post_meta( $post_id, '_site_area_to', $size );
 
-            update_post_meta( $post_id, '_site_area_to_sqft', convert_size_to_sqft( $size, ph_clean($_POST['_site_area_units']) ) );
+            update_post_meta( $post_id, '_site_area_to_sqft', convert_size_to_sqft( $size, wp_slash( $input['_site_area_units'] ) ) );
 
-            update_post_meta( $post_id, '_site_area_units', ph_clean($_POST['_site_area_units']) );
+            update_post_meta( $post_id, '_site_area_units', wp_slash( $input['_site_area_units'] ) );
 
             do_action( 'propertyhive_save_property_commercial_details', $post_id );
         }

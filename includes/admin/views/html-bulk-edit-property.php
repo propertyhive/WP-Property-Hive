@@ -20,11 +20,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="input-text-wrap">
 					<select class="on_market" name="_on_market">
 					<?php
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						$options = array(
 							'' 	=> __( '— No Change —', 'propertyhive' ),
 							'yes' => __( 'Yes', 'propertyhive' ),
 							'no' => __( 'No', 'propertyhive' ),
 						);
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						foreach ($options as $key => $value) {
 							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
@@ -40,11 +42,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="input-text-wrap">
 					<select class="featured" name="_featured">
 					<?php
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						$options = array(
 							'' 	=> __( '— No Change —', 'propertyhive' ),
 							'yes' => __( 'Yes', 'propertyhive' ),
 							'no' => __( 'No', 'propertyhive' ),
 						);
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						foreach ($options as $key => $value) {
 							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
@@ -61,22 +65,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<select class="availability" name="_availability">
 					<?php
 
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						$options = array( '' => __( '— No Change —', 'propertyhive' ) );
+		                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 		                $args = array(
 		                    'hide_empty' => false,
 		                    'parent' => 0
 		                );
-		                $terms = get_terms( 'availability', $args );
+		                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
+		                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'availability' ) ) );
 
+		                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 		                $selected_value = '';
 		                if ( !empty( $terms ) && !is_wp_error( $terms ) )
 		                {
 		                    foreach ($terms as $term)
 		                    {
+		                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 		                        $options[$term->term_id] = $term->name;
 		                    }
 		                }
 
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						foreach ($options as $key => $value) {
 							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}
@@ -91,10 +101,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="title"><?php echo esc_html(__( 'Negotiator', 'propertyhive' )); ?></span>
 				<span class="input-text-wrap">
 				<?php
+					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 					$args = array(
 	                'name' => '_negotiator_id', 
 	                'id' => '_negotiator_id', 
 	                'show_option_none' => '— No Change —',
+	                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
 	                'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
 	            );
 	            wp_dropdown_users($args);
@@ -110,13 +122,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<select class="office_id" name="_office_id">
 					<?php
 
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						$options = array( '' => __( '— No Change —', 'propertyhive' ) );
+		                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 		                $args = array(
 				            'post_type' => 'office',
 				            'nopaging' => true,
 				            'orderby' => 'title',
 				            'order' => 'ASC'
 				        );
+				        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				        $office_query = new WP_Query($args);
 				        
 				        if ($office_query->have_posts())
@@ -125,12 +140,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 				            {
 				                $office_query->the_post();
 				                
+				                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 				                $options[get_the_ID()] = get_the_title();
 				            }
 				        }
 				        
 				        $office_query->reset_postdata();
 
+						// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 						foreach ($options as $key => $value) {
 							echo '<option value="' . esc_attr( $key ) . '">' . esc_html($value) . '</option>';
 						}

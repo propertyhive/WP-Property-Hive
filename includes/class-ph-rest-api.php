@@ -13,10 +13,40 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Rest_Api; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Rest_Api {
 
 	/** @var PH_Rest_Api The single instance of the class */
 	protected static $_instance = null;
+
+	/**
+	 * Download REST media within the site's upload size limit.
+	 *
+	 * @param string $url Remote media URL.
+	 * @return string|WP_Error Temporary filename or an error.
+	 */
+	private static function download_media( $url ) {
+		$temporary_file = wp_tempnam( $url );
+		if ( ! $temporary_file ) {
+			return new WP_Error( 'propertyhive_media_temp_file', __( 'Unable to create a temporary file.', 'propertyhive' ) );
+		}
+		$maximum_size = wp_max_upload_size();
+		$response = wp_safe_remote_get( $url, array(
+			'timeout'             => 30,
+			'stream'              => true,
+			'filename'            => $temporary_file,
+			'limit_response_size' => $maximum_size + 1,
+		) );
+		if ( is_wp_error( $response ) ) {
+			wp_delete_file( $temporary_file );
+			return $response;
+		}
+		if ( 200 !== wp_remote_retrieve_response_code( $response ) || filesize( $temporary_file ) > $maximum_size ) {
+			wp_delete_file( $temporary_file );
+			return new WP_Error( 'propertyhive_media_download', __( 'The media could not be downloaded or exceeds the upload size limit.', 'propertyhive' ) );
+		}
+		return $temporary_file;
+	}
 
 	/**
 	 * Main PH_Rest_Api Instance.
@@ -40,7 +70,7 @@ class PH_Rest_Api {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -49,7 +79,7 @@ class PH_Rest_Api {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -98,7 +128,7 @@ class PH_Rest_Api {
 
 	public function block_enquiry_rest_listing($response, $server, $request) 
 	{
-	    if ( $request->get_route() === '/wp/v2/enquiry' ) 
+	    if ( preg_match( '#^/wp/v2/enquiry(?:/|$)#', $request->get_route() ) )
 	    {
 	    	$current_user = wp_get_current_user();
 
@@ -106,7 +136,7 @@ class PH_Rest_Api {
 	        {
 	            return new WP_Error(
 	                'rest_forbidden',
-	                __('You are not allowed to list enquiries.', 'propertyhive'),
+	                __( 'You are not allowed to access enquiries.', 'propertyhive' ),
 	                ['status' => 403]
 	            );
 	        }
@@ -247,20 +277,12 @@ class PH_Rest_Api {
 	    ));
 	}
 
-	public function enquiry_permission_check() 
-	{
-	    // Check if the user is authenticated
-	    if (is_user_logged_in() || apply_filters('rest_authentication_errors', null) === null) {
-	        // Check if the user has the capability to create enquiries (e.g., 'edit_posts')
-	        if (current_user_can('edit_posts')) {
-	            return true;
-	        } else {
-	            return new WP_Error('rest_forbidden', 'You do not have permissions to create enquiries.', array('status' => 403));
-	        }
-	    } else {
-	        return new WP_Error('rest_forbidden', 'You are not authenticated.', array('status' => 403));
-	    }
-	}
+	public function enquiry_permission_check() {
+        if ( current_user_can( 'manage_propertyhive' ) ) {
+            return true;
+        }
+        return new WP_Error( 'rest_forbidden', __( 'You do not have permission to create enquiries.', 'propertyhive' ), array( 'status' => 403 ) );
+    }
 
 	public function handle_enquiry_post(WP_REST_Request $request)
 	{
@@ -535,9 +557,11 @@ class PH_Rest_Api {
 		$PH_Query = new PH_Query();
 
 		// Meta query
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- REST property collection arguments are built from PH_Query filters and are consumed by WordPress REST collection pagination. Meta/tax/date filters and fixed ordering are feature behavior; the REST controller bounds per_page and the source preserves request filters.
 		$args['meta_query'] = $PH_Query->get_meta_query();
         
         // Tax query
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- REST property collection arguments are built from PH_Query filters and are consumed by WordPress REST collection pagination. Meta/tax/date filters and fixed ordering are feature behavior; the REST controller bounds per_page and the source preserves request filters.
         $args['tax_query'] = $PH_Query->get_tax_query();
 
         // Date query
@@ -547,6 +571,7 @@ class PH_Rest_Api {
 		$args['orderby'] = $ordering['orderby'] . ' post_title';
 		$args['order'] = $ordering['order'];
 		if ( isset( $ordering['meta_key'] ) )
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- REST property collection arguments are built from PH_Query filters and are consumed by WordPress REST collection pagination. Meta/tax/date filters and fixed ordering are feature behavior; the REST controller bounds per_page and the source preserves request filters.
 			$args['meta_key'] = $ordering['meta_key'];
 
 		$args = apply_filters( 'propertyhive_rest_api_query_args', $args );
@@ -990,20 +1015,24 @@ class PH_Rest_Api {
 		            			}
 		            			case "description":
 		            			{
+                                if ( ! is_string( $value ) ) {
+                                    return new WP_Error( 'propertyhive_rest_description_invalid', __( 'The description must be text.', 'propertyhive' ), array( 'status' => 400 ) );
+                                }
+                                $value = propertyhive_sanitize_description( $value );
 		            				$property = new PH_Property($object->ID);
 
 		            				if ( isset($property->_department) && $property->_department == 'commercial' )
 		            				{
 		            					update_post_meta( $object->ID, '_descriptions', '1' );
 										update_post_meta( $object->ID, '_description_name_0', '' );
-					            		update_post_meta( $object->ID, '_description_0', $value );
+                                        update_post_meta( $object->ID, '_description_0', wp_slash( $value ) );
 		            				}
 		            				else
 		            				{
 		            					update_post_meta( $object->ID, '_rooms', '1' );
 										update_post_meta( $object->ID, '_room_name_0', '' );
 							            update_post_meta( $object->ID, '_room_dimensions_0', '' );
-							            update_post_meta( $object->ID, '_room_description_0', $value );
+							            update_post_meta( $object->ID, '_room_description_0', wp_slash( $value ) );
 		            				}
 		            				break;
 		            			}
@@ -1012,6 +1041,18 @@ class PH_Rest_Api {
 		            			case "brochures":
 		            			case "epcs":
 		            			{
+                                if ( ! current_user_can( 'upload_files' ) || ! current_user_can( 'edit_post', $object->ID ) ) {
+                                    return new WP_Error( 'propertyhive_rest_media_forbidden', __( 'You do not have permission to update property media.', 'propertyhive' ), array( 'status' => 403 ) );
+                                }
+                                if ( ! is_array( $value ) || count( $value ) > 100 ) {
+                                    return new WP_Error( 'propertyhive_rest_media_invalid', __( 'Supply an array containing no more than 100 media items.', 'propertyhive' ), array( 'status' => 400 ) );
+                                }
+                                foreach ( $value as $media_item ) {
+                                    if ( ! is_array( $media_item ) || ! isset( $media_item['url'] ) || ! is_string( $media_item['url'] ) || ! preg_match( '~^(https?:)?//~i', $media_item['url'] ) ) {
+                                        return new WP_Error( 'propertyhive_rest_media_invalid', __( 'Each media item must contain an HTTP or HTTPS URL.', 'propertyhive' ), array( 'status' => 400 ) );
+                                    }
+                                }
+
 		            				if ( !function_exists('media_handle_upload') ) {
 										require_once(ABSPATH . "wp-admin" . '/includes/image.php');
 										require_once(ABSPATH . "wp-admin" . '/includes/file.php');
@@ -1087,7 +1128,7 @@ class PH_Rest_Api {
 													}
 													else
 													{
-													    $tmp = download_url( $url );
+													    $tmp = self::download_media( $url );
 													    $file_array = array(
 													        'name' => basename( $url ),
 													        'tmp_name' => $tmp
@@ -1096,7 +1137,7 @@ class PH_Rest_Api {
 													    // Check for download errors
 													    if ( is_wp_error( $tmp ) ) 
 													    {
-													        // ERROR: $tmp->get_error_message();
+													        return $tmp;
 													    }
 													    else
 													    {
@@ -1105,9 +1146,9 @@ class PH_Rest_Api {
 														    // Check for handle sideload errors.
 														    if ( is_wp_error( $id ) ) 
 														    {
-														        @unlink( $file_array['tmp_name'] );
+														        wp_delete_file( $file_array['tmp_name'] );
 														        
-														        // ERROR: $id->get_error_message();
+														        return $id;
 														    }
 														    else
 														    {
@@ -1126,7 +1167,7 @@ class PH_Rest_Api {
 											{
 												foreach ( $previous_media_ids as $previous_media_id )
 												{
-													if ( !in_array($previous_media_id, $media_ids) )
+													if ( ! in_array( $previous_media_id, $media_ids ) && current_user_can( 'delete_post', $previous_media_id ) )
 													{
 														if ( wp_delete_attachment( $previous_media_id, TRUE ) !== FALSE )
 														{
@@ -1268,4 +1309,3 @@ class PH_Rest_Api {
 	}
 
 }
-

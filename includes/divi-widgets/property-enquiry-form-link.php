@@ -40,7 +40,7 @@ class Divi_Property_Enquiry_Form_Link_Widget extends ET_Builder_Module
         
         <h2><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></h2>
         
-        <p><?php echo esc_html(__('Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' )); ?></p>
+        <p><?php esc_html_e( 'Please complete the form below and a member of staff will be in touch shortly.', 'propertyhive' ); ?></p>
         
         <?php propertyhive_enquiry_form(); ?>
         

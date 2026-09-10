@@ -1,6 +1,9 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 
 add_shortcode( 'avada_property_address_street', function( $atts ) {
     $atts = shortcode_atts( array(
@@ -25,6 +28,7 @@ add_shortcode( 'avada_property_address_street', function( $atts ) {
     
     if ( empty($property) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend property global used by the Avada shortcode contract; changing $property would break the existing property context passed to these widgets.
         $property = new PH_Property(get_the_ID());
     }
 
@@ -53,9 +57,9 @@ add_shortcode( 'avada_property_address_street', function( $atts ) {
 
     ob_start();
 
-    echo '<div ' . FusionBuilder::attributes( 'property-address-street-shortcode' ) . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-    echo '
-    	<div style="' . esc_attr($style) . '">';
+    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- FusionBuilder::attributes() returns the complete HTML attribute fragment and escapes each attribute name and value.
+    echo '<div ' . FusionBuilder::attributes( 'property-address-street-shortcode' ) . '>
+        <div style="' . esc_attr( safecss_filter_attr( $style ) ) . '">';
 
         echo esc_html($property->address_street);
 

@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Post Types Admin
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Post_Types' ) ) :
 /**
  * PH_Admin_Post_Types Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Post_Types; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Post_Types {
 
 	/**
@@ -52,6 +56,30 @@ class PH_Admin_Post_Types {
         }
 
         add_filter( 'post_row_actions', array( $this, 'modify_post_row_actions_for_archived' ), 10, 2 );
+	}
+
+	/**
+	 * Read one scalar admin query value after WordPress unslashes and sanitizes it.
+	 *
+	 * Admin list filters are read-only, but their values still flow into markup and
+	 * query arguments.  Returning an empty value for arrays keeps scalar filters
+	 * from accidentally accepting a malformed request while preserving the
+	 * existing empty-filter behaviour.
+	 *
+	 * @param string $key Query-string key.
+	 * @return string
+	 */
+	private function get_admin_query_value( $key ) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+		if ( ! isset( $_GET[ $key ] ) || ! is_scalar( $_GET[ $key ] ) ) {
+			return '';
+		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Read-only admin list value is copied, unslashed immediately below, and sanitized before use; the sniffer reports the source assignment instead of the sanitization boundary.
+		$raw_value = $_GET[ $key ];
+		$raw_value = wp_unslash( (string) $raw_value );
+
+		return sanitize_text_field( $raw_value );
 	}
 
     public function handle_bulk_action_archive_and_unarchive($redirect_to, $doaction, $post_ids) 
@@ -203,7 +231,7 @@ class PH_Admin_Post_Types {
         $post_id = isset($_GET['post']) ? intval($_GET['post']) : 0;
         $post_type = get_post_type($post_id);
 
-        if ( !wp_verify_nonce($_GET['_wpnonce'], 'archive-post_' . $post_id) )
+        if ( !wp_verify_nonce( ( isset( $_GET['_wpnonce'] ) && is_string( $_GET['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '', 'archive-post_' . $post_id) )
         {
             wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
@@ -227,7 +255,7 @@ class PH_Admin_Post_Types {
         }
 
         // Redirect to the main list of contacts
-        wp_redirect(admin_url('edit.php?post_type=' . $post_type));
+        wp_safe_redirect(admin_url('edit.php?post_type=' . $post_type));
         exit;
     }
 
@@ -240,7 +268,7 @@ class PH_Admin_Post_Types {
         $post_id = isset($_GET['post']) ? intval($_GET['post']) : 0;
         $post_type = get_post_type($post_id);
 
-        if ( !wp_verify_nonce($_GET['_wpnonce'], 'unarchive-post_' . $post_id) )
+        if ( !wp_verify_nonce( ( isset( $_GET['_wpnonce'] ) && is_string( $_GET['_wpnonce'] ) ) ? sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ) : '', 'unarchive-post_' . $post_id) )
         {
             wp_die(esc_html(__('Security check failed.', 'propertyhive')));
         }
@@ -266,11 +294,11 @@ class PH_Admin_Post_Types {
         // Redirect to the main list of contacts
         if ( isset($_GET['return']) && $_GET['return'] === 'archive' ) 
         {
-            wp_redirect(admin_url('edit.php?post_status=archive&post_type=' . get_post_type($post_id)));
+            wp_safe_redirect(admin_url('edit.php?post_status=archive&post_type=' . get_post_type($post_id)));
         }
         else
         {
-            wp_redirect(admin_url('edit.php?post_type=' . get_post_type($post_id)));
+            wp_safe_redirect(admin_url('edit.php?post_type=' . get_post_type($post_id)));
         }
         exit;
     }
@@ -457,7 +485,8 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->negotiator_filter();
 
-        echo apply_filters( 'propertyhive_property_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_property_filters', $output );
     }
     
     /**
@@ -468,12 +497,14 @@ class PH_Admin_Post_Types {
 
         $departments = ph_get_departments();
 
-        $selected_department = isset( $_GET['_department'] ) && in_array( $_GET['_department'], array_keys($departments) ) ? $_GET['_department'] : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_department'] ) && is_string( $_GET['_department'] ) ? sanitize_text_field( wp_unslash( $_GET['_department'] ) ) : '';
+        $selected_department = array_key_exists( $requested_value, $departments ) ? $requested_value : '';
         
         // Department filtering
         $output  = '<select name="_department" id="dropdown_property_department">';
             
-            $output .= '<option value="">' . __( 'All Departments', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html__( 'All Departments', 'propertyhive' ) . '</option>';
 
             foreach ( $departments as $key => $value )
             {
@@ -499,7 +530,7 @@ class PH_Admin_Post_Types {
         // Department filtering
         $output  = '<select name="_office_id" id="dropdown_property_office_id">';
         
-        $output .= '<option value="">' . __( 'All Offices', 'propertyhive' ) . '</option>';
+        $output .= '<option value="">' . esc_html__( 'All Offices', 'propertyhive' ) . '</option>';
         
         $args = array(
             'post_type' => 'office',
@@ -516,8 +547,10 @@ class PH_Admin_Post_Types {
                 $office_query->the_post();
                 
                 $output .= '<option value="' . esc_attr($post->ID) . '"';
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
                 {
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
                 }
                 $output .= '>' . esc_html(get_the_title()) . '</option>';
@@ -539,9 +572,11 @@ class PH_Admin_Post_Types {
 	    return wp_dropdown_users(array(
             'name' => '_negotiator_id', 
             'id' => 'dropdown_property_negotiator_id',
-            'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
+            'show_option_all' => esc_html__( 'All Negotiators', 'propertyhive' ),
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int)$_GET['_negotiator_id'],
             'echo' => false,
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         ));
     }
@@ -551,15 +586,18 @@ class PH_Admin_Post_Types {
 	 */
 	public function date_range_filter() {
 
-		$date_range_label = empty( $_GET['_date_range_label'] ) ? __( 'Any Time', 'propertyhive' ) : $_GET['_date_range_label'];
+		$date_range_label = $this->get_admin_query_value( '_date_range_label' );
+		$date_range_label = empty( $date_range_label ) ? __( 'Any Time', 'propertyhive' ) : $date_range_label;
 
 		// The date picker doesn't have a concept of 'Any Time', so valid dates must be used
 		// I've used the last and first date of the month (reversed) as it's a range that is not selectable, but is within the current month
 		// If I used an already labelled date range (e.g. 'Today'), it would show as 'Today' when selected
 		// If I use a nearby date range (e.g. 'Yesterday'), if someone actually selected that range it would show as 'Any Time'
 		// If I use a unlikely date range (e.g. 01-01-1970 - 31-12-2070), the custom date range picker would open showing Jan 1970.
-		$date_range_from = empty( $_GET['_date_range_from'] ) ? date('Y-m-d', strtotime('last day of this month')) : $_GET['_date_range_from'];
-		$date_range_to = empty( $_GET['_date_range_to'] ) ? date('Y-m-d', strtotime('first day of this month')) : $_GET['_date_range_to'];
+		$date_range_from = $this->get_admin_query_value( '_date_range_from' );
+		$date_range_from = empty( $date_range_from ) ? gmdate('Y-m-d', strtotime('last day of this month')) : $date_range_from;
+		$date_range_to = $this->get_admin_query_value( '_date_range_to' );
+		$date_range_to = empty( $date_range_to ) ? gmdate('Y-m-d', strtotime('first day of this month')) : $date_range_to;
 
 		return "
             <select name='_date_range_label' id='date_range' style='max-width:25rem;'>
@@ -584,7 +622,7 @@ class PH_Admin_Post_Types {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'location', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
         
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
@@ -596,7 +634,7 @@ class PH_Admin_Post_Types {
                     'hide_empty' => false,
                     'parent' => $term->term_id
                 );
-                $subterms = get_terms( 'location', $args );
+                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                 
                 if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                 {
@@ -608,7 +646,7 @@ class PH_Admin_Post_Types {
                             'hide_empty' => false,
                             'parent' => $term->term_id
                         );
-                        $subsubterms = get_terms( 'location', $args );
+                        $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                         {
@@ -629,8 +667,10 @@ class PH_Admin_Post_Types {
             foreach ( $options as $value => $label )
             {
                 $output .= '<option value="' . esc_attr($value) . '"';
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 if ( isset( $_GET['_location_id'] ) && ! empty( $_GET['_location_id'] ) )
                 {
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     $output .= selected( $value, (int)$_GET['_location_id'], false );
                 }
                 $output .= '>' . esc_html($label) . '</option>';
@@ -656,7 +696,7 @@ class PH_Admin_Post_Types {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'availability', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'availability' ) ) );
         
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
@@ -673,8 +713,10 @@ class PH_Admin_Post_Types {
             foreach ( $options as $value => $label )
             {
                 $output .= '<option value="' . esc_attr($value) . '"';
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 if ( isset( $_GET['_availability_id'] ) && ! empty( $_GET['_availability_id'] ) )
                 {
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     $output .= selected( $value, (int)$_GET['_availability_id'], false );
                 }
                 $output .= '>' . esc_html($label) . '</option>';
@@ -695,7 +737,7 @@ class PH_Admin_Post_Types {
         // Availability filtering
         $output  = '<select name="_marketing" id="dropdown_property_marketing">';
 
-        $output .= '<option value="">' . __( 'All Marketing Statuses', 'propertyhive' ) . '</option>';
+        $output .= '<option value="">' . esc_html__( 'All Marketing Statuses', 'propertyhive' ) . '</option>';
 
         $options = array(
             'on_market' => __( 'On Market Only', 'propertyhive' ),
@@ -707,7 +749,7 @@ class PH_Admin_Post_Types {
             'hide_empty' => false,
             'parent' => 0
         );
-        $terms = get_terms( 'marketing_flag', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'marketing_flag' ) ) );
         
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
@@ -718,13 +760,14 @@ class PH_Admin_Post_Types {
         }
 
         $options = apply_filters( 'propertyhive_property_filter_marketing_options', $options );
+		$selected_marketing = $this->get_admin_query_value( '_marketing' );
 
         foreach ( $options as $key => $value )
         {
             $output .= '<option value="' . esc_attr($key) . '"';
-            if ( isset( $_GET['_marketing'] ) && ! empty( $_GET['_marketing'] ) )
+            if ( ! empty( $selected_marketing ) )
             {
-                $output .= selected( $key, sanitize_text_field($_GET['_marketing']), false );
+				$output .= selected( $key, $selected_marketing, false );
             }
             $output .= '>' . esc_html($value) . '</option>';
         }
@@ -740,7 +783,9 @@ class PH_Admin_Post_Types {
     public function contact_filters() {
         global $wp_query;
 
-        $selected_contact_type = isset( $_GET['_contact_type'] ) && in_array( $_GET['_contact_type'], array( 'owner', 'potentialowner', 'applicant', 'hotapplicant', 'thirdparty' ) ) ? ph_clean($_GET['_contact_type']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_contact_type'] ) && is_string( $_GET['_contact_type'] ) ? sanitize_text_field( wp_unslash( $_GET['_contact_type'] ) ) : '';
+        $selected_contact_type = in_array( $requested_value, array( 'owner', 'potentialowner', 'applicant', 'hotapplicant', 'thirdparty' ), true ) ? $requested_value : '';
         
         // Type filtering        
         $options = array();
@@ -796,7 +841,8 @@ class PH_Admin_Post_Types {
 
         $output .= $this->date_range_filter('Date Created');
 
-        echo apply_filters( 'propertyhive_contact_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_contact_filters', $output );
     }
     
     /**
@@ -814,7 +860,8 @@ class PH_Admin_Post_Types {
         $output .= $this->enquiry_office_filter();
         $output .= $this->enquiry_negotiator_filter();
 
-        echo apply_filters( 'propertyhive_enquiry_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_enquiry_filters', $output );
     }
     
     /**
@@ -823,7 +870,9 @@ class PH_Admin_Post_Types {
     public function enquiry_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'all', 'open', 'closed' ) ) ? $_GET['_status'] : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'all', 'open', 'closed' ), true ) ? $requested_value : '';
 
         // Status filtering
         $output  = '<select name="_status" id="dropdown_enquiry_status">
@@ -834,6 +883,7 @@ class PH_Admin_Post_Types {
             foreach ( $enquiry_statuses as $status => $display_status )
             {
                 $output .= '<option value="' . esc_attr($status) . '"';
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 if ( $status == $selected_status || ( $status == 'open' && ( !isset($_GET['_status']) || empty($_GET['_status']) ) ) )
                 {
                     $output .= ' selected';
@@ -864,17 +914,18 @@ class PH_Admin_Post_Types {
         
         // Status filtering
         $output  = '<select name="_source" id="dropdown_enquiry_source">';
+		$selected_source = $this->get_admin_query_value( '_source' );
             
-            $output .= '<option value="">' . __( 'Show all sources', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html__( 'Show all sources', 'propertyhive' ) . '</option>';
             
             foreach ( $sources as $key => $value )
             {
                 $output .= '<option value="' . esc_attr($key) . '"';
-                if ( isset( $_GET['_source'] ) && ! empty( $_GET['_source'] ) )
+                if ( ! empty( $selected_source ) )
                 {
-                    $output .= selected( $key, sanitize_text_field($_GET['_source']), false );
+					$output .= selected( $key, $selected_source, false );
                 }
-                $output .= '>' . esc_html(__( $value, 'propertyhive' )) . '</option>';
+                $output .= '>' . esc_html( $value ) . '</option>';
             }
             
         $output .= '</select>';
@@ -891,7 +942,7 @@ class PH_Admin_Post_Types {
         // Department filtering
         $output  = '<select name="_office_id" id="dropdown_enquiry_office_id">';
         
-        $output .= '<option value="">' . __( 'All Offices', 'propertyhive' ) . '</option>';
+        $output .= '<option value="">' . esc_html__( 'All Offices', 'propertyhive' ) . '</option>';
         
         $args = array(
             'post_type' => 'office',
@@ -908,8 +959,10 @@ class PH_Admin_Post_Types {
                 $office_query->the_post();
                 
                 $output .= '<option value="' . esc_attr($post->ID) . '"';
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                 if ( isset( $_GET['_office_id'] ) && ! empty( $_GET['_office_id'] ) )
                 {
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     $output .= selected( $post->ID, (int)$_GET['_office_id'], false );
                 }
                 $output .= '>' . esc_html(get_the_title()) . '</option>';
@@ -930,9 +983,11 @@ class PH_Admin_Post_Types {
         return wp_dropdown_users(array(
             'name' => '_negotiator_id', 
             'id' => 'dropdown_enquiry_negotiator_id',
-            'show_option_all' => __( 'All Negotiators', 'propertyhive' ),
+            'show_option_all' => esc_html__( 'All Negotiators', 'propertyhive' ),
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             'selected' => empty( $_GET['_negotiator_id'] ) ? '' : (int)$_GET['_negotiator_id'],
             'echo' => false,
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') )
         ));
     }
@@ -949,7 +1004,8 @@ class PH_Admin_Post_Types {
         $output .= $this->negotiator_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_appraisal_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_appraisal_filters', $output );
     }
 
     /**
@@ -958,12 +1014,14 @@ class PH_Admin_Post_Types {
     public function appraisal_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'carried_out', 'won', 'lost', 'instructed', 'cancelled' ) ) ? ph_clean($_GET['_status']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'pending', 'carried_out', 'won', 'lost', 'instructed', 'cancelled' ), true ) ? $requested_value : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_appraisal_status">';
             
-            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html__( 'All Statuses', 'propertyhive' ) . '</option>';
 
             $output .= '<option value="pending"';
             $output .= selected( 'pending', $selected_status, false );
@@ -1008,7 +1066,8 @@ class PH_Admin_Post_Types {
         $output .= $this->negotiator_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_viewing_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_viewing_filters', $output );
     }
 
     /**
@@ -1017,12 +1076,14 @@ class PH_Admin_Post_Types {
     public function viewing_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'awaiting_feedback', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled', 'no_show' ) ) ? ph_clean($_GET['_status']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'pending', 'confirmed', 'unconfirmed', 'carried_out', 'awaiting_feedback', 'feedback_passed_on', 'feedback_not_passed_on', 'cancelled', 'no_show' ), true ) ? $requested_value : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_viewing_status">';
 
-            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html__( 'All Statuses', 'propertyhive' ) . '</option>';
 
             $viewing_statuses = ph_get_viewing_statuses();
 
@@ -1042,6 +1103,7 @@ class PH_Admin_Post_Types {
     public function refresh_property_office_filtering( $query ) {
         remove_filter('posts_join', array( $this, 'filter_by_property_office')  );
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
         if ( ! empty( $_GET['_office_id'] ) && in_array( $query->query['post_type'], array(
 	        'viewing',
 	        'offer',
@@ -1055,10 +1117,13 @@ class PH_Admin_Post_Types {
     public function filter_by_property_office($query) {
         global $wpdb;
 
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only office filtering; no state change.
+        $office_id = isset( $_GET['_office_id'] ) && is_scalar( $_GET['_office_id'] ) ? absint( $_GET['_office_id'] ) : 0;
+
         return $query . '
            INNER JOIN ' . $wpdb->postmeta . ' AS property_meta ON property_meta.post_id = ' . $wpdb->posts . '.ID AND property_meta.meta_key = "_property_id"
            INNER JOIN ' . $wpdb->postmeta . ' AS property_office_meta ON property_office_meta.post_id = property_meta.meta_value AND property_office_meta.meta_key = "_office_id"
-             AND property_office_meta.meta_value = ' . (int)$_GET['_office_id'];
+             AND property_office_meta.meta_value = ' . $office_id;
     }
 
     /**
@@ -1073,7 +1138,8 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_offer_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_offer_filters', $output );
     }
 
     /**
@@ -1082,7 +1148,9 @@ class PH_Admin_Post_Types {
     public function offer_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'accepted', 'declined' ) ) ? ph_clean($_GET['_status']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'pending', 'accepted', 'declined' ), true ) ? $requested_value : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_offer_status">';
@@ -1115,7 +1183,8 @@ class PH_Admin_Post_Types {
         $output .= $this->property_office_filter();
         $output .= $this->date_range_filter();
 
-        echo apply_filters( 'propertyhive_sale_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_sale_filters', $output );
     }
 
     /**
@@ -1124,12 +1193,14 @@ class PH_Admin_Post_Types {
     public function sale_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'current', 'exchanged', 'completed', 'fallen_through' ) ) ? ph_clean($_GET['_status']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'current', 'exchanged', 'completed', 'fallen_through' ), true ) ? $requested_value : '';
         
         // Status filtering
         $output  = '<select name="_status" id="dropdown_sale_status">';
             
-            $output .= '<option value="">' . __( 'All Statuses', 'propertyhive' ) . '</option>';
+            $output .= '<option value="">' . esc_html__( 'All Statuses', 'propertyhive' ) . '</option>';
 
             $sale_statuses = ph_get_sale_statuses();
 
@@ -1156,7 +1227,8 @@ class PH_Admin_Post_Types {
         $output .= $this->tenancy_status_filter();
         $output .= $this->tenancy_management_type_filter();
 
-        echo apply_filters( 'propertyhive_tenancy_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+        echo apply_filters( 'propertyhive_tenancy_filters', $output );
     }
 
     /**
@@ -1165,7 +1237,9 @@ class PH_Admin_Post_Types {
     public function tenancy_status_filter() {
         global $wp_query;
 
-        $selected_status = isset( $_GET['_status'] ) && in_array( $_GET['_status'], array( 'pending', 'current', 'finished') ) ? ph_clean($_GET['_status']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_status'] ) && is_string( $_GET['_status'] ) ? sanitize_text_field( wp_unslash( $_GET['_status'] ) ) : '';
+        $selected_status = in_array( $requested_value, array( 'pending', 'current', 'finished'), true ) ? $requested_value : '';
 
         // Status filtering
         $output  = '<select name="_status" id="dropdown_tenancy_status">';
@@ -1200,7 +1274,9 @@ class PH_Admin_Post_Types {
             'fully_managed' => 'Fully Managed'
         ) );
 
-        $selected_management_type = isset( $_GET['_management_type'] ) && in_array( $_GET['_management_type'], array_keys($management_types) ) ? ph_clean($_GET['_management_type']) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $requested_value = isset( $_GET['_management_type'] ) && is_string( $_GET['_management_type'] ) ? sanitize_text_field( wp_unslash( $_GET['_management_type'] ) ) : '';
+        $selected_management_type = array_key_exists( $requested_value, $management_types ) ? $requested_value : '';
 
         // Status filtering
         $output  = '<select name="_management_type" id="dropdown_tenancy_management_type">';
@@ -1211,7 +1287,7 @@ class PH_Admin_Post_Types {
             {
                 $output .= '<option value="' . esc_attr($key) . '"';
                 $output .= selected( $key, $selected_management_type, false );
-                $output .= '>' . esc_html(__( $value, 'propertyhive' )) . '</option>';
+                $output .= '>' . esc_html( $value ) . '</option>';
             }
 
         $output .= '</select>';
@@ -1228,16 +1304,18 @@ class PH_Admin_Post_Types {
 		$output .= $this->key_date_status_filter();
         $output .= $this->date_range_filter();
 
-		echo apply_filters( 'propertyhive_tenancy_filters', $output ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Built-in controls escape their text and attributes before this trusted PHP filter adds complete HTML controls.
+		echo apply_filters( 'propertyhive_tenancy_filters', $output );
 	}
 
 	public function key_date_type_filter() {
 
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 		$selected_value = ! empty($_GET['_key_date_type_id']) ? (int)$_GET['_key_date_type_id'] : '';
-		$terms = get_terms( 'management_key_date_type', array(
+		$terms = get_terms( array_merge( wp_parse_args( array(
 			'hide_empty' => false,
 			'parent' => 0
-		) );
+		) ), array( 'taxonomy' => 'management_key_date_type' ) ) );
 
 		$output  = '<select name="_key_date_type_id">';
 		$output .= '<option value="">' . esc_html(__( 'All Types', 'propertyhive' )) . '</option>';
@@ -1260,7 +1338,9 @@ class PH_Admin_Post_Types {
 
 	public function key_date_status_filter() {
 
-		$selected_status = isset( $_GET['status'] ) && in_array( $_GET['status'], array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending', 'on_hold', 'cancelled') ) ? ph_clean($_GET['status']) : '';
+  // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+		$requested_value = isset( $_GET['status'] ) && is_string( $_GET['status'] ) ? sanitize_text_field( wp_unslash( $_GET['status'] ) ) : '';
+		$selected_status = in_array( $requested_value, array( 'upcoming_and_overdue', 'overdue', 'booked', 'complete', 'pending', 'on_hold', 'cancelled'), true ) ? $requested_value : '';
 
 		$output  = '<select name="status" id="dropdown_key_date_status">';
 
@@ -1307,62 +1387,85 @@ class PH_Admin_Post_Types {
     public function request_query( $vars ) {
         global $typenow, $wp_query;
 
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- These hooks add status/department/taxonomy/date filters to the main admin list query. WordPress supplies the list query’s pagination; values are sanitized or selected from fixed post-type/date keys. These are request_query/filter_by_date_range values consumed by the core list table query rather than independent nopaging loops. The date meta key is chosen by post type.
         if ( !isset($vars['meta_query']) ) { $vars['meta_query'] = array(); }
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- These hooks add status/department/taxonomy/date filters to the main admin list query. WordPress supplies the list query’s pagination; values are sanitized or selected from fixed post-type/date keys. These are request_query/filter_by_date_range values consumed by the core list table query rather than independent nopaging loops. The date meta key is chosen by post type.
         if ( !isset($vars['tax_query']) ) { $vars['tax_query'] = array(); }
+
+		$department = $this->get_admin_query_value( '_department' );
+		$marketing = $this->get_admin_query_value( '_marketing' );
+		$contact_type = $this->get_admin_query_value( '_contact_type' );
+		$status = $this->get_admin_query_value( '_status' );
+		$source = $this->get_admin_query_value( '_source' );
+		$management_type = $this->get_admin_query_value( '_management_type' );
+		$key_date_status = $this->get_admin_query_value( 'status' );
 
         if ( 'property' === $typenow ) 
         {
-            if ( ! empty( $_GET['_department'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $department ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_department',
-                    'value' => sanitize_text_field( $_GET['_department'] ),
+					'value' => $department,
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_office_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_office_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_office_id'],
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_negotiator_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_location_id'] ) ) {
                 $vars['tax_query'][] = array(
                     'taxonomy'  => 'location',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'terms' => ( (is_array($_GET['_location_id'])) ? (int)$_GET['_location_id'] : array( (int)$_GET['_location_id'] ) )
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_availability_id'] ) ) {
                 $vars['tax_query'][] = array(
                     'taxonomy'  => 'availability',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'terms' => ( (is_array($_GET['_availability_id'])) ? (int)$_GET['_availability_id'] : array( (int)$_GET['_availability_id'] ) )
                 );
             }
-            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'on_market' ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+			if ( 'on_market' === $marketing ) {
                 $vars['meta_query'][] = array(
                     'key' => '_on_market',
                     'value' => 'yes',
                 );
             }
-            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'off_market' ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+			if ( 'off_market' === $marketing ) {
                 $vars['meta_query'][] = array(
                     'key' => '_on_market',
                     'value' => 'yes',
                     'compare' => '!=',
                 );
             }
-            if ( ! empty( $_GET['_marketing'] ) && $_GET['_marketing'] == 'featured' ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+			if ( 'featured' === $marketing ) {
                 $vars['meta_query'][] = array(
                     'key' => '_featured',
                     'value' => 'yes',
                 );
-            }
-            if ( ! empty( $_GET['_marketing'] ) && substr($_GET['_marketing'], 0, 15) == 'marketing_flag_' ) {
-                $marketing_flag_id = sanitize_text_field( str_replace("marketing_flag_", "", $_GET['_marketing']) );
+			}
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+			if ( 0 === strpos( $marketing, 'marketing_flag_' ) ) {
+				$marketing_flag_id = str_replace( 'marketing_flag_', '', $marketing );
                 $vars['tax_query'][] = array(
                     'taxonomy'  => 'marketing_flag',
                     'terms' => ( (is_array($marketing_flag_id)) ? $marketing_flag_id : array( $marketing_flag_id ) )
@@ -1371,9 +1474,9 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'contact' === $typenow ) 
         {
-            if ( ! empty( $_GET['_contact_type'] ) ) 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $contact_type ) )
             {
-                $contact_type = ph_clean($_GET['_contact_type']);
                 if ( $contact_type == 'hotapplicant' )
                 {
                     $contact_type = 'applicant';
@@ -1394,16 +1497,18 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'enquiry' === $typenow )
         {
-            if ( ! empty( $_GET['_status'] ) && ph_clean($_GET['_status']) != 'all' ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) && $status != 'all' ) {
 
                 $vars['meta_query'][] = array(
                     'key' => '_status',
-                    'value' => sanitize_text_field( $_GET['_status'] ),
+					'value' => $status,
                 );
             }
             else
             {
-                if ( empty( $_GET['_status'] ) )
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                if ( empty( $status ) )
                 {
                     $vars['meta_query'][] = array(
                         'key' => '_status',
@@ -1411,21 +1516,26 @@ class PH_Admin_Post_Types {
                     );
                 }
             }
-            if ( ! empty( $_GET['_source'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $source ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_source',
-                    'value' => sanitize_text_field( $_GET['_source'] ),
+					'value' => $source,
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_office_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_office_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_office_id'],
                 );
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_negotiator_id'] ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
@@ -1434,8 +1544,9 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'appraisal' === $typenow )
         {
-            if ( ! empty( $_GET['_status'] ) ) {
-                switch ( sanitize_text_field( $_GET['_status'] ) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) ) {
+                switch ( $status )
                 {
                     case "confirmed":
                     {
@@ -1465,15 +1576,17 @@ class PH_Admin_Post_Types {
                     {
                         $vars['meta_query'][] = array(
                             'key' => '_status',
-                            'value' => sanitize_text_field( $_GET['_status'] ),
+							'value' => $status,
                         );
                     }
                 }
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_negotiator_id'] ) ) 
             {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
@@ -1482,15 +1595,19 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'viewing' === $typenow ) 
         {
-            if ( ! empty( $_GET['_status'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) ) {
 
-                $vars['meta_query'] = add_viewing_status_meta_query( $vars['meta_query'], sanitize_text_field( $_GET['_status'] ) );
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query,WordPress.Security.NonceVerification.Recommended -- Read-only status filtering of the paginated core viewing list uses the existing viewing metadata schema; no state change.
+                $vars['meta_query'] = add_viewing_status_meta_query( $vars['meta_query'], $status );
 
             }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( ! empty( $_GET['_negotiator_id'] ) ) 
             {
                 $vars['meta_query'][] = array(
                     'key' => '_negotiator_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_negotiator_id'],
                 );
             }
@@ -1499,10 +1616,11 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'offer' === $typenow ) 
         {
-            if ( ! empty( $_GET['_status'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_status',
-                    'value' => sanitize_text_field( $_GET['_status'] ),
+					'value' => $status,
                 );
             }
 
@@ -1510,10 +1628,11 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'sale' === $typenow ) 
         {
-            if ( ! empty( $_GET['_status'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_status',
-                    'value' => sanitize_text_field( $_GET['_status'] ),
+					'value' => $status,
                 );
             }
 
@@ -1521,14 +1640,16 @@ class PH_Admin_Post_Types {
         }
         elseif ( 'tenancy' === $typenow )
         {
-            if ( ! empty( $_GET['_status'] ) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $status ) )
             {
-                switch ( $_GET['_status'] )
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                switch ( $status )
                 {
                     case 'pending' :
                         $vars['meta_query'][] = array(
                             'key' => '_start_date',
-                            'value' => date('Y-m-d'),
+                            'value' => gmdate('Y-m-d'),
                             'type'  => 'date',
                             'compare' => '>',
                         );
@@ -1540,13 +1661,13 @@ class PH_Admin_Post_Types {
                             array(
                                 array(
                                     'key' => '_start_date',
-                                    'value' => date('Y-m-d'),
+                                    'value' => gmdate('Y-m-d'),
                                     'type'  => 'date',
                                     'compare' => '<=',
                                 ),
                                 array(
                                     'key' => '_end_date',
-                                    'value' => date('Y-m-d'),
+                                    'value' => gmdate('Y-m-d'),
                                     'type'  => 'date',
                                     'compare' => '>=',
                                 )
@@ -1554,7 +1675,7 @@ class PH_Admin_Post_Types {
                             array(
                                 array(
                                     'key' => '_start_date',
-                                    'value' => date('Y-m-d'),
+                                    'value' => gmdate('Y-m-d'),
                                     'type'  => 'date',
                                     'compare' => '<=',
                                 ),
@@ -1570,7 +1691,7 @@ class PH_Admin_Post_Types {
                     case 'finished':
                         $vars['meta_query'][] = array(
                             'key' => '_end_date',
-                            'value' => date('Y-m-d'),
+                            'value' => gmdate('Y-m-d'),
                             'type'  => 'date',
                             'compare' => '<',
                         );
@@ -1578,18 +1699,20 @@ class PH_Admin_Post_Types {
                 }
             }
 
-            if ( ! empty( $_GET['_management_type'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $management_type ) ) {
                 $vars['meta_query'][] = array(
                     'key' => '_management_type',
-                    'value' => sanitize_text_field( $_GET['_management_type'] ),
+					'value' => $management_type,
                 );
             }
         }
         elseif ( 'key_date' === $typenow )
         {
-            if ( ! empty( $_GET['status'] ) ) {
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( ! empty( $key_date_status ) ) {
 
-                $value = sanitize_text_field( $_GET['status'] );
+				$value = $key_date_status;
 
                 switch ($value) {
                     case 'booked':
@@ -1615,7 +1738,7 @@ class PH_Admin_Post_Types {
                         );
                         $vars['meta_query'][] = array(
                             'key' => '_date_due',
-                            'value' => date("Y-m-d"),
+                            'value' => gmdate("Y-m-d"),
                             'type' => 'date',
                             'compare' => '<',
                         );
@@ -1637,10 +1760,12 @@ class PH_Admin_Post_Types {
                 }
             }
 
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
             if ( !empty( $_GET['_key_date_type_id'] ) )
             {
                 $vars['meta_query'][] = array(
                     'key' => '_key_date_type_id',
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'value' => (int)$_GET['_key_date_type_id'],
                 );
             }
@@ -1655,34 +1780,39 @@ class PH_Admin_Post_Types {
 
     private function filter_by_date_range($vars, $meta_key = '_start_date_time')
     {
+		$date_range_label = $this->get_admin_query_value( '_date_range_label' );
+		$date_range_from = $this->get_admin_query_value( '_date_range_from' );
+		$date_range_to = $this->get_admin_query_value( '_date_range_to' );
+
 	    if (
-		    ! empty( $_GET['_date_range_label'] )
-		    && ! empty( $_GET['_date_range_from'] )
-		    && ! empty( $_GET['_date_range_to'] )
-		    && $_GET['_date_range_label'] !== 'Any Time'
-		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_from']) !== false
-		    && DateTime::createFromFormat('Y-m-d', $_GET['_date_range_to']) !== false
+		    ! empty( $date_range_label )
+		    && ! empty( $date_range_from )
+		    && ! empty( $date_range_to )
+		    && $date_range_label !== 'Any Time'
+		    && DateTime::createFromFormat('Y-m-d', $date_range_from) !== false
+		    && DateTime::createFromFormat('Y-m-d', $date_range_to) !== false
 	    )
 	    {
             if ( $meta_key == 'date_query' )
             {
                 $vars['date_query'] = array(
-                    'after' => $_GET['_date_range_from'] . ' 00:00:00',
-                    'before' => $_GET['_date_range_to'] . ' 23:59:59',
+	                    'after' => $date_range_from . ' 00:00:00',
+	                    'before' => $date_range_to . ' 23:59:59',
                 );
             }
             else
             {
+                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Add validated date boundaries using the fixed date key selected for this paginated admin post-type list.
     		    $vars['meta_query'] = array_merge($vars['meta_query'], array (
     			    array(
     				    'key' => $meta_key,
-    				    'value' => ph_clean($_GET['_date_range_from']),
+				    'value' => $date_range_from,
     				    'type'  => 'date',
     				    'compare' => '>='
     			    ),
     			    array(
     				    'key' => $meta_key,
-    				    'value' => ph_clean($_GET['_date_range_to']),
+				    'value' => $date_range_to,
     				    'type'  => 'date',
     				    'compare' => '<='
     			    ),
@@ -1699,8 +1829,11 @@ class PH_Admin_Post_Types {
         if ( !$q->is_main_query() )
             return $join;
 
-        if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $search = isset( $_GET['s'] ) && is_string( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+        if ( $search === '' ) {
             return $join;
+        }
 
         if ( 'property' === $typenow ) 
         {
@@ -1713,9 +1846,11 @@ LEFT JOIN " . $wpdb->postmeta . " AS ph_property_filter_meta_owner_details ON " 
         elseif ( 'contact' === $typenow ) 
         {
             $phone_number = '';
-            if ( is_numeric(substr(ph_clean($_GET['s']), 0, 1)) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( is_numeric(substr($search, 0, 1)) )
             {
-                $phone_number = preg_replace( "/[^0-9,]/", "", ph_clean($_GET['s']) );
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                $phone_number = preg_replace( "/[^0-9,]/", "", $search );
             }
 
             $join .= " 
@@ -1760,33 +1895,41 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
         if ( !$q->is_main_query() )
             return $where;
 
-        if ( !isset($_GET['s']) || ( isset($_GET['s']) && ph_clean($_GET['s']) == '' ) )
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $search = isset( $_GET['s'] ) && is_string( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+        if ( $search === '' ) {
             return $where;
+        }
+        $reference_like = $wpdb->prepare( '%s', $wpdb->esc_like( $search ) . '%' );
+        $reference_exact = $wpdb->prepare( '%s', $search );
+        $phone_number = '';
 
         if ( 'property' === $typenow ) 
         {
-            $where = preg_replace(
-                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
-                "(
-                    (" . $wpdb->posts . ".post_title LIKE $1) 
+            $where = preg_replace_callback(
+                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
+                static function( $matches ) use ( $wpdb, $reference_like, $reference_exact, $phone_number ) {
+                    return "(
+                    (" . $wpdb->posts . ".post_title LIKE " . $matches[1] . ")
                     OR
-                    (ph_property_filter_meta_address_concatenated.meta_value LIKE $1)
+                    (ph_property_filter_meta_address_concatenated.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_property_filter_meta_reference_number.meta_value LIKE '" . esc_sql($_GET['s']) . "%')
+                    (ph_property_filter_meta_reference_number.meta_value LIKE " . $reference_like . ")
                     OR 
-                    (ph_property_filter_meta_owner_details.meta_value LIKE $1)
-                )", 
+                    (ph_property_filter_meta_owner_details.meta_value LIKE " . $matches[1] . ")
+                )";
+                },
                 $where 
             );
 
             $where = preg_replace(
-                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
                 "",
                 $where
             );
 
             $where = preg_replace(
-                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
                 "",
                 $where
             );
@@ -1794,73 +1937,81 @@ LEFT JOIN " . $wpdb->posts . " AS ph_applicant_filter_posts ON ph_applicant_filt
         elseif ( 'contact' === $typenow ) 
         {
             $phone_number = '';
-            if ( is_numeric(substr(ph_clean($_GET['s']), 0, 1)) )
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( is_numeric(substr($search, 0, 1)) )
             {
-                $phone_number = preg_replace( "/[^0-9,]/", "", ph_clean($_GET['s']) );
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+                $phone_number = preg_replace( "/[^0-9,]/", "", $search );
             }
 
-            $where = preg_replace(
-                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
-                "(
-                    (" . $wpdb->posts . ".post_title LIKE $1) 
+            $where = preg_replace_callback(
+                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
+                static function( $matches ) use ( $wpdb, $reference_like, $reference_exact, $phone_number ) {
+                    return "(
+                    (" . $wpdb->posts . ".post_title LIKE " . $matches[1] . ")
                     OR
-                    (ph_contact_filter_meta_address_concatenated.meta_value LIKE $1)
+                    (ph_contact_filter_meta_address_concatenated.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_contact_filter_meta_email_address.meta_value LIKE $1)
+                    (ph_contact_filter_meta_email_address.meta_value LIKE " . $matches[1] . ")
                     " . ( $phone_number != '' ? "OR (ph_contact_filter_meta_telephone_number.meta_value LIKE '%" . $phone_number . "%')" : '' ) . "
-                )", 
+                )";
+                },
                 $where 
             );
 
             $where = preg_replace(
-                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_excerpt\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
                 "",
                 $where
             );
 
             $where = preg_replace(
-                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*(\'[^\']+\')\s*\)/",
+                "/\s+OR\s+\(\s*" . $wpdb->posts . ".post_content\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
                 "",
                 $where
             );
         }
         elseif ( 'appraisal' === $typenow ) 
         {
-            $where = preg_replace(
-                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
-                "(
-                    (" . $wpdb->posts . ".post_title LIKE $1) 
+            $where = preg_replace_callback(
+                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
+                static function( $matches ) use ( $wpdb, $reference_like, $reference_exact, $phone_number ) {
+                    return "(
+                    (" . $wpdb->posts . ".post_title LIKE " . $matches[1] . ")
                     OR
-                    (ph_appraisal_filter_meta_name_number.meta_value LIKE $1)
+                    (ph_appraisal_filter_meta_name_number.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_appraisal_filter_meta_street.meta_value LIKE $1)
+                    (ph_appraisal_filter_meta_street.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_appraisal_filter_meta_2.meta_value LIKE $1)
+                    (ph_appraisal_filter_meta_2.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_appraisal_filter_meta_3.meta_value LIKE $1)
+                    (ph_appraisal_filter_meta_3.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_appraisal_filter_meta_4.meta_value LIKE $1)
+                    (ph_appraisal_filter_meta_4.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_appraisal_filter_meta_postcode.meta_value LIKE $1)
-                )", 
+                    (ph_appraisal_filter_meta_postcode.meta_value LIKE " . $matches[1] . ")
+                )";
+                },
                 $where 
             );
         }
         elseif ( 'viewing' === $typenow || 'offer' === $typenow || 'sale' === $typenow || 'tenancy' === $typenow ) 
         {
-            $where = preg_replace(
-                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*(\'[^\']+\')\s*\)/",
-                "(
-                    (" . $wpdb->posts . ".post_title LIKE $1) 
+            $where = preg_replace_callback(
+                "/\(\s*" . $wpdb->posts . ".post_title\s+LIKE\s*('(?:\\\\.|[^'\\\\])*')\s*\)/",
+                static function( $matches ) use ( $wpdb, $reference_like, $reference_exact, $phone_number ) {
+                    return "(
+                    (" . $wpdb->posts . ".post_title LIKE " . $matches[1] . ")
                     OR 
-                    (ph_property_filter_posts.post_title LIKE $1) 
+                    (ph_property_filter_posts.post_title LIKE " . $matches[1] . ")
                     OR
-                    (ph_property_filter_meta_address_concatenated.meta_value LIKE $1)
+                    (ph_property_filter_meta_address_concatenated.meta_value LIKE " . $matches[1] . ")
                     OR 
-                    (ph_property_filter_meta_reference_number.meta_value = '" . esc_sql($_GET['s']) . "')
+                    (ph_property_filter_meta_reference_number.meta_value = " . $reference_exact . ")
                     OR
-                    (ph_applicant_filter_posts.post_title LIKE $1) 
-                )", 
+                    (ph_applicant_filter_posts.post_title LIKE " . $matches[1] . ")
+                )";
+                },
                 $where 
             );
         }

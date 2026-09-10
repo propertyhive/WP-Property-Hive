@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Admin Functions
  *
@@ -15,6 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  *
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_screen_ids; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_screen_ids() {
     return apply_filters( 'propertyhive_screen_ids', array(
         'edit-property',
@@ -51,6 +55,7 @@ function ph_get_screen_ids() {
  * @param int $post_parent (default: 0) Parent for the new page
  * @return int page ID
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_create_page; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_create_page( $slug, $option = '', $page_title = '', $page_content = '', $post_parent = 0 ) {
     global $wpdb;
 

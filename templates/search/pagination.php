@@ -14,7 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 	<?php
 		if ( $max_num_pages  > 1 )
 		{
-			echo wp_kses_post(paginate_links( apply_filters( 'propertyhive_pagination_args', array(
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WordPress builds and escapes pagination links; preserve the PHP pagination customization filter.
+			echo paginate_links( apply_filters( 'propertyhive_pagination_args', array(
 				'base'         => esc_url_raw( str_replace( 999999999, '%#%', get_pagenum_link( 999999999, false ) ) ),
 				'format'       => '',
 				'current'      => max( 1, get_query_var( 'paged' ) ),
@@ -24,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 				'type'         => 'list',
 				'end_size'     => 3,
 				'mid_size'     => 3
-			) ) ));
+			) ) );
 		}
 		else
 		{

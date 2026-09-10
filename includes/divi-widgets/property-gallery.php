@@ -253,12 +253,12 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
 
                     echo '<a';
 
-                    if ( $id_text ) 
+                    if ( $id_text )
                     {
                         echo ' id="' . esc_attr( $id_text ) . '"';
                     }
 
-                    if ( $id_text_mobile ) 
+                    if ( $id_text_mobile )
                     {
                         echo ' id="' . esc_attr( $id_text_mobile ) . '"';
                     }
@@ -270,7 +270,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                         echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            esc_html(__( 'See all %d images', 'propertyhive' )), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';
@@ -280,7 +280,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                         echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
-                            esc_html(__( 'See all %d images', 'propertyhive' )), 
+                            esc_html__( 'See all %d images', 'propertyhive' ),
                             count($images) + count($images_hidden) 
                         );
                         echo '</a></div></div>';

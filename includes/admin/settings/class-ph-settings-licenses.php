@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive License Settings
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Settings_Licenses' ) ) :
 /**
  * PH_Settings_Licenses.
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Licenses; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Licenses extends PH_Settings_Page {
 
 	/**
@@ -73,8 +77,8 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			{
 				if ( (strtotime($license['expires_at']) + 86400) <= time() )
 				{
-					// Expired
-					$output = '<span style="color:#900">' . __( 'License expired on ' . date("jS F Y", strtotime($license['expires_at'])), 'propertyhive' ) . '. ' . $renew_link . '</span>';
+					/* translators: %s: License expiry date. */
+					$output = '<span style="color:#900">' . sprintf( __( 'License expired on %s', 'propertyhive' ), gmdate( 'jS F Y', strtotime( $license['expires_at'] ) ) ) . '. ' . $renew_link . '</span>';
 					$input_border_color = '#900';
 				}
 				else
@@ -85,6 +89,13 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 					$valid_license = true;
 				}
 			}
+		}
+
+		$legacy_error = get_option( 'propertyhive_license_key_error', '' );
+		if ( 'old' === $license_type && '' !== $legacy_error ) {
+			$output = '<span style="color:#900">' . esc_html( $legacy_error ) . '</span>';
+			$input_border_color = '#900';
+			$valid_license = false;
 		}
 
 		// get new license information
@@ -143,15 +154,11 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$settings[] = array(
 			'type'        => 'html',
 			'id' 		  => 'pro_license_key_info',
-			'html' 		  => __( '<p>With a Pro license subscription you\'ll unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found within the \'<a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a>\' section of our website.</p>
-							' . ( (!$valid_pro_license) ? 
-									'<br><p><a href="https://wp-property-hive.com/pricing/?src=plugin-license-settings" class="button button-primary" target="_blank">Get PRO</a></p>' : 
-									'<br><p>
-										<a href="' . admin_url('admin.php?page=ph-settings&tab=features') . '" class="button button-primary">Activate Features</a>
-										<a href="https://wp-property-hive.com/my-account/subscriptions/?src=wordpress-license-tab" class="button button" target="_blank">Manage Subscription</a>
-									</p>'
-								), 'propertyhive' ) . '
-			<input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
+			'html'       => '<p>' . wp_kses_post( __( 'With a Pro license subscription you unlock a wide array of Property Hive functionality. We offer multiple packages to suit your needs. Your Pro subscription details and license key can be found in the <a href="https://wp-property-hive.com/my-account/" target="_blank">My Account</a> section of our website.', 'propertyhive' ) ) . '</p><br><p>' .
+                ( ! $valid_pro_license ?
+                    '<a href="https://wp-property-hive.com/pricing/?src=plugin-license-settings" class="button button-primary" target="_blank">' . esc_html__( 'Get PRO', 'propertyhive' ) . '</a>' :
+                    '<a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=features' ) ) . '" class="button button-primary">' . esc_html__( 'Activate Features', 'propertyhive' ) . '</a> <a href="https://wp-property-hive.com/my-account/subscriptions/?src=wordpress-license-tab" class="button button" target="_blank">' . esc_html__( 'Manage Subscription', 'propertyhive' ) . '</a>'
+                ) . '</p><input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
 		);
 
 		if ( $valid_pro_license )
@@ -160,7 +167,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 				'type'        => 'html',
 				'id' 		  => 'pro_license_key_display',
 				'title'		  => __( 'License Key', 'propertyhive' ),
-				'html' 		  => '<input type="text" disabled="disabled" value="' . $license_key_to_display . '" style="min-width:350px; border:1px solid ' . $pro_input_border_color . '"> ' . $pro_output
+				'html' 		  => '<input type="text" disabled="disabled" value="' . esc_attr( $license_key_to_display ) . '" style="min-width:350px; border:1px solid ' . esc_attr( $pro_input_border_color ) . '"> ' . esc_html( $pro_output )
 			);
 
 			$settings[] = array(
@@ -236,6 +243,15 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 	 * Save settings.
 	 */
 	public function save() {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
+
+        $license_type = isset( $_POST['propertyhive_license_type'] ) && is_string( $_POST['propertyhive_license_type'] ) ? sanitize_text_field( wp_unslash( $_POST['propertyhive_license_type'] ) ) : '';
+        $license_key = isset( $_POST['propertyhive_pro_license_key'] ) && is_string( $_POST['propertyhive_pro_license_key'] ) ? ph_clean( wp_unslash( $_POST['propertyhive_pro_license_key'] ) ) : '';
+        $license_action = isset( $_POST['pro_license_key_action'] ) && is_string( $_POST['pro_license_key_action'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_license_key_action'] ) ) : '';
+
 
 		$settings = $this->get_settings();
 
@@ -243,7 +259,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
 		update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
 
-		if ( $_POST['propertyhive_license_type'] == 'pro' && isset($_POST['propertyhive_pro_license_key']) && !empty(ph_clean($_POST['propertyhive_pro_license_key'])) && $_POST['pro_license_key_action'] == 'activate' )
+		if ( 'pro' === $license_type && ! empty( $license_key ) && 'activate' === $license_action )
 		{
 			$return = PH()->license->activate_pro_license_key();
 			if ( $return['success'] === false )
@@ -256,7 +272,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			}
 		}
 
-		if ( $_POST['propertyhive_license_type'] == 'pro' && isset($_POST['propertyhive_pro_license_key']) && !empty(ph_clean($_POST['propertyhive_pro_license_key'])) && $_POST['pro_license_key_action'] == 'deactivate' )
+		if ( 'pro' === $license_type && ! empty( $license_key ) && 'deactivate' === $license_action )
 		{
 			$return = PH()->license->deactivate_pro_license_key();
 			if ( $return['success'] === false )
@@ -269,7 +285,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			}
 		}
 
-		if ( $_POST['propertyhive_license_type'] == 'old' )
+		if ( 'old' === $license_type )
 		{
 			PH()->license->ph_check_licenses(true);
 		}

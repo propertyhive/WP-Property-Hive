@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
  * @category	Class
  * @author 		PropertyHive
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Address_Keyword_Polygon; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Address_Keyword_Polygon {
 
     /** @var PH_Emails The single instance of the class */
@@ -43,7 +44,7 @@ class PH_Address_Keyword_Polygon {
      * @since 1.0.0
      */
     public function __clone() {
-        _doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
+        _doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
     }
 
     /**
@@ -52,7 +53,7 @@ class PH_Address_Keyword_Polygon {
      * @since 1.0.0
      */
     public function __wakeup() {
-        _doing_it_wrong( __FUNCTION__, esc_html( __( 'Cheatin&#8217; huh?', 'propertyhive' ) ), '1.0.0' );
+        _doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
     }
 
     /**
@@ -70,6 +71,7 @@ class PH_Address_Keyword_Polygon {
         $address_keyword = trim($address_keyword);
 
         // see if it exists in the table
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- Prepared read from the plugin's persistent geocoding cache; cached polygons avoid external HTTP and this custom table has no core data API.
         $results = $wpdb->get_results(
             $wpdb->prepare(
                 "
@@ -124,6 +126,7 @@ class PH_Address_Keyword_Polygon {
                         if ( !empty($polygon_coordinates) )
                         {
                             // Insert into email log
+                            // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Populate the plugin's persistent polygon cache using explicit string formats; no equivalent core data API exists for this table.
                             $insert = $wpdb->insert( 
                                 $wpdb->prefix . 'ph_address_keyword_polygon', 
                                 array( 

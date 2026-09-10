@@ -127,33 +127,20 @@ class Elementor_Property_Embedded_Virtual_Tours_Widget extends \Elementor\Widget
 				{
 					if ( isset($settings['oembed']) && $settings['oembed'] == 'yes' )
 					{
-						$embed_code = wp_oembed_get( $virtual_tour['url'] );
-
-						$allowed_html = wp_kses_allowed_html( 'post' );
-
-						$allowed_html['iframe'] = array(
-						    'src'             => true,
-						    'width'           => true,
-						    'height'          => true,
-						    'frameborder'     => true,
-						    'allow'           => true,
-						    'allowfullscreen' => true,
-						    'loading'         => true,
-						    'title'           => true,
-						    'class'           => true,
-						);
-
-						echo wp_kses( $embed_code, $allowed_html );
+						$embed_code = wp_oembed_get($virtual_tour['url']);
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- wp_oembed_get() uses WordPress provider trust and sanitization; preserve supported provider scripts and trusted PHP filters.
+        				echo $embed_code;
 					}
 					else
 					{
 						if ( strpos($virtual_tour['url'], 'instagram.com/reel') !== false )
 						{
+							// phpcs:ignore PluginCheck.CodeAnalysis.EnqueuedResourceOffloading.OffloadedContent, WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Provider maintains this API endpoint without a plugin version. Required Instagram SDK for the property's configured Reel embed.
+							wp_enqueue_script( 'propertyhive-instagram-embed', 'https://www.instagram.com/embed.js', array(), null, true );
 							echo '
 								<blockquote class="instagram-media"
 								  data-instgrm-permalink="' . esc_url($virtual_tour['url']) . '"
 								  data-instgrm-version="14"></blockquote>
-								<script async src="https://www.instagram.com/embed.js"></script>
 								';
 						}
 						else

@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 function propertyhive_wp_text_input( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_text_field', $field, $thepostid );
@@ -54,7 +55,8 @@ function propertyhive_wp_text_input( $field ) {
 	<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '">
 	   <label for="' . esc_attr( $field['id'] ) . '">' . wp_kses_post( $field['label'] ) . '</label>
 	   <input type="' . esc_attr( $field['type'] ) . '" class="' . esc_attr( $field['class'] ) . '" name="' . esc_attr( $field['name'] ) . '" id="' . esc_attr( $field['id'] ) . '" value="' . esc_attr( $field['value'] ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '" ';
-	   echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Custom attributes come from the PHP field definition/filter; every name and value is escaped above before assembling this attribute fragment.
+	echo implode( ' ', $custom_attributes );
 	echo ' /> ';
 
 	if ( ! empty( $field['description'] ) ) {
@@ -79,6 +81,7 @@ function propertyhive_wp_text_input( $field ) {
 function propertyhive_wp_photo_upload( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_photo_upload_field', $field, $thepostid );
@@ -200,6 +203,7 @@ function propertyhive_wp_photo_upload( $field ) {
 function propertyhive_wp_file_upload( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_file_upload_field', $field, $thepostid );
@@ -322,6 +326,7 @@ function propertyhive_wp_file_upload( $field ) {
 function propertyhive_wp_hidden_input( $field ) {
 	global $thepostid, $post;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_hidden_field', $field, $thepostid );
@@ -341,6 +346,7 @@ function propertyhive_wp_hidden_input( $field ) {
 function propertyhive_wp_textarea_input( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_textarea_field', $field, $thepostid );
@@ -359,7 +365,8 @@ function propertyhive_wp_textarea_input( $field ) {
 			$custom_attributes[] = esc_attr( $attribute ) . '="' . esc_attr( $value ) . '"';
 
 	echo '<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '"><label for="' . esc_attr( $field['id'] ) . '">' . wp_kses_post( $field['label'] ) . '</label><textarea class="' . esc_attr( $field['class'] ) . '" name="' . esc_attr( $field['name'] ) . '" id="' . esc_attr( $field['id'] ) . '" placeholder="' . esc_attr( $field['placeholder'] ) . '" rows="2" cols="20" ';
-	echo implode( ' ', $custom_attributes ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Custom attributes come from the PHP field definition/filter; every name and value is escaped above before assembling this attribute fragment.
+	echo implode( ' ', $custom_attributes );
 	echo '>' . esc_textarea( $field['value'] ) . '</textarea> ';
 
 	if ( ! empty( $field['description'] ) ) {
@@ -384,6 +391,7 @@ function propertyhive_wp_textarea_input( $field ) {
 function propertyhive_wp_checkbox( $field ) {
 	global $thepostid, $post;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_checkbox_field', $field, $thepostid );
@@ -411,6 +419,7 @@ function propertyhive_wp_checkbox( $field ) {
 function propertyhive_wp_checkboxes( $field ) {
 	global $thepostid, $post;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid              = empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_checkboxes_field', $field, $thepostid );
@@ -443,6 +452,7 @@ function propertyhive_wp_checkboxes( $field ) {
 function propertyhive_wp_select( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_select_field', $field, $thepostid );
@@ -484,6 +494,7 @@ function propertyhive_wp_select( $field ) {
 function propertyhive_wp_select_optgroups( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_select_optgroups_field', $field, $thepostid );
@@ -534,6 +545,7 @@ function propertyhive_wp_select_optgroups( $field ) {
 function propertyhive_wp_radio( $field ) {
 	global $thepostid, $post, $propertyhive;
 
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared meta-box global contract; $thepostid is intentionally carried into the public Property Hive field-rendering helpers.
 	$thepostid 				= empty( $thepostid ) ? $post->ID : $thepostid;
 
 	$field = apply_filters( 'propertyhive_meta_box_wp_radio_field', $field, $thepostid );

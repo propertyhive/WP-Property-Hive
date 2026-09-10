@@ -87,6 +87,7 @@ class PH_Salient {
 
 new PH_Salient();
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_extract_font_style_from_salient_font_container; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_extract_font_style_from_salient_font_container( $font_container = '' )
 {
 	$style = '';
@@ -125,7 +126,7 @@ function ph_extract_font_style_from_salient_font_container( $font_container = ''
 	}
 
 	if ( ! empty( $styles ) ) {
-		$style = 'style="' . esc_attr( implode( ';', $styles ) ) . '"';
+		$style = 'style="' . esc_attr( safecss_filter_attr( implode( ';', $styles ) ) ) . '"';
 	} else {
 		$style = '';
 	}

@@ -21,6 +21,7 @@ if ( ! class_exists( 'PH_Admin_CPT_Tenancy' ) ) :
 /**
  * PH_Admin_CPT_Tenancy Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_CPT_Tenancy; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 
 	/**
@@ -52,19 +53,15 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 	 * Check if we're editing or adding a tenancy
 	 * @return boolean
 	 */
-	private function is_editing_tenancy() {
-		if ( ! empty( $_GET['post_type'] ) && 'tenancy' == $_GET['post_type'] ) {
-			return true;
-		}
-		if ( ! empty( $_GET['post'] ) && 'tenancy' == get_post_type( (int) $_GET['post'] ) ) {
-			return true;
-		}
-		if ( ! empty( $_REQUEST['post_id'] ) && 'tenancy' == get_post_type( (int) $_REQUEST['post_id'] ) ) {
-			return true;
-		}
-
-		return false;
-	}
+    private function is_editing_tenancy() {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection; mutations have separate save guards.
+        $post_type = isset( $_GET['post_type'] ) && is_string( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : '';
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection.
+        $post_id = isset( $_GET['post'] ) && is_string( $_GET['post'] ) ? absint( $_GET['post'] ) : 0;
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only screen detection for AJAX requests.
+        $request_id = isset( $_REQUEST['post_id'] ) && is_string( $_REQUEST['post_id'] ) ? absint( $_REQUEST['post_id'] ) : 0;
+        return 'tenancy' === $post_type || ( $post_id > 0 && 'tenancy' === get_post_type( $post_id ) ) || ( $request_id > 0 && 'tenancy' === get_post_type( $request_id ) );
+    }
 
 	/**
 	 * @param int $post_id
@@ -119,6 +116,7 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 
 		if ( empty( $the_tenancy ) || $the_tenancy->ID != $post->ID )
 		{
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Retain the legacy global name for compatibility with external admin column callbacks.
 			$the_tenancy = new PH_Tenancy( $post->ID );
 		}
 
@@ -167,25 +165,25 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 				break;
 			case 'applicant' :
 
-				echo wp_kses_post($the_tenancy->get_tenants(false, true));
+				echo wp_kses_post( $the_tenancy->get_tenants(false, true) );
 
 				break;
 			case 'start_date' :
-				echo ( $the_tenancy->_start_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_start_date ) )) : '-' );
+				echo ( $the_tenancy->_start_date != '' ? esc_html(gmdate( "d/m/Y", strtotime( $the_tenancy->_start_date ) )) : '-' );
 
 				break;
 			case 'end_date' :
-				echo ( $the_tenancy->_end_date != '' ? esc_html(date( "d/m/Y", strtotime( $the_tenancy->_end_date ) )) : '-' );
+				echo ( $the_tenancy->_end_date != '' ? esc_html(gmdate( "d/m/Y", strtotime( $the_tenancy->_end_date ) )) : '-' );
 
 				break;
 			case 'rent' :
 
-				echo wp_kses_post($the_tenancy->get_formatted_rent());
+				echo wp_kses_post( $the_tenancy->get_formatted_rent() );
 
 				break;
 			case 'status' :
 
-				echo wp_kses_post($the_tenancy->get_status());
+				echo wp_kses_post( $the_tenancy->get_status() );
 
 				break;
 			default :
@@ -252,12 +250,14 @@ class PH_Admin_CPT_Tenancy extends PH_Admin_CPT {
 		if ( isset( $vars['orderby'] ) ) {
 			if ( '_start_date' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_start_date',
 					'orderby' 	=> 'meta_value'
 				) );
 			}
 			elseif ( '_end_date' == $vars['orderby'] ) {
 				$vars = array_merge( $vars, array(
+					// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- All these meta_key values are literal, supported CPT date/status/price keys used by paginated WordPress admin list ordering. Core admin post queries provide pagination; no arbitrary request key is copied into these lines.
 					'meta_key' 	=> '_end_date',
 					'orderby' 	=> 'meta_value'
 				) );

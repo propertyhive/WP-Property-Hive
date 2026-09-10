@@ -20,6 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $page
  * @return int
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_get_page_id; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_get_page_id( $page ) {
 
 	$page = apply_filters( 'propertyhive_get_' . $page . '_page_id', get_option('propertyhive_' . $page . '_page_id' ) );
@@ -33,6 +34,7 @@ function ph_get_page_id( $page ) {
  * @param array $menu_items
  * @return array
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_nav_menu_item_classes; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_nav_menu_item_classes( $menu_items ) {
 	if ( ! is_propertyhive() ) {
 		return $menu_items;
@@ -72,6 +74,7 @@ add_filter( 'wp_nav_menu_objects', 'ph_nav_menu_item_classes', 2 );
  * @param string $pages
  * @return string
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_list_pages; the established callable name is part of the plugin/extension API and must remain stable.
 function ph_list_pages( $pages ) {
 	if ( is_propertyhive() ) {
 		// Remove current_page_parent class from any item.

@@ -28,12 +28,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<th>' . esc_html(__( 'Status', 'propertyhive' )) . '</th>
 				</tr>
 			';
+			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable included through the account rendering helper scope.
 			foreach ( $properties as $property )
 			{
+			    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable included through the account rendering helper scope.
 			    $property_url = ( 'yes' === $property->on_market )
 			        ? get_permalink( $property->id )
 			        : '';
 
+			    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable included through the account rendering helper scope.
 			    $image = $property->get_main_photo_src();
 
 			    echo '<tr>';

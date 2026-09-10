@@ -1,6 +1,9 @@
 <?php
 
-if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 
 add_shortcode( 'avada_property_image', function( $atts ) {
     $atts = shortcode_atts( array(
@@ -20,6 +23,7 @@ add_shortcode( 'avada_property_image', function( $atts ) {
     
     if ( empty($property) )
     {
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared frontend property global used by the Avada shortcode contract; changing $property would break the existing property context passed to these widgets.
         $property = new PH_Property(get_the_ID());
     }
     

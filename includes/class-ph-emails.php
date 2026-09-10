@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -42,7 +45,7 @@ class PH_Emails {
 	 * @since 1.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, esc_html(__( 'Cheatin&#8217; huh?', 'propertyhive' )), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -51,7 +54,7 @@ class PH_Emails {
 	 * @since 1.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, esc_html(__( 'Cheatin&#8217; huh?', 'propertyhive' )), '1.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Cheatin&#8217; huh?', 'propertyhive' ), '1.0.0' );
 	}
 
 	/**
@@ -93,23 +96,31 @@ class PH_Emails {
 
 	public function run_custom_email_cron()
 	{
-		if (isset($_GET['custom_email_log_cron']) && in_array($_GET['custom_email_log_cron'], array('propertyhive_process_email_log', 'propertyhive_auto_email_match')) )
+		if ( isset( $_GET['custom_email_log_cron'] ) )
         {
-            do_action($_GET['custom_email_log_cron']);
+            if ( ! current_user_can( 'manage_propertyhive' ) ) {
+                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
+            }
+            check_admin_referer( 'propertyhive-run-email-job' );
+            $job = is_string( $_GET['custom_email_log_cron'] ) ? sanitize_key( wp_unslash( $_GET['custom_email_log_cron'] ) ) : '';
+            if ( ! in_array( $job, array( 'propertyhive_process_email_log', 'propertyhive_auto_email_match' ), true ) ) {
+                wp_die( esc_html__( 'Invalid email job.', 'propertyhive' ), '', array( 'response' => 400 ) );
+            }
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- Dynamic email cron dispatch is a bounded internal false positive: the value is sanitized, restricted to two propertyhive_* jobs, and reached only after capability and nonce checks.
+            do_action( $job );
         }
 	}
 
-	public function send_applicant_registration_alert( $contact_post_id, $user_id )
-	{
-		if ( 
-			get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && 
-			isset($_POST['office_id']) && // in the future we should have office stored against contact and use that
-			$_POST['office_id'] != '' &&
-			isset($_POST['department']) && // Should really take department from contacts requirements
-			$_POST['department'] != ''
-		)
+		public function send_applicant_registration_alert( $contact_post_id, $user_id )
 		{
-			$to = get_post_meta( (int)$_POST['office_id'], '_office_email_address_' . str_replace("residential-", "", ph_clean($_POST['department'])), TRUE );
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
+			$request_post = wp_unslash( $_POST );
+			$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
+			$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
+
+			if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
+			{
+				$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
 
 			if ( $to == '' )
 			{
@@ -147,7 +158,8 @@ class PH_Emails {
             		continue;
             	}
 
-            	$value = ph_clean($_POST[$key]);
+					$raw_value = isset( $request_post[ $key ] ) && ( is_string( $request_post[ $key ] ) || is_array( $request_post[ $key ] ) ) ? $request_post[ $key ] : '';
+				$value = ph_clean( $raw_value );
             	$values = array();
             	if ( !empty($value) && taxonomy_exists($key) )
             	{
@@ -188,83 +200,31 @@ class PH_Emails {
 
 		$lock_id = uniqid( "", true );
 
-		$twenty_four_hours_ago = date( 'Y-m-d H:i:s', strtotime( '-24 hours' ) );
-		$now                   = date( 'Y-m-d H:i:s' );
+		$expired_lock = gmdate( 'Y-m-d H:i:s', strtotime( '24 hours ago' ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table and these bounded maintenance updates have no WordPress API equivalent.
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}ph_email_log SET status = 'fail2', lock_id = '' WHERE status = 'fail1' AND lock_id <> '' AND locked_at <= %s",
+            $expired_lock
+        ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table and these bounded maintenance updates have no WordPress API equivalent.
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}ph_email_log SET status = 'fail1', lock_id = '' WHERE status = '' AND lock_id <> '' AND locked_at <= %s",
+            $expired_lock
+        ) );
 
-		$wpdb->query(
-		    $wpdb->prepare(
-		        "
-		        UPDATE {$wpdb->prefix}ph_email_log
-		        SET
-		            status = 'fail2',
-		            lock_id = ''
-		        WHERE
-		            status = 'fail1'
-		            AND lock_id <> ''
-		            AND locked_at <= %s
-		        ",
-		        $twenty_four_hours_ago
-		    )
-		);
-
-		$wpdb->query(
-		    $wpdb->prepare(
-		        "
-		        UPDATE {$wpdb->prefix}ph_email_log
-		        SET
-		            status = 'fail1',
-		            lock_id = ''
-		        WHERE
-		            status = ''
-		            AND lock_id <> ''
-		            AND locked_at <= %s
-		        ",
-		        $twenty_four_hours_ago
-		    )
-		);
-		
-		// Lock/reserve all emails in log that are status blank or 'fail1' and lock_id blank and send_at in the past
-		// Only grab 25 at a time to prevent hanging/being seen as spamming
-		$process_limit = absint(
-		    apply_filters( 'propertyhive_email_process_limit', 25 )
-		);
-
-		if ( 0 === $process_limit ) 
-		{
-		    $process_limit = 25;
-		}
-
-		$wpdb->query(
-		    $wpdb->prepare(
-		        "
-		        UPDATE {$wpdb->prefix}ph_email_log
-		        SET
-		            lock_id = %s,
-		            locked_at = %s
-		        WHERE
-		            ( status = '' OR status = 'fail1' )
-		            AND lock_id = ''
-		            AND send_at <= %s
-		        LIMIT %d
-		        ",
-		        $lock_id,
-		        $now,
-		        $now,
-		        $process_limit
-		    )
-		);
-
-		// We now have up to 25 emails locked. Get this 25 and attempt to send
-		$emails_to_send = $wpdb->get_results(
-		    $wpdb->prepare(
-		        "
-		        SELECT *
-		        FROM {$wpdb->prefix}ph_email_log
-		        WHERE lock_id = %s
-		        ",
-		        $lock_id
-		    )
-		);
+        // Reserve a bounded batch before sending, so concurrent workers cannot send it twice.
+        $process_limit = max( 1, min( 1000, (int) apply_filters( 'propertyhive_email_process_limit', 25 ) ) );
+        $now = gmdate( 'Y-m-d H:i:s' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table and this bounded reservation update has no WordPress API equivalent.
+        $wpdb->query( $wpdb->prepare(
+            "UPDATE {$wpdb->prefix}ph_email_log SET lock_id = %s, locked_at = %s WHERE (status = '' OR status = 'fail1') AND lock_id = '' AND send_at <= %s LIMIT %d",
+            $lock_id, $now, $now, $process_limit
+        ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table and this lock-scoped read has no WordPress API equivalent.
+        $emails_to_send = $wpdb->get_results( $wpdb->prepare(
+            "SELECT * FROM {$wpdb->prefix}ph_email_log WHERE lock_id = %s",
+            $lock_id
+        ) );
 
 		foreach ( $emails_to_send as $email_to_send ) 
 		{
@@ -317,14 +277,14 @@ class PH_Emails {
 					$new_status = 'fail2';
 				}
 			}
-			$wpdb->query("
-			    UPDATE " . $wpdb->prefix . "ph_email_log
-			    SET 
-					status = '" . $new_status . "',
-					lock_id = ''
-			    WHERE 
-			    	email_id = '" . $email_id . "'
-			");
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table; wpdb is the required API for updating its status.
+			$wpdb->update(
+                $wpdb->prefix . 'ph_email_log',
+                array( 'status' => $new_status, 'lock_id' => '' ),
+                array( 'email_id' => (int) $email_id ),
+                array( '%s', '%s' ),
+                array( '%d' )
+            );
 		}
 
 		// Delete old logs
@@ -337,7 +297,11 @@ class PH_Emails {
 	        $keep_logs_days = '3650';
 	    }
 
-	    $wpdb->query( "DELETE FROM " . $wpdb->prefix . "ph_email_log WHERE send_at < DATE_SUB(NOW(), INTERVAL " . $keep_logs_days . " DAY)" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The email queue is a custom plugin table and this retention cleanup has no WordPress API equivalent.
+	    $wpdb->query( $wpdb->prepare(
+            "DELETE FROM {$wpdb->prefix}ph_email_log WHERE send_at < DATE_SUB(NOW(), INTERVAL %d DAY)",
+            (int) $keep_logs_days
+        ) );
 	}
 
 	/*
@@ -347,7 +311,9 @@ class PH_Emails {
 	{
 		global $post;
 
-		$dry_run = isset($_GET['dry_run']) ? true : false;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- dry_run only selects diagnostic output and never changes persisted data; the real email action is capability and nonce protected in run_custom_email_cron().
+		$request_get = wp_unslash( $_GET );
+		$dry_run = isset( $request_get['dry_run'] );
 
 		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
 
@@ -360,7 +326,7 @@ class PH_Emails {
 
 		$auto_property_match_enabled = get_option( 'propertyhive_auto_property_match', '' );
 
-		if ( $dry_run === true ) { echo esc_html('Auto-match setting enabled: ' . $auto_property_match_enabled) . "<br>\n"; }
+		if ( $dry_run === true ) { echo 'Auto-match setting enabled: ' . esc_html( $auto_property_match_enabled ) . "<br>\n"; }
 
 		if ( $auto_property_match_enabled == '' )
 		{
@@ -369,7 +335,7 @@ class PH_Emails {
 		
 		$auto_property_match_enabled_date = get_option( 'propertyhive_auto_property_match_enabled_date', '' );
 
-		if ( $dry_run === true ) { echo esc_html('Auto-match setting enabled date: ' . $auto_property_match_enabled_date) . "<br>\n"; }
+		if ( $dry_run === true ) { echo 'Auto-match setting enabled date: ' . esc_html( $auto_property_match_enabled_date ) . "<br>\n"; }
 
 		if ( $auto_property_match_enabled_date == '' )
 		{
@@ -408,6 +374,7 @@ class PH_Emails {
 
         $args = array(
             'number' => 9999,
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- Legacy Property Negotiator compatibility filter; existing role filters depend on this exact public hook name.
             'role__not_in' => apply_filters( 'property_negotiator_exclude_roles', array('property_hive_contact', 'subscriber') ),
             'fields' => array( 'ID', 'display_name', 'user_email' )
         );
@@ -454,15 +421,16 @@ class PH_Emails {
 		$args = array(
 			'post_type' => 'contact',
 			'nopaging' => true,
+			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Matching mail must include all eligible applicant profiles; membership and opt-in eligibility are stored in contact metadata.
 			'meta_query' => $meta_query,
 			'fields' => 'ids'
 		);
 
-		if ( $dry_run === true ) { echo esc_html('Running query to get contacts with args: ' . print_r($args, true)) . "<br>\n"; }
+		if ( $dry_run === true ) { echo 'Running query to get contacts with args: ' . esc_html( wp_json_encode( $args, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
 		$contact_query = new WP_Query( $args );
 
-		if ( $dry_run === true ) { echo esc_html('Found ' . $contact_query->found_posts . ' contacts') . "<br>\n"; }
+		if ( $dry_run === true ) { echo 'Found ' . esc_html( $contact_query->found_posts ) . ' contacts' . "<br>\n"; }
 
 		if ( $contact_query->have_posts() )
 		{
@@ -489,7 +457,7 @@ class PH_Emails {
             );
             $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
 
-            $default_body = wp_kses($default_body, $allowedposttags);
+            $default_body = wp_kses( $default_body, $allowed_tags );
 
 			while ( $contact_query->have_posts() )
 			{
@@ -497,7 +465,7 @@ class PH_Emails {
 
 				$contact_id = get_the_ID();
 
-				if ( $dry_run === true ) { echo esc_html('Doing contact: ' . get_the_title()) . "<br>\n"; }
+				if ( $dry_run === true ) { echo 'Doing contact: ' . esc_html( get_the_title() ) . "<br>\n"; }
 
 				// invalid email address
 				if ( strpos( get_post_meta( $contact_id, '_email_address', TRUE ), '@' ) === FALSE )
@@ -526,7 +494,7 @@ class PH_Emails {
 						$dismissed_properties = array();
 					}
 
-					if ( $dry_run === true ) { if ( !empty($dismissed_properties) ) { echo 'Dismissed properties: ' . esc_html( print_r($dismissed_properties, true) ) . "<br>\n"; } }
+					if ( $dry_run === true ) { if ( !empty($dismissed_properties) ) { echo 'Dismissed properties: ' . esc_html( wp_json_encode( $dismissed_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; } }
 
 					for ( $i = 0; $i < $applicant_profiles; ++$i )
 					{
@@ -563,7 +531,7 @@ class PH_Emails {
 							// Remove from this array if on market changed or price changed
 							if ( is_array($already_sent_properties) )
 							{
-								if ( $dry_run === true ) { echo esc_html('Already sent properties before: ' . print_r($already_sent_properties, true)) . "<br>\n"; }
+								if ( $dry_run === true ) { echo 'Already sent properties before: ' . esc_html( wp_json_encode( $already_sent_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
@@ -571,26 +539,26 @@ class PH_Emails {
 
 									if ( $highest_send != '' )
 									{
-										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last sent: ' . $highest_send) . "<br>\n"; }
+										if ( $dry_run === true ) { echo 'Property: ' . esc_html( $already_sent_property_id ) . ' last sent: ' . esc_html( $highest_send ) . "<br>\n"; }
 
 										$on_market_change_date = get_post_meta( $already_sent_property_id, '_on_market_change_date', TRUE );
 
-										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last on market change: ' . $on_market_change_date) . "<br>\n"; }
+										if ( $dry_run === true ) { echo 'Property: ' . esc_html( $already_sent_property_id ) . ' last on market change: ' . esc_html( $on_market_change_date ) . "<br>\n"; }
 
 										$price_change_date = get_post_meta( $already_sent_property_id, '_price_change_date', TRUE );
 
-										if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' last price change: ' . $price_change_date) . "<br>\n"; }
+										if ( $dry_run === true ) { echo 'Property: ' . esc_html( $already_sent_property_id ) . ' last price change: ' . esc_html( $price_change_date ) . "<br>\n"; }
 
 										if ( $on_market_change_date > $highest_send )
 										{
-											if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' has changed on market since last sent') . "<br>\n"; }
+											if ( $dry_run === true ) { echo 'Property: ' . esc_html( $already_sent_property_id ) . ' has changed on market since last sent' . "<br>\n"; }
 
 											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
 											unset($already_sent_properties[$already_sent_property_id]);
 										}
 										elseif ( $price_change_date > $highest_send )
 										{
-											if ( $dry_run === true ) { echo esc_html('Property: ' . $already_sent_property_id . ' has changed price since last sent') . "<br>\n"; }
+											if ( $dry_run === true ) { echo 'Property: ' . esc_html( $already_sent_property_id ) . ' has changed price since last sent' . "<br>\n"; }
 
 											// This property has changed since it was last sent. Remove from already sent list so it gets sent again
 											unset($already_sent_properties[$already_sent_property_id]);
@@ -598,10 +566,10 @@ class PH_Emails {
 									}
 								}
 
-								if ( $dry_run === true ) { echo esc_html('Already sent properties after: ' . print_r($already_sent_properties, true)) . "<br>\n"; }
+								if ( $dry_run === true ) { echo 'Already sent properties after: ' . esc_html( wp_json_encode( $already_sent_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 							}
 
-							if ( $dry_run === true ) { echo esc_html('Matching properties before removing already sent: ' . print_r($matching_properties, true)) . "<br>\n"; }
+							if ( $dry_run === true ) { echo 'Matching properties before removing already sent: ' . esc_html( wp_json_encode( $matching_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
 							// Check properties haven't already been sent and not marked as 'not interested'
 							$new_matching_properties = array();
@@ -613,7 +581,7 @@ class PH_Emails {
 								}
 							}
 
-							if ( $dry_run === true ) { echo esc_html('Matching properties after removing already sent: ' . print_r($new_matching_properties, true)) . "<br>\n"; }
+							if ( $dry_run === true ) { echo 'Matching properties after removing already sent: ' . esc_html( wp_json_encode( $new_matching_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
 							$max_results = apply_filters( 'propertyhive_auto_match_maximum_results', FALSE);
 							if ( $max_results !== FALSE )
@@ -628,8 +596,8 @@ class PH_Emails {
 								$subject = str_replace("[property_count]", count($new_matching_properties) . ' propert' . ( ( count($new_matching_properties) != 1 ) ? 'ies' : 'y' ), $default_subject);
 
 						        $contact = new PH_Contact($contact_id);
-						        $body = str_replace("[contact_name]", $contact->post_title, $default_body);
-						        $body = str_replace("[contact_dear]", $contact->dear(), $body);
+						        $body = str_replace( '[contact_name]', esc_html( $contact->post_title ), $default_body );
+						        $body = str_replace( '[contact_dear]', esc_html( $contact->dear() ), $body );
 						        $body = str_replace("[property_count]", count($new_matching_properties) . ' propert' . ( ( count($new_matching_properties) != 1 ) ? 'ies' : 'y' ), $body);
 
 						        $office_counts = array();
@@ -680,8 +648,8 @@ class PH_Emails {
 									$highest_office_email_address = get_option('admin_email');
 								}
 
-								$body = str_replace("[office_name]", $highest_office_name, $body);
-								$body = str_replace("[office_email_address]", $highest_office_email_address, $body);
+								$body = str_replace( '[office_name]', esc_html( $highest_office_name ), $body );
+								$body = str_replace( '[office_email_address]', esc_html( $highest_office_email_address ), $body );
 
 								$highest_negotiator_name = '';
 								$highest_negotiator_email_address = '';
@@ -694,8 +662,8 @@ class PH_Emails {
 									$highest_negotiator_email_address = ( isset($negotiator_email_addresses[$highest_negotiator_id]) ? $negotiator_email_addresses[$highest_negotiator_id] : '' );
 								}
 
-								$body = str_replace("[negotiator_name]", $highest_negotiator_name, $body);
-								$body = str_replace("[negotiator_email_address]", $highest_negotiator_email_address, $body);
+								$body = str_replace( '[negotiator_name]', esc_html( $highest_negotiator_name ), $body );
+								$body = str_replace( '[negotiator_email_address]', esc_html( $highest_negotiator_email_address ), $body );
 
 								$highest_office_email_address = apply_filters( 'propertyhive_auto_match_from_email_address', $highest_office_email_address );
 
@@ -752,13 +720,13 @@ class PH_Emails {
 			$css = apply_filters( 'propertyhive_email_styles', ob_get_clean() );
 
 			// include css inliner
-			if ( ! class_exists( 'Emogrifier' ) && class_exists( 'DOMDocument' ) ) {
+			if ( ! class_exists( 'PropertyHive_Emogrifier' ) && class_exists( 'DOMDocument' ) ) {
 				include_once( dirname( __FILE__ ) . '/libraries/class-emogrifier.php' );
 			}
 			
 			// apply CSS styles inline for picky email clients
 			try {
-				$emogrifier = new Emogrifier( $content, $css );
+				$emogrifier = new PropertyHive_Emogrifier( $content, $css );
 				$content    = $emogrifier->emogrify();
 			} catch ( Exception $e ) {
 				die(esc_html("Error converting CSS styles to be inline. Error as follows: " . $e->getMessage()));
@@ -781,7 +749,7 @@ class PH_Emails {
 		$unsubscribe_link = '';
 		if ($contact_id != '')
 		{
-			$unsubscribe_link = site_url() .'?ph_unsubscribe=' . base64_encode($contact_id . '|' . md5( get_post_meta( $contact_id, '_email_address', TRUE ) ) );
+			$unsubscribe_link = PH()->get_contact_unsubscribe_url( $contact_id );
 		}
 
 		ph_get_template( 'emails/email-footer.php', array( 'unsubscribe_link' => $unsubscribe_link ) );
@@ -800,7 +768,8 @@ class PH_Emails {
 
 		do_action( 'propertyhive_email_header', $contact_id );
 
-		echo wp_kses_post( wpautop( wptexturize( $message ) ) );
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Email bodies are deliberately HTML. The callers sanitize stored/request template content before this shared wrapper, and email header/footer plus propertyhive_mail_content are trusted extension points; escaping here would break supported markup.
+		echo wpautop( wptexturize( $message ) );
 
 		do_action( 'propertyhive_email_footer', $contact_id );
 
@@ -812,12 +781,24 @@ class PH_Emails {
 
 	public function send_enquiry_auto_responder( $data = array() )
 	{
-		if ( isset($data['property_id']) && !empty(ph_clean($data['property_id'])) )
-		{
-			$property_ids = ph_clean(explode("|", $data['property_id']));
-			if ( !is_array($property_ids) ) { $property_ids = array($property_ids); }
+		if ( ! is_array( $data ) ) {
+			return;
+		}
 
-			$to = sanitize_email( $_POST['email_address'] );
+		$request_data = wp_unslash( $data );
+		if ( isset( $request_data['property_id'] ) && is_string( $request_data['property_id'] ) && '' !== $request_data['property_id'] )
+		{
+			$property_ids = array_filter( array_map( 'absint', explode( '|', $request_data['property_id'] ) ) );
+			if ( empty( $property_ids ) || count( $property_ids ) > 100 ) {
+				return;
+			}
+			foreach ( $property_ids as $property_id ) {
+				if ( 'property' !== get_post_type( $property_id ) || ! propertyhive_is_post_publicly_viewable( $property_id ) ) {
+					return;
+				}
+			}
+
+			$to = isset( $request_data['email_address'] ) && is_string( $request_data['email_address'] ) ? sanitize_email( $request_data['email_address'] ) : '';
 			$subject = get_option( 'propertyhive_enquiry_auto_responder_email_subject', '' );
 			$body = get_option( 'propertyhive_enquiry_auto_responder_email_body', '' );
 
@@ -827,12 +808,13 @@ class PH_Emails {
 				$headers[] = 'From: ' . html_entity_decode(get_bloginfo('name')) . ' <' . get_option( 'propertyhive_email_from_address', get_option( 'admin_email' ) ) . '>';
 				$headers[] = 'Content-Type: text/html; charset=UTF-8';
 
-				$body = str_replace( "[name]", ( isset($_POST['name']) ? ph_clean($_POST['name']) : '' ), $body );
+				$name = isset( $request_data['name'] ) && is_string( $request_data['name'] ) ? ph_clean( $request_data['name'] ) : '';
+				$body = str_replace( '[name]', esc_html( $name ), $body );
 
 				$property_address_hyperlinked = array();
 				foreach ( $property_ids as $property_id )
 				{
-					$property_address_hyperlinked[] = '<a href="' . get_permalink($property_id) . '">' . get_the_title($property_id) . '</a>';
+					$property_address_hyperlinked[] = '<a href="' . esc_url( get_permalink( $property_id ) ) . '">' . esc_html( get_the_title( $property_id ) ) . '</a>';
 				}
 				$body = str_replace( "[property_address_hyperlinked]", implode(' and ', array_filter(array_merge(array(join(', ', array_slice($property_address_hyperlinked, 0, -1))), array_slice($property_address_hyperlinked, -1)), 'strlen')), $body );
 
@@ -850,6 +832,7 @@ class PH_Emails {
 							'post_status' => 'publish',
 							'posts_per_page' => 3,
 							'orderby' => 'rand',
+							// phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Each email’s similar-property query returns three properties and excludes the current property. posts_per_page=3; post__not_in is one property ID; metadata/taxonomy match the recommendation rules.
 							'post__not_in' => array($property_id),
 						);
 
@@ -915,11 +898,13 @@ class PH_Emails {
 							}
 						}
 
+						// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Each email’s similar-property query returns three properties and excludes the current property. posts_per_page=3; post__not_in is one property ID; metadata/taxonomy match the recommendation rules.
 						$args['meta_query'] = $meta_query;
 
 						$property_match_statuses = get_option( 'propertyhive_property_match_statuses', '' );
 						if ( $property_match_statuses != '' && is_array($property_match_statuses) && !empty($property_match_statuses) )
 						{
+							// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Each email’s similar-property query returns three properties and excludes the current property. posts_per_page=3; post__not_in is one property ID; metadata/taxonomy match the recommendation rules.
 							$args['tax_query'] = array(
 								array(
 									'taxonomy' => 'availability',

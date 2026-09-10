@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Setup menus in WP admin.
  *
@@ -15,6 +18,7 @@ if ( ! class_exists( 'PH_Admin_Menus' ) ) :
 /**
  * PH_Admin_Menus Class
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Menus; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Menus {
 
 	/**
@@ -48,17 +52,24 @@ class PH_Admin_Menus {
 		PH_Admin_Settings::get_settings_pages();
 		
 		// Get current tab/section.
-		$current_tab     = empty( $_GET['tab'] ) ? 'general' : sanitize_title( wp_unslash( $_GET['tab'] ) ); // WPCS: input var okay, CSRF ok.
-		$current_section = empty( $_REQUEST['section'] ) ? '' : sanitize_title( wp_unslash( $_REQUEST['section'] ) ); // WPCS: input var okay, CSRF ok.
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound, WordPress.Security.NonceVerification.Recommended -- Read-only settings routing; saved data is separately nonce/capability checked by PH_Admin_Settings::save(). Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
+		$current_tab     = empty( $_GET['tab'] ) || ! is_string( $_GET['tab'] ) ? 'general' : sanitize_title( wp_unslash( $_GET['tab'] ) ); // WPCS: input var okay, CSRF ok.
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound, WordPress.Security.NonceVerification.Recommended -- Read-only settings routing; saved data is separately nonce/capability checked by PH_Admin_Settings::save(). Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
+		$current_section = empty( $_REQUEST['section'] ) || ! is_string( $_REQUEST['section'] ) ? '' : sanitize_title( wp_unslash( $_REQUEST['section'] ) ); // WPCS: input var okay, CSRF ok.
 
-		// Save settings if data has been posted.
-		if ( '' !== $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}_{$current_section}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+		// Save settings if data has been posted. The called save method verifies nonce and capabilities.
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only save intent; PH_Admin_Settings::save() validates before changing any settings.
+		$save_requested = ! empty( $_POST['save'] );
+		if ( '' !== $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}_{$current_section}", $save_requested ) ) { // WPCS: input var okay, CSRF ok.
 			PH_Admin_Settings::save();
-		} elseif ( '' === $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}", ! empty( $_POST['save'] ) ) ) { // WPCS: input var okay, CSRF ok.
+		} elseif ( '' === $current_section && apply_filters( "propertyhive_save_settings_{$current_tab}", $save_requested ) ) { // WPCS: input var okay, CSRF ok.
 			PH_Admin_Settings::save();
 		}
 
-		$redirect_after_save = empty( $_POST['redirect'] ) ? '' : sanitize_url( wp_unslash( $_POST['redirect'] ) );
+        $redirect_after_save = '';
+        if ( current_user_can( 'manage_options' ) && isset( $_REQUEST['_wpnonce'] ) && is_string( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            $redirect_after_save = isset( $_POST['redirect'] ) && is_string( $_POST['redirect'] ) ? sanitize_url( wp_unslash( $_POST['redirect'] ) ) : '';
+        }
 		if ( !empty($redirect_after_save) )
 		{
 			wp_safe_redirect($redirect_after_save . '&ph_message=' . __( 'Your settings have been saved.', 'propertyhive' ) );
@@ -197,9 +208,11 @@ class PH_Admin_Menus {
 	    	{
 		    	$args = array(
 		    		'post_type' => 'enquiry',
-		    		'nopaging' => true,
+                    'posts_per_page' => 1,
+                'no_found_rows' => false,
 		    		'fields' => 'ids',
-		    		'meta_query' => array(
+                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Count-only menu query fetches one ID while retaining found_rows for the complete total.
+                'meta_query' => array(
 		    			array(
 		    				'key' => '_status',
 		    				'value' => 'open'
@@ -245,16 +258,18 @@ class PH_Admin_Menus {
 	    	{
 	            $args = array(
 	                'post_type' => 'key_date',
-	                'nopaging' => true,
+	                'posts_per_page' => 1,
+                'no_found_rows' => false,
 	                'fields' => 'ids',
-	                'meta_query' => array(
+	                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Count-only menu query fetches one ID while retaining found_rows for the complete total.
+                'meta_query' => array(
 	                    array(
 	                        'key' => '_key_date_status',
 	                        'value' => 'pending'
 	                    ),
 	                    array(
 	                        'key' => '_date_due',
-	                        'value' => date('Y-m-d'),
+	                        'value' => gmdate('Y-m-d'),
 	                        'type' => 'date',
 	                        'compare' => '<=',
 	                    ),
@@ -410,9 +425,11 @@ class PH_Admin_Menus {
 
 		if ( $crm_only_mode == '1' )
 		{
-			if ( $post_type == 'contact' && isset($_GET['_contact_type']) && !empty(ph_clean($_GET['_contact_type'])) )
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only CRM navigation highlighting, not a data mutation.
+			$contact_type = isset( $_GET['_contact_type'] ) && is_string( $_GET['_contact_type'] ) ? sanitize_text_field( wp_unslash( $_GET['_contact_type'] ) ) : '';
+			if ( $post_type == 'contact' && '' !== $contact_type )
 			{
-				$parent_file = 'edit.php?post_type=contact&_contact_type=' . ph_clean($_GET['_contact_type']);
+				$parent_file = 'edit.php?post_type=contact&_contact_type=' . rawurlencode( $contact_type );
 			}
 		}
 		else

@@ -71,24 +71,26 @@ class Bricks_Builder_Property_Bathrooms_Widget extends \Bricks\Element {
 	    // Add 'class' attribute to element root tag
 	    $this->set_attribute( '_root', 'class', $root_classes );
 
-		echo "<div {$this->render_attributes( '_root' )}>"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks serializes registered attributes through its documented render_attributes() API.
+		echo "<div {$this->render_attributes( '_root' )}>";
 
 			if ( isset( $this->settings['icon'] ) ) 
 			{
-		    	echo wp_kses_post(self::render_icon( $this->settings['icon'] ));
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Bricks Element::render_icon() returns the icon-control HTML fragment, including i/svg markup; Bricks sanitizes uploaded SVGs at its documented upload boundary.
+		    	echo self::render_icon( $this->settings['icon'] );
 		    	echo ' ';
 		    }
 
 		    if ( isset($this->settings['before']) && !empty($this->settings['before']) )
 	        {
-	        	echo wp_kses_post($this->settings['before']) . ' ';
+                echo wp_kses_post( $this->settings['before'] ) . ' ';
 	        }
 
 			echo esc_html($property->bathrooms);
 
 			if ( isset($this->settings['after']) && !empty($this->settings['after']) )
 	        {
-	        	echo ' ' . wp_kses_post($this->settings['after']);
+                echo ' ' . wp_kses_post( $this->settings['after'] );
 	        }
 
 		echo '</div>';

@@ -20,6 +20,7 @@ global $post, $property;
         <?php do_action( 'propertyhive_property_meta_list_start' ); ?>
     
     	<?php
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
             foreach ( $meta as $key => $value )
             {
                 echo '<li class="' . esc_attr( $key ) . '"><span>' . esc_html($value['label']) . ':</span> ' . esc_html($value['value']) . '</li>';

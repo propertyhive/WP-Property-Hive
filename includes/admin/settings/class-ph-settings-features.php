@@ -17,6 +17,7 @@ if ( ! class_exists( 'PH_Settings_Features' ) ) :
 /**
  * PH_Settings_Features
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Features; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Features extends PH_Settings_Page {
 
 	/**
@@ -65,11 +66,10 @@ class PH_Settings_Features extends PH_Settings_Page {
             'free' => 'Free',
         );
 
-        $selected_category = '';
-        if ( isset($_GET['profilter']) && array_key_exists(sanitize_text_field($_GET['profilter']), $categories) )
-        {
-            $selected_category = sanitize_text_field($_GET['profilter']);
-        }
+        // Read-only category selection: no settings are changed by this query parameter.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Publicly linkable display filter only; no state mutation.
+        $requested_category = isset( $_GET['profilter'] ) && is_string( $_GET['profilter'] ) ? sanitize_text_field( wp_unslash( $_GET['profilter'] ) ) : '';
+        $selected_category = array_key_exists( $requested_category, $categories ) ? $requested_category : '';
 
         echo '<div class="pro-filters">';
             echo '<ul>';
@@ -130,7 +130,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                     
 
                     echo '<div style="float:right; padding-top:6px;">';
-                    echo implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links);
+                    echo wp_kses_post( implode( "&nbsp;&nbsp;|&nbsp;&nbsp;", $links ) );
                     echo '</div>';
 
                     echo '<label class="switch">
@@ -156,6 +156,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 }
 
                 $pro = false;
+                $can_use = true;
 
                 echo '">
                     <div class="inner"' . ( !$can_use ? ' style="border:1px solid #900"' : '' ) . '>
@@ -167,7 +168,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                     $links[] = 'This feature has moved. <a href="https://wp-property-hive.com/template-assistant-is-now-part-of-property-hive-core-plugin?src=plugin-feature-settings" target="_blank" style="text-decoration:none">' . esc_html(__( 'Read More', 'propertyhive' )) . '</a>';
                     
                     echo '<div style="float:right; padding-top:6px;">';
-                    echo wp_kses_post(implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links));
+                    echo wp_kses_post( implode( "&nbsp;&nbsp;|&nbsp;&nbsp;", $links ) );
                     echo '</div>';
 
                     echo '<label class="switch">
@@ -201,7 +202,7 @@ class PH_Settings_Features extends PH_Settings_Page {
             }
 
             $pro = false;
-            $plans = (isset($feature['plans']) & is_array($feature['plans'])) ? $feature['plans'] : array();
+            $plans = (isset($feature['plans']) && is_array($feature['plans'])) ? $feature['plans'] : array();
             if ( !in_array('free', $plans) )
             {
                 $pro = true;
@@ -248,7 +249,7 @@ class PH_Settings_Features extends PH_Settings_Page {
                 }
 
                 echo '<div style="float:right; padding-top:6px;">';
-                echo wp_kses_post(implode("&nbsp;&nbsp;|&nbsp;&nbsp;", $links));
+                echo wp_kses_post( implode( "&nbsp;&nbsp;|&nbsp;&nbsp;", $links ) );
                 echo '</div>';
 
                 echo '<label class="switch">
@@ -279,6 +280,7 @@ class PH_Settings_Features extends PH_Settings_Page {
     public function output() {
     	global $current_section, $hide_save_button;
 
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $hide_save_button = true;
         $settings = $this->get_settings(); 
 

@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) )
 	exit;
 }
 
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Key_Date; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Key_Date {
 
 	/** @var int */

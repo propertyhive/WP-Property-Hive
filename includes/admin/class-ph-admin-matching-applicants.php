@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Admin Matching Applicants Class.
  *
@@ -15,25 +18,38 @@ if ( ! class_exists( 'PH_Admin_Matching_Applicants' ) ) :
 /**
  * PH_Admin_Matching_Applicants
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Matching_Applicants; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Admin_Matching_Applicants {
 
 	public function output()
 	{
-        if ( !isset($_GET['property_id']) || (isset($_GET['property_id']) && get_post_type((int)$_GET['property_id']) != 'property') )
-        {
-            die('Invalid property_id passed');
-        }
+		// The initial matching screen is read-only. The POST branch below verifies the
+		// matching nonce before it performs any state-changing action.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This request is used to render the read-only matching screen; POST mutations verify the matching nonce below.
+		$request_get = wp_unslash( $_GET );
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Only the presence of the action selector is checked here; request values are normalized after the nonce check below.
+		$has_step = isset( $_POST['step'] );
 
-        $property_id = (int)$_GET['property_id'];
+		$property_id = ( isset( $request_get['property_id'] ) && is_scalar( $request_get['property_id'] ) ) ? absint( $request_get['property_id'] ) : 0;
 
-        $property = new PH_Property($property_id);
+		if ( ! $property_id || get_post_type( $property_id ) !== 'property' )
+	        {
+	            die('Invalid property_id passed');
+	        }
 
-		if ( isset($_POST['step']) )
+	        $property = new PH_Property($property_id);
+
+		if ( $has_step )
 		{
-			if ( empty( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( $_REQUEST['_wpnonce'], 'propertyhive-matching-applicants' ) )
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- Only the nonce value is read before verification; all other POST values are normalized after the check below.
+			$request_request = wp_unslash( $_REQUEST );
+			if ( empty( $request_request['_wpnonce'] ) || ! wp_verify_nonce( ( isset( $request_request['_wpnonce'] ) && is_string( $request_request['_wpnonce'] ) ) ? sanitize_text_field( $request_request['_wpnonce'] ) : '', 'propertyhive-matching-applicants' ) )
 	    		die( esc_html(__( 'Action failed. Please refresh the page and retry.', 'propertyhive' )) );
 
-			switch ( $_POST['step'] )
+			$request_post = wp_unslash( $_POST );
+			$step = is_string( $request_post['step'] ) ? sanitize_key( $request_post['step'] ) : '';
+
+			switch ( $step )
 			{
 				case "one":
 				{
@@ -45,7 +61,7 @@ class PH_Admin_Matching_Applicants {
                     $nothing_to_send = true;
 
 					// Handle properties to email
-					if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) )
+						if ( isset( $request_post['email_contact_applicant_profile_id'] ) && ! empty( $request_post['email_contact_applicant_profile_id'] ) )
 					{
                         $nothing_to_send = false;
 
@@ -75,7 +91,7 @@ class PH_Admin_Matching_Applicants {
 
         <form method="post" id="mainform" action="" enctype="multipart/form-data">
 <?php
-            if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) )
+		            if ( isset( $request_post['email_contact_applicant_profile_id'] ) && ! empty( $request_post['email_contact_applicant_profile_id'] ) )
             {
                 // We've got emails to send
                 include 'views/html-admin-matching-applicants-email.php';
@@ -86,12 +102,25 @@ class PH_Admin_Matching_Applicants {
             <p class="submit">
 
                 <input name="save" class="button-primary" type="submit" value="<?php echo esc_attr(__( 'Send Matches', 'propertyhive' )); ?>" />
-                <?php if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) ) { ?>
+	                <?php if ( isset( $request_post['email_contact_applicant_profile_id'] ) && ! empty( $request_post['email_contact_applicant_profile_id'] ) ) { ?>
                 <input name="preview" id="preview_email" class="button" type="button" value="<?php echo esc_attr(__( 'Preview Email', 'propertyhive' )); ?>" />
                 <?php } ?>
 
                 <input type="hidden" name="step" value="two" />
-                <input type="hidden" name="email_contact_applicant_profile_id" value="<?php echo ( isset($_POST['email_contact_applicant_profile_id']) && is_array($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) ) ? esc_attr(implode(",", ph_clean($_POST['email_contact_applicant_profile_id']))) : ''; ?>" />
+	                <input type="hidden" name="email_contact_applicant_profile_id" value="<?php
+						$selected_contact_applicant_profile_ids = array();
+						if ( isset( $request_post['email_contact_applicant_profile_id'] ) && is_array( $request_post['email_contact_applicant_profile_id'] ) ) {
+							foreach ( $request_post['email_contact_applicant_profile_id'] as $selected_contact_applicant_profile_id ) {
+								if ( is_string( $selected_contact_applicant_profile_id ) ) {
+									$parts = explode( '|', $selected_contact_applicant_profile_id );
+									if ( count( $parts ) >= 2 ) {
+										$selected_contact_applicant_profile_ids[] = absint( $parts[0] ) . '|' . absint( $parts[1] );
+									}
+								}
+							}
+						}
+						echo esc_attr( implode( ',', $selected_contact_applicant_profile_ids ) );
+					?>" />
                 <?php do_action( 'propertyhive_applicant_match_step_two_hidden_fields' ); ?>
                 <?php wp_nonce_field( 'propertyhive-matching-applicants' ); ?>
 
@@ -99,9 +128,9 @@ class PH_Admin_Matching_Applicants {
 
             <p>
             <?php
-                /* translators: 1: Opening link tag to the WordPress.org SMTP plugins page, 2: Closing link tag. */
                 echo wp_kses_post(
                     sprintf(
+                        /* translators: 1: Opening link tag to the WordPress.org SMTP plugins page, 2: Closing link tag. */
                         __(
                             'When sending out lots of emails we recommend using %1$sa plugin%2$s to send them out using SMTP. Your web developer or hosting company should be able to advise on this.',
                             'propertyhive'
@@ -134,7 +163,7 @@ class PH_Admin_Matching_Applicants {
     function showPreview()
     {
         jQuery('#mainform').attr('target', '_blank');
-        jQuery('#mainform').attr('action', '<?php echo esc_url(admin_url( '?preview_propertyhive_email=true&property_id=' . (int)$_GET['property_id'])); ?>');
+	        jQuery('#mainform').attr('action', <?php echo wp_json_encode( admin_url( '?preview_propertyhive_email=true&property_id=' . $property_id ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?>);
 
         jQuery('#mainform').submit();
         jQuery('#mainform').attr('target', '_self');
@@ -147,7 +176,7 @@ class PH_Admin_Matching_Applicants {
 
 					if ( $nothing_to_send == true )
                     {
-                        echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=2";</script>';
+	                        echo '<script>window.location.href = ' . wp_json_encode( get_edit_post_link( $property_id, 'url' ) . '&ph_message=2', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';</script>';
 
 						//header("Location: " . get_edit_post_link( $contact_id, 'url' ) . '&ph_message=2' ); // properties marked as not interested
                         //die();
@@ -157,15 +186,22 @@ class PH_Admin_Matching_Applicants {
 				}
 				case "two":
 				{
-                    if ( isset($_POST['email_contact_applicant_profile_id']) && !empty($_POST['email_contact_applicant_profile_id']) )
-                    {
-                        $email_contact_applicant_profile_id = explode(",", sanitize_text_field($_POST['email_contact_applicant_profile_id']));
+	                    if ( isset( $request_post['email_contact_applicant_profile_id'] ) && ! empty( $request_post['email_contact_applicant_profile_id'] ) )
+	                    {
+	                        $email_contact_applicant_profile_id_input = ( isset( $request_post['email_contact_applicant_profile_id'] ) && is_string( $request_post['email_contact_applicant_profile_id'] ) ) ? $request_post['email_contact_applicant_profile_id'] : '';
+	                        $email_contact_applicant_profile_id = explode( ',', sanitize_text_field( $email_contact_applicant_profile_id_input ) );
 
-                        foreach ( $email_contact_applicant_profile_id as $contact_applicant_profile_id )
-                        {
-                            $explode_contact_applicant_profile_id = explode("|", $contact_applicant_profile_id);
-                            $contact_id = $explode_contact_applicant_profile_id[0];
-                            $applicant_profile_id = $explode_contact_applicant_profile_id[1];
+	                        foreach ( $email_contact_applicant_profile_id as $contact_applicant_profile_id )
+	                        {
+	                            $explode_contact_applicant_profile_id = explode("|", $contact_applicant_profile_id);
+	                            if ( count( $explode_contact_applicant_profile_id ) < 2 ) {
+	                                continue;
+	                            }
+                            $contact_id = absint( $explode_contact_applicant_profile_id[0] );
+                            $applicant_profile_id = absint( $explode_contact_applicant_profile_id[1] );
+                            if ( ! $contact_id ) {
+                                continue;
+                            }
 
                             $email_address = get_post_meta( (int)$contact_id, '_email_address', TRUE );
                             
@@ -176,14 +212,16 @@ class PH_Admin_Matching_Applicants {
                                 $new_to_email_addresses[] = sanitize_email($to_email_address);
                             }
 
-                            $cc_email_addresses = explode(",", $_POST['cc_email_address']);
+	                            $cc_email_address_input = ( isset( $request_post['cc_email_address'] ) && is_string( $request_post['cc_email_address'] ) ) ? $request_post['cc_email_address'] : '';
+	                            $cc_email_addresses = explode( ',', $cc_email_address_input );
                             $new_cc_email_addresses = array();
                             foreach ( $cc_email_addresses as $cc_email_address )
                             {
                                 $new_cc_email_addresses[] = sanitize_email($cc_email_address);
                             }
 
-                            $bcc_email_addresses = explode(",", $_POST['bcc_email_address']);
+	                            $bcc_email_address_input = ( isset( $request_post['bcc_email_address'] ) && is_string( $request_post['bcc_email_address'] ) ) ? $request_post['bcc_email_address'] : '';
+	                            $bcc_email_addresses = explode( ',', $bcc_email_address_input );
                             $new_bcc_email_addresses = array();
                             foreach ( $bcc_email_addresses as $bcc_email_address )
                             {
@@ -210,16 +248,20 @@ class PH_Admin_Matching_Applicants {
                             );
                             $allowed_tags = apply_filters( 'propertyhive_match_email_allowed_tags', $allowed_tags );
 
-                            $body = wp_kses(wp_unslash($_POST['body']), $allowedposttags);
+	                            $body_input = ( isset( $request_post['body'] ) && is_string( $request_post['body'] ) ) ? $request_post['body'] : '';
+	                            $body = wp_kses( $body_input, $allowed_tags );
+	                            $from_name_input = ( isset( $request_post['from_name'] ) && is_string( $request_post['from_name'] ) ) ? $request_post['from_name'] : '';
+	                            $from_email_address_input = ( isset( $request_post['from_email_address'] ) && is_string( $request_post['from_email_address'] ) ) ? $request_post['from_email_address'] : '';
+	                            $subject_input = ( isset( $request_post['subject'] ) && is_string( $request_post['subject'] ) ) ? $request_post['subject'] : '';
 
         					// Email info entered. Time to send emails
                             $this->send_emails(
                                 (int)$contact_id, 
                                 (int)$applicant_profile_id, 
                                 array($property_id),
-                                ph_clean(wp_unslash($_POST['from_name'])),
-                                sanitize_email(wp_unslash($_POST['from_email_address'])),
-                                ph_clean(wp_unslash($_POST['subject'])),
+	                                ph_clean( $from_name_input ),
+	                                sanitize_email( $from_email_address_input ),
+	                                ph_clean( $subject_input ),
                                 $body,
                                 implode(",", $new_to_email_addresses),
                                 implode(",", $new_cc_email_addresses),
@@ -233,13 +275,13 @@ class PH_Admin_Matching_Applicants {
 
                     do_action( 'propertyhive_applicant_match_step_send', $property_id );
 
-                    echo '<script>window.location.href = "' . esc_url(get_edit_post_link( $property_id, 'url' )) . '&ph_message=1";</script>';
+	                    echo '<script>window.location.href = ' . wp_json_encode( get_edit_post_link( $property_id, 'url' ) . '&ph_message=1', JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . ';</script>';
 				}
 			}
 		}
 		else
 		{
-			$applicants = $this->get_matching_applicants( (int)$_GET['property_id'] );
+			$applicants = $this->get_matching_applicants( $property_id );
 
             $on_market_change_date = $property->_on_market_change_date;
             $price_change_date = $property->_price_change_date;
@@ -248,18 +290,32 @@ class PH_Admin_Matching_Applicants {
 		}
 	}
 
-	private function dismiss_properties()
-	{
-		$property_id = (int)$_GET['property_id'];
-
-		if ( isset($_POST['not_interested_contact_applicant_profile_id']) && !empty($_POST['not_interested_contact_applicant_profile_id']) )
+		private function dismiss_properties()
 		{
-			foreach ( $_POST['not_interested_contact_applicant_profile_id'] as $contact_applicant_profile_id )
-			{
-                $explode_contact_applicant_profile_id = explode("|", $contact_applicant_profile_id);
+			// output() verifies the matching nonce before calling this private mutator.
+			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This private helper is only called from output() after the matching nonce has been verified.
+			$request_post = wp_unslash( $_POST );
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This private helper receives the read-only property identifier from the already-authorized matching screen.
+			$request_get = wp_unslash( $_GET );
+			$property_id = ( isset( $request_get['property_id'] ) && is_scalar( $request_get['property_id'] ) ) ? absint( $request_get['property_id'] ) : 0;
 
-                $contact_id = $explode_contact_applicant_profile_id[0];
-                $applicant_profile_id = $explode_contact_applicant_profile_id[1];
+			if ( isset( $request_post['not_interested_contact_applicant_profile_id'] ) && is_array( $request_post['not_interested_contact_applicant_profile_id'] ) && ! empty( $request_post['not_interested_contact_applicant_profile_id'] ) )
+			{
+				foreach ( $request_post['not_interested_contact_applicant_profile_id'] as $contact_applicant_profile_id )
+				{
+					if ( ! is_string( $contact_applicant_profile_id ) ) {
+						continue;
+					}
+	                $explode_contact_applicant_profile_id = explode("|", $contact_applicant_profile_id);
+	                if ( count( $explode_contact_applicant_profile_id ) < 2 ) {
+	                continue;
+	                }
+
+	                $contact_id = absint( $explode_contact_applicant_profile_id[0] );
+	                $applicant_profile_id = absint( $explode_contact_applicant_profile_id[1] );
+	                if ( ! $contact_id ) {
+	                continue;
+	                }
 
                 // Get currently dismissed properties for this contact to decide if we need to add or remove it
                 $dismissed_properties = get_post_meta( $contact_id, '_dismissed_properties', TRUE );
@@ -376,6 +432,7 @@ class PH_Admin_Matching_Applicants {
                 'compare' => 'LIKE'
             );
 
+            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Applicant membership is stored in serialized _contact_types metadata; preserve complete matching results and per-profile extension checks.
             $args['meta_query'] = $meta_query;
 
             $contacts_query = new WP_Query( $args );
@@ -631,8 +688,8 @@ class PH_Admin_Matching_Applicants {
 
         $subject = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $subject);
 
-        $body = str_replace("[contact_name]", $contact->post_title, $body);
-        $body = str_replace("[contact_dear]", $contact->dear(), $body);
+	        $body = str_replace( '[contact_name]', esc_html( $contact->post_title ), $body );
+	        $body = str_replace( '[contact_dear]', esc_html( $contact->dear() ), $body );
         $body = str_replace("[property_count]", count($email_property_ids) . ' propert' . ( ( count($email_property_ids) != 1 ) ? 'ies' : 'y' ), $body);
 
         $office_counts = array();
@@ -680,11 +737,11 @@ class PH_Admin_Matching_Applicants {
             $office_email_address = get_post_meta( $office_id, '_office_email_address_' . str_replace("residential-", "", $applicant_profile_details['department']), TRUE );
         }
 
-        $body = str_replace("[office_name]", $office_name, $body);
-        $body = str_replace("[office_email_address]", $office_email_address, $body);
+	        $body = str_replace( '[office_name]', esc_html( $office_name ), $body );
+	        $body = str_replace( '[office_email_address]', esc_html( $office_email_address ), $body );
 
-        $body = str_replace("[negotiator_name]", $current_user->display_name, $body);
-        $body = str_replace("[negotiator_email_address]", $current_user->user_email, $body);
+	        $body = str_replace( '[negotiator_name]', esc_html( $current_user->display_name ), $body );
+	        $body = str_replace( '[negotiator_email_address]', esc_html( $current_user->user_email ), $body );
 
         $body = stripslashes($body);
 
@@ -698,6 +755,7 @@ class PH_Admin_Matching_Applicants {
         }
 
         // Insert into email log
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- Typed insertion into the plugin-owned email queue table; no WordPress object API represents these queued messages.
         $insert = $wpdb->insert( 
             $wpdb->prefix . 'ph_email_log', 
             array( 
@@ -712,7 +770,7 @@ class PH_Admin_Matching_Applicants {
                 'subject' => stripslashes($subject),
                 'body' => $body,
                 'status' => '',
-                'send_at' => date("Y-m-d H:i:s"),
+                'send_at' => gmdate("Y-m-d H:i:s"),
                 'sent_by' => $current_user->ID,
             ), 
             array( 
@@ -753,7 +811,7 @@ class PH_Admin_Matching_Applicants {
                     }
 
                     $applicant_profile_match_history[$email_property_id][] = array(
-                        'date' => date("Y-m-d H:i:s"),
+                        'date' => gmdate("Y-m-d H:i:s"),
                         'method' => 'email',
                         'email_log_id' => $email_log_id,
                     );
@@ -770,7 +828,7 @@ class PH_Admin_Matching_Applicants {
                         'comment_author'       => $current_user->display_name,
                         'comment_author_email' => 'propertyhive@noreply.com',
                         'comment_author_url'   => '',
-                        'comment_date'         => date("Y-m-d H:i:s"),
+                        'comment_date'         => gmdate("Y-m-d H:i:s"),
                         'comment_content'      => serialize($comment),
                         'comment_approved'     => 1,
                         'comment_type'         => 'propertyhive_note',
@@ -793,7 +851,7 @@ class PH_Admin_Matching_Applicants {
                     'comment_author'       => $current_user->display_name,
                     'comment_author_email' => 'propertyhive@noreply.com',
                     'comment_author_url'   => '',
-                    'comment_date'         => date("Y-m-d H:i:s"),
+                    'comment_date'         => gmdate("Y-m-d H:i:s"),
                     'comment_content'      => serialize($comment),
                     'comment_approved'     => 1,
                     'comment_type'         => 'propertyhive_note',

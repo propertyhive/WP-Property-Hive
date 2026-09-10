@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Enquiry_Lead_Tracking
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Enquiry_Lead_Tracking; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Enquiry_Lead_Tracking {
 
 	/**

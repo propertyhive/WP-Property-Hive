@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * Add extra profile fields for users in admin
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 	/**
 	 * PH_Admin_Profile Class.
 	 */
+	// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Admin_Profile; preserving the existing PH_* class name is required for plugin and extension compatibility.
 	class PH_Admin_Profile {
 
 		/**
@@ -226,11 +230,16 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 		 */
 		public function save_extra_user_meta_fields( $user_id ) {
 			
-			if ( ! current_user_can( 'manage_propertyhive' ) ) {
+			if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_user', $user_id ) ) {
 				return;
 			}
 
-			$user_meta = get_userdata($user_id); 
+			if ( ! isset( $_POST['_wpnonce'] ) || ! is_string( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), 'update-user_' . $user_id ) ) {
+				return;
+			}
+
+			$user_meta = get_userdata($user_id);
+            if ( ! $user_meta ) { return; }
 			$user_roles = $user_meta->roles;
 
 			if ( ! in_array("administrator", $user_roles) && ! in_array("editor", $user_roles) ) {
@@ -246,7 +255,11 @@ if ( ! class_exists( 'PH_Admin_Profile', false ) ) :
 					if ( isset( $field['type'] ) && 'checkbox' === $field['type'] ) {
 						update_user_meta( $user_id, $key, isset( $_POST[ $key ] ) );
 					} elseif ( isset( $_POST[ $key ] ) ) {
-						update_user_meta( $user_id, $key, ph_clean( $_POST[ $key ] ) );
+                        if ( isset( $field['type'] ) && in_array( $field['type'], array( 'text', 'hidden', 'color', 'image', 'select' ), true ) && ! is_scalar( $_POST[ $key ] ) ) {
+                            continue;
+                        }
+						// Metadata APIs expect slashed values; preserve literal backslashes after sanitizing.
+                        update_user_meta( $user_id, $key, wp_slash( ph_clean( wp_unslash( $_POST[ $key ] ) ) ) );
 					}
 				}
 			}

@@ -33,6 +33,7 @@ class PH_Elementor {
 			$query_vars['order'] = $ordering['order'];
 			if ( isset( $ordering['meta_key'] ) )
 			{
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key -- Elementor integration copies the ordering meta_key produced by PH_Query, whose supported order cases map to fixed Property Hive keys. The surrounding hook applies only to named Property Hive query IDs; Elementor supplies its own paginated widget query.
 				$query_vars['meta_key'] = $ordering['meta_key'];
 			}
 		}
@@ -92,15 +93,7 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_sales_only( $query )
 	{
-		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
-		
-		$_GET['department'] = 'residential-sales';
-		$_REQUEST['department'] = 'residential-sales';
-
-		PH()->query->property_query( $query );
-
-		$_GET['department'] = $original_department;
-		$_REQUEST['department'] = $original_department;
+        $this->query_department( $query, 'residential-sales' );
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
@@ -118,15 +111,7 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_lettings_only( $query )
 	{
-		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
-		
-		$_GET['department'] = 'residential-lettings';
-		$_REQUEST['department'] = 'residential-lettings';
-
-		PH()->query->property_query( $query );
-
-		$_GET['department'] = $original_department;
-		$_REQUEST['department'] = $original_department;
+        $this->query_department( $query, 'residential-lettings' );
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
@@ -144,15 +129,7 @@ class PH_Elementor {
 
 	public function elementor_query_on_market_commercial_only( $query )
 	{
-		$original_department = isset($_REQUEST['department']) ? $_REQUEST['department'] : '';
-		
-		$_GET['department'] = 'commercial';
-		$_REQUEST['department'] = 'commercial';
-
-		PH()->query->property_query( $query );
-
-		$_GET['department'] = $original_department;
-		$_REQUEST['department'] = $original_department;
+        $this->query_department( $query, 'commercial' );
 
 		// Set the custom post type 
 		$query->set( 'post_type', [ 'property' ] );
@@ -193,6 +170,30 @@ class PH_Elementor {
 		$query->set( 'order', $original_order );
 	}
 
+    /** Temporarily scope the public query while preserving the exact surrounding request. */
+    private function query_department( $query, $department ) {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Snapshot only: this raw value is restored unchanged, never used in the scoped query. PH_Query separately validates request inputs.
+        $original_request = array_key_exists( 'department', $_REQUEST ) ? array( $_REQUEST['department'] ) : array();
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Snapshot only: preserve GET independently from REQUEST, including absence and the original slashing contract.
+        $original_get = array_key_exists( 'department', $_GET ) ? array( $_GET['department'] ) : array();
+        $_GET['department'] = $department;
+        $_REQUEST['department'] = $department;
+        try {
+            PH()->query->property_query( $query );
+        } finally {
+            if ( $original_request ) {
+                $_REQUEST['department'] = $original_request[0];
+            } else {
+                unset( $_REQUEST['department'] );
+            }
+            if ( $original_get ) {
+                $_GET['department'] = $original_get[0];
+            } else {
+                unset( $_GET['department'] );
+            }
+        }
+    }
+
 	private function remove_department_from_query( $query )
 	{
 		$new_meta_query = array();
@@ -224,13 +225,13 @@ class PH_Elementor {
 
 	    wp_enqueue_script( 'flexslider', $assets_path . 'js/flexslider/jquery.flexslider' . $suffix . '.js', array( 'jquery' ), '2.2.2', true );
         wp_enqueue_script( 'flexslider-init', $assets_path . 'js/flexslider/jquery.flexslider.init' . $suffix . '.js', array( 'jquery','flexslider' ), PH_VERSION, true );
-        wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css' );
+        wp_enqueue_style( 'flexslider_css', $assets_path . 'css/flexslider.css', array(), PH_VERSION );
 
         $api_key = get_option('propertyhive_google_maps_api_key');
-	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3');
+	    wp_register_script('googlemaps', '//maps.googleapis.com/maps/api/js?' . ( ( $api_key != '' && $api_key !== FALSE ) ? 'key=' . $api_key : '' ), false, '3', true );
 	    wp_enqueue_script('googlemaps');
 
-		wp_enqueue_script( 'propertyhive_elementor', $assets_path . 'js/elementor/elementor.js', array( 'jquery','flexslider' ), PH_VERSION, true );
+		wp_enqueue_script( 'propertyhive_elementor', $assets_path . 'js/elementor/elementor.js', array( 'jquery','flexslider', 'googlemaps' ), PH_VERSION, true );
 	}
 
 	public function add_elementor_widget_category( $elements_manager )
@@ -393,9 +394,9 @@ class PH_Elementor {
 		$image_src = $images[0]['url'];
 
 		$image_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . $settings['hover_animation'] : '';
-		$image_class_html = ! empty( $image_class ) ? ' class="' . $image_class . '"' : '';
+		$image_class_html = ! empty( $image_class ) ? ' class="' . esc_attr( $image_class ) . '"' : '';
 
-		$html = sprintf( '<img src="%s" title="" alt=""%s />', esc_attr( $image_src ), $image_class_html );
+		$html = sprintf( '<img src="%s" title="" alt=""%s />', esc_url( $image_src ), $image_class_html );
 		return $html;
 	}
 
@@ -416,9 +417,9 @@ class PH_Elementor {
         $widget->add_control(
             'flag_note',
             [
-                'label' => __( '', 'propertyhive' ),
+                'label' => '',
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
-                'raw' => __( 'The flag shown will take its colour and position settings from the <a href="' . admin_url('admin.php?page=ph-settings&tab=template-assistant&section=flags') . '" target="_blank">Template Assistant Flags</a> settings area', 'propertyhive' ),
+                'raw' => /* translators: %s: Template Assistant flags settings URL. */ sprintf( __( 'The flag shown will take its colour and position settings from the <a href="%s" target="_blank">Template Assistant Flags</a> settings area', 'propertyhive' ), esc_url( admin_url( 'admin.php?page=ph-settings&tab=template-assistant&section=flags' ) ) ),
                 'condition' => [
                     'show_flag' => 'yes',
                 ],
@@ -438,7 +439,7 @@ class PH_Elementor {
             {
                 $current_settings = get_option( 'propertyhive_template_assistant', array() );
 
-                echo '<div class="flag flag-' . esc_attr(sanitize_title($flag)) . '" style="position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . esc_attr($current_settings['flag_position']) . '; color:' . esc_attr($current_settings['flag_text_color']) . '; background:' . esc_attr($current_settings['flag_bg_color']) . ';">' . wp_kses_post($flag) . '</div>';
+                echo '<div class="flag flag-' . esc_attr( sanitize_title( $flag ) ) . '" style="' . esc_attr( 'position:absolute; text-transform:uppercase; font-size:13px; box-sizing:border-box; padding:7px 20px; ' . propertyhive_get_flag_custom_style( $current_settings ) ) . '">' . esc_html( $flag ) . '</div>';
             }
         }
     }

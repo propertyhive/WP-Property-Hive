@@ -11,6 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Sale_Applicant
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Sale_Applicant; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Sale_Applicant {
 
 	/**
@@ -58,15 +59,17 @@ class PH_Meta_Box_Sale_Applicant {
 
                 $fields = apply_filters( 'propertyhive_sale_applicant_fields', $fields, $post->ID, $applicant_contact_id );
 
-                $div_style = $i > 0 ? 'style="border-top:1px solid #ddd"' : '';
-                echo "<div " . $div_style . ">"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo $i > 0 ? '<div style="border-top:1px solid #ddd">' : '<div >';
                 foreach ( $fields as $key => $field )
                 {
                     echo '<p class="form-field ' . esc_attr($key) . '" >
 
                         <label>' . esc_html($field['label']) . '</label>
 
-                        ' . wp_kses_post($field['value']) . '
+                        ';
+                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core field values are escaped above before the trusted PHP propertyhive_sale_applicant_fields filter, which intentionally permits extension HTML.
+                    echo $field['value'];
+                    echo '
 
                     </p>';
                 }

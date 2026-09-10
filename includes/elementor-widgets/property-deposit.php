@@ -152,7 +152,7 @@ class Elementor_Property_Deposit_Widget extends \Elementor\Widget_Base {
 			return;
 		}
 
-        echo '<div class="elementor-widget-deposit>';
+        echo '<div class="elementor-widget-deposit">';
         if ( isset($settings['icon']) && !empty($settings['icon']) )
         {
         	\Elementor\Icons_Manager::render_icon( $settings['icon'], [ 'aria-hidden' => 'true' ] );
@@ -160,12 +160,12 @@ class Elementor_Property_Deposit_Widget extends \Elementor\Widget_Base {
         }
         if ( isset($settings['before']) && !empty($settings['before']) )
         {
-        	echo wp_kses_post($settings['before']) . ' ';
+            echo wp_kses_post( $settings['before'] ) . ' ';
         }
-        echo wp_kses_post($property->get_formatted_deposit());
+        echo esc_html( $property->get_formatted_deposit() );
         if ( isset($settings['after']) && !empty($settings['after']) )
         {
-        	echo ' ' . wp_kses_post($settings['after']);
+            echo ' ' . wp_kses_post( $settings['after'] );
         }
         echo '</div>';
 

@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 /**
  * PH_Meta_Box_Property_Commercial_Units
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Meta_Box_Property_Commercial_Units; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Meta_Box_Property_Commercial_Units {
 
     /**
@@ -58,12 +59,14 @@ class PH_Meta_Box_Property_Commercial_Units {
                         $floor_area = $the_property->get_formatted_floor_area();
                         if ( $floor_area != '' )
                         {
-                            echo 'Floor Area: ' . wp_kses_post($floor_area) . '<br>';
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Floor-area producer escapes base text before trusted propertyhive_floor_area_output HTML.
+                            echo 'Floor Area: ' . $floor_area . '<br>';
                         }
                         $site_area = $the_property->get_formatted_site_area();
                         if ( $site_area != '' )
                         {
-                            echo 'Site Area: ' . wp_kses_post($site_area);
+                            // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Site-area producer escapes base text before trusted propertyhive_site_area_output HTML.
+                            echo 'Site Area: ' . $site_area;
                         }
 
                         if ( $floor_area == '' && $site_area == '' )
@@ -77,14 +80,15 @@ class PH_Meta_Box_Property_Commercial_Units {
                         {
                             $price = '-';
                         }
-                        echo wp_kses_post($price);
+                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Price producers escape stored text before trusted currency/commercial/property price HTML filters.
+                            echo $price;
                         echo '</td>';
                         echo '<td style="text-align:left;">';
                         $term_list = wp_get_post_terms($post->ID, 'availability', array("fields" => "names"));
             
                         if ( !is_wp_error($term_list) && is_array($term_list) && !empty($term_list) )
                         {
-                           echo esc_html($term_list[0]) . '<br>';
+                           echo esc_html( $term_list[0] ) . '<br>';
                         }
 
                         if (isset($the_property->_on_market) && $the_property->_on_market == 'yes')

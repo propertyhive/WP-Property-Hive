@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 <p><?php 
-	echo esc_html( __( 'It looks like you\'re already logged in.', 'propertyhive' ) ); 
+	esc_html_e( 'It looks like you\'re already logged in.', 'propertyhive' );
 ?></p>
 
 <?php 

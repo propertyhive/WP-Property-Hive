@@ -1,4 +1,7 @@
 <?php
+// phpcs:set WordPress.Security.ValidatedSanitizedInput customSanitizingFunctions[] ph_clean
+// ph_clean() recursively sanitizes text; presence, shape and unslashing checks remain separate.
+
 /**
  * PropertyHive Custom Fields Settings
  *
@@ -17,6 +20,7 @@ if ( ! class_exists( 'PH_Settings_Custom_Fields' ) ) :
 /**
  * PH_Settings_General
  */
+// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy public global class PH_Settings_Custom_Fields; preserving the existing PH_* class name is required for plugin and extension compatibility.
 class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
     const LINKED_POSTS_COLUMN_HEADING = 'Assigned Properties';
@@ -54,7 +58,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             return;
         }
 
-        if ( ! current_user_can( 'manage_propertyhive' ) ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
             wp_die(
                 esc_html__( 'You do not have permission to manage Property Hive fields.', 'propertyhive' ),
                 '',
@@ -64,7 +68,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         check_admin_referer( 'propertyhive_delete_additional_field' );
 
-        $current_id = isset( $_GET['id'] )
+        $current_id = isset( $_GET['id'] ) && is_string( $_GET['id'] )
             ? sanitize_title( wp_unslash( $_GET['id'] ) )
             : '';
 
@@ -118,7 +122,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             return;
         }
 
-        if ( ! current_user_can( 'manage_propertyhive' ) ) {
+        if ( ! current_user_can( 'manage_options' ) ) {
             wp_die(
                 esc_html__( 'You do not have permission to manage Property Hive fields.', 'propertyhive' ),
                 '',
@@ -127,6 +131,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         }
 
         check_admin_referer( 'propertyhive_reorder_additional_fields' );
+
+        if ( ! is_string( $_GET['neworder'] ) ) {
+            wp_die( esc_html__( 'Invalid additional field order.', 'propertyhive' ), '', array( 'response' => 400 ) );
+        }
 
         $new_order = array_map(
             'sanitize_title',
@@ -329,34 +337,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         global $hide_save_button;
         
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $hide_save_button = true;
 
         $i = 0;
-        $html = '<style>
-
-            .ph-custom-fields-grid { display:grid; grid-template-columns:repeat(4, 1fr); gap:22px; }
-            .ph-custom-fields-grid > div { display:flex; gap:20px; background:#FFF; padding:25px; border:1px solid #AAA }
-            .ph-custom-fields-grid > div .ph-grid-image { flex:0 0 50px; }
-            .ph-custom-fields-grid > div .ph-grid-image-bg { background:#fbfcd4; border:1px solid #ffcd00; padding:10px; border-radius:7px; }
-            .ph-custom-fields-grid > div .ph-grid-image img { max-width:40px; height:40px; display:block }
-            .ph-custom-fields-grid > div .feature-card-content { flex:1; min-width:0; }
-            .ph-custom-fields-grid > div h3 { margin-top:0; margin-bottom:0.6em }
-
-            @media (max-width:1750px) {
-
-                .ph-custom-fields-grid { grid-template-columns:repeat(3, 1fr); }
-
-            }
-
-            @media (max-width:1370px) {
-
-                .ph-custom-fields-grid { grid-template-columns:repeat(2, 1fr); }
-
-            }
-
-        </style>
-
-        <div class="ph-custom-fields-grid">';
+        $html = '<div class="ph-custom-fields-grid">';
         foreach ( $this->custom_field_sections as $key => $value )
         {
             $image = 'default.png';
@@ -406,6 +391,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 {
                     global $hide_save_button;
                 
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
                     $hide_save_button = true;
             
                     // The main custom field screen listing them in a table
@@ -427,9 +413,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 }
                 default:
                 {
-                    if (isset($_REQUEST['id'])) // we're either adding or editing
+                    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This branch only renders a settings form from an optional id; it does not mutate state. The corresponding save path verifies the settings nonce and capability.
+                    if ( isset( $_REQUEST['id'] ) ) // we're either adding or editing
                     {
-                        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_text_field($_REQUEST['id']);
+                        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This id is used only to render a settings form; the corresponding save path verifies the settings nonce and capability.
+                        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '';
                         
                         switch ($current_section)
                         {
@@ -488,6 +476,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     {
                         global $hide_save_button;
                 
+                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
                         $hide_save_button = true;
                 
                         // The main custom field screen listing them in a table
@@ -517,7 +506,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             $current_settings['custom_fields'] = array();
         }
 
-        $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
         $custom_field_details = array();
 
@@ -537,7 +527,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $settings = array(
 
-            array( 'title' => __( ( $current_section == 'addadditionalfield' ? 'Add Additional Field' : 'Edit Additional Field' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'customfield' ),
+            array( 'title' => ( $current_section == 'addadditionalfield' ? __( 'Add Additional Field', 'propertyhive' ) : __( 'Edit Additional Field', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'customfield' ),
 
         );
 
@@ -782,7 +772,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             $current_settings['custom_fields'] = array();
         }
 
-        $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
         $custom_field_details = array();
 
@@ -805,13 +796,13 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
             <th scope="row" class="titledesc">
                 <label for="field_type">Dropdown Options</label>
             </th>
-            <td class="forminp forminp-dropdown-options"><div id="sortable_options_' . esc_attr($current_id) . '">';
+            <td class="forminp forminp-dropdown-options"><div id="sortable_options_' . esc_attr( $current_id ) . '">';
         if ( isset($custom_field_details['dropdown_options']) && !empty($custom_field_details['dropdown_options']) )
         {
             foreach ( $custom_field_details['dropdown_options'] as $dropdown_option )
             {
                 echo '
-                    <div><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> <input type="text" name="dropdown_options[]" value="' . esc_attr($dropdown_option) . '"> <a href="" class="delete-dropdown-option">Delete Option</a></div>
+                    <div><i class="fa fa-reorder" style="cursor:pointer; opacity:0.3"></i> <input type="text" name="dropdown_options[]" value="' . esc_attr( $dropdown_option ) . '"> <a href="" class="delete-dropdown-option">Delete Option</a></div>
                 ';
             }
         }
@@ -857,7 +848,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                     }
                 });
 
-                jQuery( \'#sortable_options_' . esc_attr($current_id) . '\' )
+                jQuery( \'#sortable_options_' . esc_js( $current_id ) . '\' )
                 .sortable({
                     axis: "y",
                     handle: "i",
@@ -992,7 +983,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
                                         echo '<td class="settings">
                                             <a class="button" href="' . esc_url(admin_url( 'admin.php?page=ph-settings&tab=customfields&section=editadditionalfield&id=' . $id )) . '">' . esc_html(__( 'Edit Field', 'propertyhive' )) . '</a>
-                                            <a class="button" href="' . esc_url($delete_url) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this custom field?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>
+                                            <a class="button" href="' . esc_url( $delete_url ) . '" onclick="var confirmBox = confirm(\'Are you sure you wish to delete this custom field?\'); return confirmBox;">' . esc_html(__( 'Delete', 'propertyhive' )) . '</a>
                                         </td>';
                                     echo '</tr>';
                                 }
@@ -1029,21 +1020,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     });
 
                                     // reload page
-                                    <?php
-                                        $reorder_url = add_query_arg(
-                                            array(
-                                                'page'     => 'ph-settings',
-                                                'tab'      => 'customfields',
-                                                'section'  => 'additional',
-                                                '_wpnonce' => wp_create_nonce( 'propertyhive_reorder_additional_fields' ),
-                                            ),
-                                            admin_url( 'admin.php' )
-                                        );
-                                    ?>
-
-                                    window.location.href =
-                                        <?php echo wp_json_encode( $reorder_url ); ?> +
-                                        '&neworder=' + encodeURIComponent( new_order );
+                                    window.location.href = <?php echo wp_json_encode( add_query_arg( '_wpnonce', wp_create_nonce( 'propertyhive_reorder_additional_fields' ), admin_url( 'admin.php?page=ph-settings&tab=customfields&section=additional' ) ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + '&neworder=' + encodeURIComponent( new_order );
                             }
                         });
 
@@ -1117,7 +1094,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <?php do_action( 'propertyhive_custom_field_availability_table_before_header_column' ); ?>
                             <th class="type"><?php echo esc_html(__( 'Availability', 'propertyhive' )); ?></th>
                             <th class="department"><?php echo esc_html(__( 'Applies To', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1127,7 +1104,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'availability', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'availability' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1226,7 +1203,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <?php do_action( 'propertyhive_custom_field_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php echo esc_html(__( 'Property Type', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1236,7 +1213,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'property_type', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
 
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1248,7 +1225,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     'hide_empty' => false,
                                     'parent' => $parent_term_id
                                 );
-                                $subterms = get_terms( 'property_type', $args );
+                                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"><?php }else{ echo '&nbsp;'; } ?></td>
@@ -1340,7 +1317,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <?php do_action( 'propertyhive_custom_field_commercial_property_type_table_before_header_column' ); ?>
                             <th class="type"><?php echo esc_html(__( 'Property Type', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1350,7 +1327,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'commercial_property_type', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1362,7 +1339,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     'hide_empty' => false,
                                     'parent' => $parent_term_id
                                 );
-                                $subterms = get_terms( 'commercial_property_type', $args );
+                                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"><?php }else{ echo '&nbsp;'; } ?></td>
@@ -1453,7 +1430,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Location', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1463,7 +1440,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'location', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1473,7 +1450,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                     'hide_empty' => false,
                                     'parent' => $term->term_id
                                 );
-                                $subterms = get_terms( 'location', $args );
+                                $subterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                         ?>
                         <tr>
                             <td class="cb"><?php if ( empty( $subterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"><?php }else{ echo '&nbsp;'; } ?></td>
@@ -1496,7 +1473,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                             'hide_empty' => false,
                                             'parent' => $term->term_id
                                         );
-                                        $subsubterms = get_terms( 'location', $args );
+                                        $subsubterms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'location' ) ) );
                                         ?>
                                         <tr>
                                             <td class="cb"><?php if ( empty( $subsubterms ) ) { ?><input type="checkbox" name="term_id[]" value="<?php echo esc_attr($term->term_id); ?>"><?php }else{ echo '&nbsp;'; } ?></td>
@@ -1587,7 +1564,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Parking', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1597,7 +1574,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'parking', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'parking' ) ) );
 
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1669,7 +1646,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Outside Space', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1679,7 +1656,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'outside_space', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'outside_space' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1751,7 +1728,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Price Qualifier', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1761,7 +1738,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'price_qualifier', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'price_qualifier' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1833,7 +1810,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Sale By', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1843,7 +1820,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'sale_by', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'sale_by' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1915,7 +1892,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Tenure', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -1925,7 +1902,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'tenure', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'tenure' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -1997,7 +1974,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Tenure', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -2007,7 +1984,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'commercial_tenure', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_tenure' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -2079,7 +2056,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Furnished', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -2089,7 +2066,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'furnished', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'furnished' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -2147,7 +2124,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 		</tr>
 		<?php foreach( array ('property_management' =>  __( 'Property Management', 'propertyhive' ), 'tenancy_management' => __( 'Tenancy Management', 'propertyhive' ) ) as $type => $title): ?>
 		<tr valign="top">
-			<th scope="row" class="titledesc no-auto"><?php echo esc_html(__( $title, 'propertyhive' )); ?></th>
+			<th scope="row" class="titledesc no-auto"><?php echo esc_html( $title ); ?></th>
 			<td class="forminp no-auto">
 				<table class="ph_customfields widefat" cellspacing="0">
 					<thead>
@@ -2164,7 +2141,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 						'hide_empty' => false,
 						'parent' => 0
 					);
-					$terms = get_terms( 'management_key_date_type', $args );
+					$terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'management_key_date_type' ) ) );
 
 					if ( !empty( $terms ) && !is_wp_error( $terms ) )
 					{
@@ -2287,7 +2264,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Marketing Flag', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -2297,7 +2274,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'marketing_flag', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'marketing_flag' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -2369,7 +2346,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             <th class="cb" style="width:1px;"><input class="select_all" type="checkbox" style="margin: 2px 0 0 0;"></th>
                             <th class="id" style="width:45px;"><?php echo esc_html(__( 'ID', 'propertyhive' )); ?></th>
                             <th class="type"><?php echo esc_html(__( 'Property Feature', 'propertyhive' )); ?></th>
-                            <th class="assigned_count"><?php echo esc_html(__( $this::LINKED_POSTS_COLUMN_HEADING, 'propertyhive' )); ?></th>
+                            <th class="assigned_count"><?php echo esc_html(__( 'Assigned Properties', 'propertyhive' )); ?></th>
                             <th class="settings">&nbsp;</th>
                         </tr>
                     </thead>
@@ -2379,7 +2356,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'hide_empty' => false,
                             'parent' => 0
                         );
-                        $terms = get_terms( 'property_feature', $args );
+                        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_feature' ) ) );
                         
                         if ( !empty( $terms ) && !is_wp_error( $terms ) )
                         {
@@ -2432,7 +2409,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_availability_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'availability';
         $term_name = '';
@@ -2446,7 +2424,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Availability Option' : 'Edit Availability' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_availability_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Availability Option', 'propertyhive' ) : __( 'Edit Availability', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_availability_settings' ),
             
             array(
                 'title' => __( 'Availability', 'propertyhive' ),
@@ -2500,7 +2478,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_property_type_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'property_type';
         $term_name = '';
@@ -2517,9 +2496,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $args = array(
             'hide_empty' => false,
             'parent' => 0,
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Edit screens exclude only the currently edited term from its own parent choices. Each line is exclude=>array($current_id), where current_id is cast to int from the request; one term ID prevents self-parenting.
             'exclude' => array($current_id)
         );
-        $terms = get_terms( 'property_type', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'property_type' ) ) );
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
@@ -2530,7 +2510,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Property Type' : 'Edit Property Type' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_property_type_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Property Type', 'propertyhive' ) : __( 'Edit Property Type', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_property_type_settings' ),
             
             array(
                 'title' => __( 'Property Type', 'propertyhive' ),
@@ -2571,7 +2551,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_commercial_property_type_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'commercial_property_type';
         $term_name = '';
@@ -2588,9 +2569,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $args = array(
             'hide_empty' => false,
             'parent' => 0,
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Edit screens exclude only the currently edited term from its own parent choices. Each line is exclude=>array($current_id), where current_id is cast to int from the request; one term ID prevents self-parenting.
             'exclude' => array($current_id)
         );
-        $terms = get_terms( 'commercial_property_type', $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => 'commercial_property_type' ) ) );
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
@@ -2601,7 +2583,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Property Type' : 'Edit Property Type' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_property_type_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Property Type', 'propertyhive' ) : __( 'Edit Property Type', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_property_type_settings' ),
             
             array(
                 'title' => __( 'Property Type', 'propertyhive' ),
@@ -2642,7 +2624,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_location_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'location';
         $term_name = '';
@@ -2659,9 +2642,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         $args = array(
             'hide_empty' => false,
             'parent' => 0,
+            // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Edit screens exclude only the currently edited term from its own parent choices. Each line is exclude=>array($current_id), where current_id is cast to int from the request; one term ID prevents self-parenting.
             'exclude' => array($current_id)
         );
-        $terms = get_terms( $taxonomy, $args );
+        $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => $taxonomy ) ) );
         if ( !empty( $terms ) && !is_wp_error( $terms ) )
         {
             foreach ($terms as $term)
@@ -2671,9 +2655,10 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                 $args = array(
                     'hide_empty' => false,
                     'parent' => $term->term_id,
+                    // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- Edit screens exclude only the currently edited term from its own parent choices. Each line is exclude=>array($current_id), where current_id is cast to int from the request; one term ID prevents self-parenting.
                     'exclude' => array($current_id)
                 );
-                $terms = get_terms( $taxonomy, $args );
+                $terms = get_terms( array_merge( wp_parse_args( $args ), array( 'taxonomy' => $taxonomy ) ) );
                 if ( !empty( $terms ) && !is_wp_error( $terms ) )
                 {
                     foreach ($terms as $term)
@@ -2686,7 +2671,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Location' : 'Edit Location' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_location_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Location', 'propertyhive' ) : __( 'Edit Location', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_location_settings' ),
             
             array(
                 'title' => __( 'Location', 'propertyhive' ),
@@ -2727,7 +2712,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_parking_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'parking';
         $term_name = '';
@@ -2739,7 +2725,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Parking Option' : 'Edit Parking' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_parking_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Parking Option', 'propertyhive' ) : __( 'Edit Parking', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_parking_settings' ),
             
             array(
                 'title' => __( 'Parking', 'propertyhive' ),
@@ -2770,7 +2756,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_outside_space_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : (int)$_REQUEST['id'];
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This getter only renders stored taxonomy settings and does not mutate state.
+        $current_id = $this->normalize_custom_fields_render_term_id( ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '' );
         
         $taxonomy = 'outside_space';
         $term_name = '';
@@ -2782,7 +2769,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Outside Space' : 'Edit Outside Space' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_outside_space_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Outside Space', 'propertyhive' ) : __( 'Edit Outside Space', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_outside_space_settings' ),
             
             array(
                 'title' => __( 'Outside Space', 'propertyhive' ),
@@ -2815,18 +2802,24 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
     {
         global $save_button_text;
         
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
         $save_button_text = __( 'Delete', 'propertyhive' );
         
         //$taxonomy = 'outside_space';
         //$taxonomy_name = __( 'Outside Space', 'propertyhive' );
         
-        if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == 1 )
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- This branch only selects a read-only success view; the deletion mutation occurs in save() after the settings nonce and capability checks.
+        $confirm_removal = ( isset( $_POST['confirm_removal'] ) && is_string( $_POST['confirm_removal'] ) ) ? sanitize_text_field( wp_unslash( $_POST['confirm_removal'] ) ) : '';
+        if ( '1' === $confirm_removal )
         {
             // A term has just been deleted
             global $hide_save_button, $show_cancel_button, $cancel_button_href;
             
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $hide_save_button = TRUE;
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $show_cancel_button = TRUE;
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Shared admin settings-view state; this global is intentionally used to control the common settings template and is not an arbitrary application global.
             $cancel_button_href = admin_url( 'admin.php?page=ph-settings&tab=customfields&section=' . str_replace("_", "-", $taxonomy) );
             
             $args = array();
@@ -2875,6 +2868,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             'post_type' => 'property',
                             'nopaging' => true,
                             'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                            // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Term deletion/reassignment must locate all properties or key dates attached to this selected term before removing it.
                             'tax_query' => array(
                                 array(
                                     'taxonomy' => $taxonomy,
@@ -2897,6 +2891,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                                 'post_type' => 'contact',
                                 'nopaging' => true,
                                 'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Applicant preferences are serialized profile metadata; deletion/reassignment must inspect every applicant profile to preserve its other selections.
                                 'meta_query' => array(
                                     array(
                                         'key' => '_contact_types',
@@ -2955,6 +2950,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 			                    'post_type' => 'key_date',
 			                    'nopaging' => true,
 			                    'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+			                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Term deletion/reassignment must locate all properties or key dates attached to this selected term before removing it.
 			                    'tax_query' => array(
 				                    array(
 					                    'taxonomy' => $taxonomy,
@@ -2978,10 +2974,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
                             
                             $term_args = array(
                                 'hide_empty' => false,
+                                // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- This is a get_terms argument excluding the terms being deleted from reassignment choices, not a posts exclusion query.
                                 'exclude' => $term_ids,
                                 'parent' => 0
                             );
-                            $terms = get_terms( $taxonomy, $term_args );
+                            $terms = get_terms( array_merge( wp_parse_args( $term_args ), array( 'taxonomy' => $taxonomy ) ) );
                             
                             if ( !empty( $terms ) && !is_wp_error( $terms ) )
                             {
@@ -2991,10 +2988,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
                                     $term_args = array(
                                         'hide_empty' => false,
+                                        // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- This is a get_terms argument excluding the terms being deleted from reassignment choices, not a posts exclusion query.
                                         'exclude' => $term_ids,
                                         'parent' => $term->term_id
                                     );
-                                    $subterms = get_terms( $taxonomy, $term_args );
+                                    $subterms = get_terms( array_merge( wp_parse_args( $term_args ), array( 'taxonomy' => $taxonomy ) ) );
                                     
                                     if ( !empty( $subterms ) && !is_wp_error( $subterms ) )
                                     {
@@ -3004,10 +3002,11 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
                                             $term_args = array(
                                                 'hide_empty' => false,
+                                                // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_exclude -- This is a get_terms argument excluding the terms being deleted from reassignment choices, not a posts exclusion query.
                                                 'exclude' => $term_ids,
                                                 'parent' => $term->term_id
                                             );
-                                            $subsubterms = get_terms( $taxonomy, $term_args );
+                                            $subsubterms = get_terms( array_merge( wp_parse_args( $term_args ), array( 'taxonomy' => $taxonomy ) ) );
                                             
                                             if ( !empty( $subsubterms ) && !is_wp_error( $subsubterms ) )
                                             {
@@ -3067,7 +3066,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_price_qualifier_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'price_qualifier';
         $term_name = '';
@@ -3079,7 +3079,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Price Qualifier' : 'Edit Price Qualifier' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_price_qualifier_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Price Qualifier', 'propertyhive' ) : __( 'Edit Price Qualifier', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_price_qualifier_settings' ),
             
             array(
                 'title' => __( 'Price Qualifier', 'propertyhive' ),
@@ -3110,7 +3110,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_sale_by_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'sale_by';
         $term_name = '';
@@ -3122,7 +3123,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Sale By' : 'Edit Sale By' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_sale_by_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Sale By', 'propertyhive' ) : __( 'Edit Sale By', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_sale_by_settings' ),
             
             array(
                 'title' => __( 'Sale By', 'propertyhive' ),
@@ -3153,7 +3154,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_tenure_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'tenure';
         $term_name = '';
@@ -3165,7 +3167,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Tenure' : 'Edit Tenure' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_tenure_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Tenure', 'propertyhive' ) : __( 'Edit Tenure', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_tenure_settings' ),
             
             array(
                 'title' => __( 'Tenure', 'propertyhive' ),
@@ -3196,7 +3198,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_commercial_tenure_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'commercial_tenure';
         $term_name = '';
@@ -3208,7 +3211,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Tenure' : 'Edit Tenure' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_tenure_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Tenure', 'propertyhive' ) : __( 'Edit Tenure', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_commercial_tenure_settings' ),
             
             array(
                 'title' => __( 'Tenure', 'propertyhive' ),
@@ -3239,7 +3242,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_furnished_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'furnished';
         $term_name = '';
@@ -3251,7 +3255,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Furnished' : 'Edit Furnished' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_furnished_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Furnished', 'propertyhive' ) : __( 'Edit Furnished', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_furnished_settings' ),
             
             array(
                 'title' => __( 'Furnished', 'propertyhive' ),
@@ -3281,7 +3285,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 	 */
 	public function get_custom_fields_management_key_date_type_setting()
 	{
-		$current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+		$current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
 
 		$taxonomy = 'management_key_date_type';
 		$term_name = '';
@@ -3316,7 +3321,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
 		$args = array(
 
-			array( 'title' => __( ( $current_id == '' ? 'Add New Management Date Type' : 'Edit Management Date Type' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_management_key_date_type_settings' ),
+			array( 'title' => ( $current_id == '' ? __( 'Add New Management Date Type', 'propertyhive' ) : __( 'Edit Management Date Type', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_management_key_date_type_settings' ),
 
 			array(
 				'title' => __( 'Description', 'propertyhive' ),
@@ -3386,7 +3391,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_marketing_flag_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'marketing_flag';
         $term_name = '';
@@ -3398,7 +3404,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Marketing Flag' : 'Edit Marketing Flag' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_marketing_flag_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Marketing Flag', 'propertyhive' ) : __( 'Edit Marketing Flag', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_marketing_flag_settings' ),
             
             array(
                 'title' => __( 'Marketing Flag', 'propertyhive' ),
@@ -3429,7 +3435,8 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
      */
     public function get_custom_fields_property_feature_setting()
     {
-        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_title( $_REQUEST['id'] );
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This settings getter only loads stored configuration for rendering; it does not mutate state.
+        $current_id = ( isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] ) ) ? sanitize_title( wp_unslash( $_REQUEST['id'] ) ) : '';
         
         $taxonomy = 'property_feature';
         $term_name = '';
@@ -3441,7 +3448,7 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
 
         $args = array(
 
-            array( 'title' => __( ( $current_id == '' ? 'Add New Property Feature' : 'Edit Property Feature' ), 'propertyhive' ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_property_feature_settings' ),
+            array( 'title' => ( $current_id == '' ? __( 'Add New Property Feature', 'propertyhive' ) : __( 'Edit Property Feature', 'propertyhive' ) ), 'type' => 'title', 'desc' => '', 'id' => 'custom_field_property_feature_settings' ),
             
             array(
                 'title' => __( 'Property Feature', 'propertyhive' ),
@@ -3464,397 +3471,491 @@ class PH_Settings_Custom_Fields extends PH_Settings_Page {
         return apply_filters( 'propertyhive_custom_field_property_feature_settings', $args );
     }
 
+    private function normalize_custom_fields_field_type( $value ) {
+        if ( ! is_string( $value ) ) {
+            return 'text';
+        }
+
+        $field_type = sanitize_key( $value );
+        $allowed_types = array( 'text', 'textarea', 'select', 'multiselect', 'checkbox', 'date', 'image', 'file' );
+
+        return in_array( $field_type, $allowed_types, true ) ? $field_type : 'text';
+    }
+
+    private function normalize_custom_fields_dropdown_options( $value ) {
+        if ( ! is_array( $value ) ) {
+            return '';
+        }
+
+        $options = array();
+        foreach ( $value as $option ) {
+            if ( ! is_string( $option ) ) {
+                return '';
+            }
+            $options[] = sanitize_text_field( $option );
+        }
+
+        return $options;
+    }
+
+    private function normalize_custom_fields_checkbox( $value ) {
+        return ( is_string( $value ) && '1' === $value ) ? '1' : '';
+    }
+
+    private function normalize_custom_fields_meta_box( $value ) {
+        return is_string( $value ) ? sanitize_key( $value ) : '';
+    }
+
+    private function normalize_custom_fields_term_id( $value, $allow_empty = true ) {
+        if ( ! is_string( $value ) ) {
+            return null;
+        }
+
+        $value = trim( $value );
+        if ( '' === $value ) {
+            return $allow_empty ? '' : null;
+        }
+
+        if ( ! preg_match( '/^[0-9]+$/D', $value ) ) {
+            return null;
+        }
+
+        $term_id = absint( $value );
+        return $term_id > 0 ? (string) $term_id : null;
+    }
+
+    private function normalize_custom_fields_render_term_id( $value ) {
+        $term_id = $this->normalize_custom_fields_term_id( $value );
+        return ( null === $term_id || '' === $term_id ) ? '' : absint( $term_id );
+    }
+
+    private function normalize_custom_fields_parent_id( $value ) {
+        if ( ! is_string( $value ) ) {
+            return null;
+        }
+
+        $value = trim( $value );
+        if ( '' === $value ) {
+            return 0;
+        }
+
+        if ( ! preg_match( '/^[0-9]+$/D', $value ) ) {
+            return null;
+        }
+
+        return absint( $value );
+    }
+
+    private function normalize_custom_fields_term_id_list( $value ) {
+        if ( ! is_string( $value ) || '' === trim( $value ) ) {
+            return array();
+        }
+
+        $term_ids = array();
+        foreach ( explode( '-', trim( $value ) ) as $term_id ) {
+            if ( ! preg_match( '/^[0-9]+$/D', $term_id ) ) {
+                return array();
+            }
+
+            $term_id = absint( $term_id );
+            if ( $term_id < 1 || in_array( (string) $term_id, $term_ids, true ) ) {
+                return array();
+            }
+
+            $term_ids[] = (string) $term_id;
+        }
+
+        return $term_ids;
+    }
+
+    private function normalize_custom_fields_reassignment( $value, $deleted_ids ) {
+        if ( ! is_string( $value ) ) {
+            return null;
+        }
+
+        $value = trim( $value );
+        if ( '' === $value || 'none' === $value || ! preg_match( '/^[0-9]+$/D', $value ) ) {
+            return null;
+        }
+
+        $term_id = (string) absint( $value );
+        if ( '0' === $term_id || in_array( $term_id, $deleted_ids, true ) ) {
+            return null;
+        }
+
+        return $term_id;
+    }
+
+    private function get_custom_fields_taxonomy_for_section( $section ) {
+        $taxonomies = array(
+            'availability'              => 'availability',
+            'property-type'             => 'property_type',
+            'commercial-property-type'  => 'commercial_property_type',
+            'location'                  => 'location',
+            'parking'                   => 'parking',
+            'outside-space'             => 'outside_space',
+            'price-qualifier'           => 'price_qualifier',
+            'sale-by'                   => 'sale_by',
+            'tenure'                    => 'tenure',
+            'commercial-tenure'         => 'commercial_tenure',
+            'furnished'                 => 'furnished',
+            'management-key-date-type'  => 'management_key_date_type',
+            'marketing-flag'            => 'marketing_flag',
+            'property-feature'          => 'property_feature',
+        );
+
+        if ( isset( $taxonomies[ $section ] ) ) {
+            return $taxonomies[ $section ];
+        }
+
+        if ( is_string( $section ) && '-delete' === substr( $section, -7 ) ) {
+            $base_section = substr( $section, 0, -7 );
+            return isset( $taxonomies[ $base_section ] ) ? $taxonomies[ $base_section ] : '';
+        }
+
+        return '';
+    }
+
     /**
-     * Save settings
+     * Save settings.
      */
     public function save() {
+        if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
+            return;
+        }
+
         global $current_section, $post;
 
-        if ( $current_section != '' ) 
-        {
-            switch ($current_section)
-            {
-                case "addadditionalfield": 
-                case "editadditionalfield": 
-                {
-                    $current_settings = get_option( 'propertyhive_template_assistant', array() );
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Existing shared settings-router global; normalization preserves the public settings page contract.
+        $current_section = is_string( $current_section ) ? $current_section : '';
+        $request_id_present = isset( $_REQUEST['id'] ) && is_string( $_REQUEST['id'] );
+        $request_id = $request_id_present ? sanitize_text_field( wp_unslash( $_REQUEST['id'] ) ) : '';
+        $post_data = is_array( $_POST ) ? wp_unslash( $_POST ) : array();
 
-                    $current_id = ( !isset( $_REQUEST['id'] ) ) ? '' : sanitize_title( $_REQUEST['id'] );
+        if ( '' === $current_section ) {
+            return;
+        }
 
-                    $existing_custom_fields = ( (isset($current_settings['custom_fields'])) ? $current_settings['custom_fields'] : array() );
+        switch ( $current_section ) {
+            case 'addadditionalfield':
+            case 'editadditionalfield':
+                $current_settings = get_option( 'propertyhive_template_assistant', array() );
+                if ( ! is_array( $current_settings ) ) {
+                    $current_settings = array();
+                }
 
-                    if ( $current_section == 'editadditionalfield' && $current_id != 'default' && !isset($existing_custom_fields[$current_id]) )
-                    {
-                        die("Trying to edit a non-existant custom field. Please go back and try again");
-                    }
+                $current_id = $request_id_present ? sanitize_title( $request_id ) : '';
+                $existing_custom_fields = ( isset( $current_settings['custom_fields'] ) && is_array( $current_settings['custom_fields'] ) ) ? $current_settings['custom_fields'] : array();
 
-                    $field_name = trim( ( ( isset($_POST['field_name']) ) ? sanitize_title( $_POST['field_name'] ) : '' ) );
+                if ( 'editadditionalfield' === $current_section && 'default' !== $current_id && ! isset( $existing_custom_fields[ $current_id ] ) ) {
+                    die( 'Trying to edit a non-existant custom field. Please go back and try again' );
+                }
 
-                    if ( $field_name == '' )
-                    {
-                        $field_name = str_replace("-", "_", sanitize_title( $_POST['field_label'] ) );
-                    }
+                $field_label = ( isset( $post_data['field_label'] ) && is_string( $post_data['field_label'] ) ) ? sanitize_text_field( $post_data['field_label'] ) : '';
+                $field_name = ( isset( $post_data['field_name'] ) && is_string( $post_data['field_name'] ) ) ? sanitize_title( $post_data['field_name'] ) : '';
+                if ( '' === trim( $field_name ) ) {
+                    $field_name = str_replace( '-', '_', sanitize_title( $field_label ) );
+                }
+                $field_name = '_' . ltrim( $field_name, '_' );
 
-                    $field_name = '_' . ltrim( $field_name, '_' );
+                $field_type = $this->normalize_custom_fields_field_type( isset( $post_data['field_type'] ) ? $post_data['field_type'] : '' );
+                $dropdown_options = ( in_array( $field_type, array( 'select', 'multiselect' ), true ) && isset( $post_data['dropdown_options'] ) ) ? $this->normalize_custom_fields_dropdown_options( $post_data['dropdown_options'] ) : '';
+                $field_settings = array(
+                    'field_label'                         => $field_label,
+                    'field_name'                          => $field_name,
+                    'field_type'                          => $field_type,
+                    'dropdown_options'                    => $dropdown_options,
+                    'meta_box'                            => $this->normalize_custom_fields_meta_box( isset( $post_data['meta_box'] ) ? $post_data['meta_box'] : '' ),
+                    'display_on_website'                  => $this->normalize_custom_fields_checkbox( isset( $post_data['display_on_website'] ) ? $post_data['display_on_website'] : '' ),
+                    'display_on_applicant_requirements'   => $this->normalize_custom_fields_checkbox( isset( $post_data['display_on_applicant_requirements'] ) ? $post_data['display_on_applicant_requirements'] : '' ),
+                    'exact_match'                         => $this->normalize_custom_fields_checkbox( isset( $post_data['exact_match'] ) ? $post_data['exact_match'] : '' ),
+                    'display_on_user_details'             => $this->normalize_custom_fields_checkbox( isset( $post_data['display_on_user_details'] ) ? $post_data['display_on_user_details'] : '' ),
+                    'admin_list'                          => $this->normalize_custom_fields_checkbox( isset( $post_data['admin_list'] ) ? $post_data['admin_list'] : '' ),
+                    'admin_list_sortable'                 => $this->normalize_custom_fields_checkbox( isset( $post_data['admin_list_sortable'] ) ? $post_data['admin_list_sortable'] : '' ),
+                );
 
-                    if ( $current_section == 'addadditionalfield' )
-                    {
-                        $existing_custom_fields[] = array(
-                            'field_label' => sanitize_text_field(wp_unslash($_POST['field_label'])),
-                            'field_name' => $field_name,
-                            'field_type' => ( ( isset($_POST['field_type']) && $_POST['field_type'] != '' ) ? sanitize_text_field($_POST['field_type']) : 'text' ),
-                            'dropdown_options' => ( ( isset($_POST['field_type']) && ( $_POST['field_type'] == 'select' || $_POST['field_type'] == 'multiselect' ) && isset($_POST['dropdown_options']) ) ? $_POST['dropdown_options'] : '' ),
-                            'meta_box' => sanitize_text_field($_POST['meta_box']),
-                            'display_on_website' => ( ( isset($_POST['display_on_website']) ) ? sanitize_text_field($_POST['display_on_website']) : '' ),
-                            'display_on_applicant_requirements' => ( ( isset($_POST['display_on_applicant_requirements']) ) ? sanitize_text_field($_POST['display_on_applicant_requirements']) : '' ),
-                            'exact_match' => ( ( isset($_POST['exact_match']) ) ? sanitize_text_field($_POST['exact_match']) : '' ),
-                            'display_on_user_details' => ( ( isset($_POST['display_on_user_details']) ) ? sanitize_text_field($_POST['display_on_user_details']) : '' ),
-                            'admin_list' => ( ( isset($_POST['admin_list']) ) ? sanitize_text_field($_POST['admin_list']) : '' ),
-                            'admin_list_sortable' => ( ( isset($_POST['admin_list_sortable']) ) ? sanitize_text_field($_POST['admin_list_sortable']) : '' ),
-                        );
-                    }
-                    else
-                    {
-                        $existing_custom_fields[$current_id] = array(
-                            'field_label' => sanitize_text_field(wp_unslash($_POST['field_label'])),
-                            'field_name' => $field_name,
-                            'field_type' => ( ( isset($_POST['field_type']) && $_POST['field_type'] != '' ) ? sanitize_text_field($_POST['field_type']) : 'text' ),
-                            'dropdown_options' => ( ( isset($_POST['field_type']) && ( $_POST['field_type'] == 'select' || $_POST['field_type'] == 'multiselect' ) && isset($_POST['dropdown_options']) ) ? $_POST['dropdown_options'] : '' ),
-                            'meta_box' => sanitize_text_field($_POST['meta_box']),
-                            'display_on_website' => ( ( isset($_POST['display_on_website']) ) ? sanitize_text_field($_POST['display_on_website']) : '' ),
-                            'display_on_applicant_requirements' => ( ( isset($_POST['display_on_applicant_requirements']) ) ? sanitize_text_field($_POST['display_on_applicant_requirements']) : '' ),
-                            'exact_match' => ( ( isset($_POST['exact_match']) ) ? sanitize_text_field($_POST['exact_match']) : '' ),
-                            'display_on_user_details' => ( ( isset($_POST['display_on_user_details']) ) ? sanitize_text_field($_POST['display_on_user_details']) : '' ),
-                            'admin_list' => ( ( isset($_POST['admin_list']) ) ? sanitize_text_field($_POST['admin_list']) : '' ),
-                            'admin_list_sortable' => ( ( isset($_POST['admin_list_sortable']) ) ? sanitize_text_field($_POST['admin_list_sortable']) : '' ),
-                        );
-                    }
+                if ( 'addadditionalfield' === $current_section ) {
+                    $existing_custom_fields[] = $field_settings;
+                } else {
+                    $existing_custom_fields[ $current_id ] = $field_settings;
+                }
 
-                    $current_settings['custom_fields'] = $existing_custom_fields;
+                $current_settings['custom_fields'] = $existing_custom_fields;
 
-                    // see if this custom field in used in search forms and amend the type accordingly
-                    if ( $current_section != 'addadditionalfield' )
-                    {
-                        if ( isset($current_settings['search_forms']) && !empty($current_settings['search_forms']) )
-                        {
-                            foreach ( $current_settings['search_forms'] as $search_form_id => $search_form )
-                            {
-                                // Active fields
-                                if ( isset($search_form['active_fields']) && !empty($search_form['active_fields']) )
-                                {
-                                    foreach ( $search_form['active_fields'] as $field_id => $field_data )
-                                    {
-                                        if ( $field_name == $field_id )
-                                        {
-                                            // we found this field. Set type
-                                            $current_settings['search_forms'][$search_form_id]['active_fields'][$field_id]['type'] = ( ( isset($_POST['field_type']) && $_POST['field_type'] != '' ) ? sanitize_text_field($_POST['field_type']) : 'text' );
-                                        }
-                                    }
+                if ( 'addadditionalfield' !== $current_section && ! empty( $current_settings['search_forms'] ) && is_array( $current_settings['search_forms'] ) ) {
+                    foreach ( $current_settings['search_forms'] as $search_form_id => $search_form ) {
+                        if ( isset( $search_form['active_fields'] ) && is_array( $search_form['active_fields'] ) ) {
+                            foreach ( $search_form['active_fields'] as $field_id => $field_data ) {
+                                if ( $field_name === $field_id ) {
+                                    $current_settings['search_forms'][ $search_form_id ]['active_fields'][ $field_id ]['type'] = $field_type;
                                 }
+                            }
+                        }
 
-                                // Inactive fields
-                                if ( isset($search_form['inactive_fields']) && !empty($search_form['inactive_fields']) )
-                                {
-                                    foreach ( $search_form['inactive_fields'] as $field_id => $field_data )
-                                    {
-                                        if ( $field_name == $field_id )
-                                        {
-                                            // we found this field. Set type
-                                            $current_settings['search_forms'][$search_form_id]['inactive_fields'][$field_id]['type'] = ( ( isset($_POST['field_type']) && $_POST['field_type'] != '' ) ? sanitize_text_field($_POST['field_type']) : 'text' );
-                                        }
-                                    }
+                        if ( isset( $search_form['inactive_fields'] ) && is_array( $search_form['inactive_fields'] ) ) {
+                            foreach ( $search_form['inactive_fields'] as $field_id => $field_data ) {
+                                if ( $field_name === $field_id ) {
+                                    $current_settings['search_forms'][ $search_form_id ]['inactive_fields'][ $field_id ]['type'] = $field_type;
                                 }
                             }
                         }
                     }
-
-                    update_option( 'propertyhive_template_assistant', $current_settings );
-
-                    break; 
                 }
-                default:
-                {
-                    if (isset($_REQUEST['id'])) // we're either adding or editing
-                    {
-                        $current_id = empty( $_REQUEST['id'] ) ? '' : sanitize_text_field($_REQUEST['id']);
-                        
-                        switch ($current_section)
-                        {
-                            // With heirarchy
-                            case "property-type":
-                            case "commercial-property-type":
-                            case "location":
-                            {
-                                // TODO: Validate (check for blank fields)
-                                
-                                if ($current_id == '')
-                                {
-                                    // Adding new term
-                                    
-                                    // TODO: Check term doesn't exist already
-                                    
-                                    wp_insert_term(
-                                        ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name']), // the term 
-                                        ph_clean($_POST['taxonomy']), // the taxonomy
-                                        array(
-                                            'parent' => $_POST['parent_' . ph_clean($_POST['taxonomy']) . '_id']
-                                        )
-                                    );
-                                    
-                                    // TODO: Check for errors returned from wp_insert_term()
-                                }
-                                else
-                                {
-                                    // Editing term
-                                    wp_update_term($current_id, ph_clean($_POST['taxonomy']), array(
-                                        'name' => ph_clean($_POST[ph_clean($_POST['taxonomy']).'_name']),
-                                         'parent' => ph_clean($_POST['parent_' . $_POST['taxonomy'] . '_id'])
-                                    ));
-                                    
-                                    // TODO: Check for errors returned from wp_update_term()
-                                }
-                                break;
+
+                update_option( 'propertyhive_template_assistant', $current_settings );
+                break;
+
+            default:
+                if ( ! $request_id_present ) {
+                    break;
+                }
+
+                $taxonomy = $this->get_custom_fields_taxonomy_for_section( $current_section );
+                $is_delete_section = '-delete' === substr( $current_section, -7 );
+
+                if ( '' !== $taxonomy ) {
+                    if ( $is_delete_section ) {
+                        $term_ids = $this->normalize_custom_fields_term_id_list( $request_id );
+                        if ( empty( $term_ids ) ) {
+                            return;
+                        }
+                        $current_id = implode( '-', $term_ids );
+                    } else {
+                        $current_id = $this->normalize_custom_fields_term_id( $request_id );
+                        if ( null === $current_id ) {
+                            return;
+                        }
+                    }
+                } else {
+                    $current_id = sanitize_text_field( $request_id );
+                }
+
+                switch ( $current_section ) {
+                    case 'property-type':
+                    case 'commercial-property-type':
+                    case 'location':
+                        $term_name_key = $taxonomy . '_name';
+                        $parent_key = 'parent_' . $taxonomy . '_id';
+                        $term_name = ( isset( $post_data[ $term_name_key ] ) && is_string( $post_data[ $term_name_key ] ) ) ? sanitize_text_field( $post_data[ $term_name_key ] ) : '';
+                        $parent_id = $this->normalize_custom_fields_parent_id( isset( $post_data[ $parent_key ] ) ? $post_data[ $parent_key ] : '' );
+                        if ( '' === $term_name || null === $parent_id ) {
+                            return;
+                        }
+
+                        if ( '' === $current_id ) {
+                            wp_insert_term(
+                                $term_name,
+                                $taxonomy,
+                                array( 'parent' => $parent_id )
+                            );
+                        } else {
+                            wp_update_term(
+                                absint( $current_id ),
+                                $taxonomy,
+                                array(
+                                    'name'   => $term_name,
+                                    'parent' => $parent_id,
+                                )
+                            );
+                        }
+                        break;
+
+                    case 'availability':
+                    case 'outside-space':
+                    case 'parking':
+                    case 'price-qualifier':
+                    case 'sale-by':
+                    case 'tenure':
+                    case 'commercial-tenure':
+                    case 'furnished':
+                    case 'management-key-date-type':
+                    case 'marketing-flag':
+                    case 'property-feature':
+                        $term_name_key = $taxonomy . '_name';
+                        $term_name = ( isset( $post_data[ $term_name_key ] ) && is_string( $post_data[ $term_name_key ] ) ) ? sanitize_text_field( $post_data[ $term_name_key ] ) : '';
+                        if ( '' === $term_name ) {
+                            return;
+                        }
+
+                        if ( '' === $current_id ) {
+                            $term = wp_insert_term( $term_name, $taxonomy );
+                            if ( ! is_wp_error( $term ) ) {
+                                $current_id = isset( $term['term_id'] ) ? (string) absint( $term['term_id'] ) : '0';
                             }
-                            // Without heirarchy
-                            case "availability":
-                            case "outside-space":
-                            case "parking":
-                            case "price-qualifier":
-                            case "sale-by":
-                            case "tenure":
-                            case "commercial-tenure":
-                            case "furnished":
-                            case "management-key-date-type":
-                            case "marketing-flag":
-                            case "property-feature":
-                            {
-                                // TODO: Validate (check for blank fields)
-                                
-                                if ($current_id == '')
-                                {
-                                    // Adding new term
-                                    
-                                    // TODO: Check term doesn't exist already
-                                    
-                                    $term = wp_insert_term(
-                                        ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name']), // the term 
-                                        $_POST['taxonomy'] // the taxonomy
-                                    );
-                                    
-                                    // TODO: Check for errors returned from wp_insert_term()
+                        } else {
+                            wp_update_term( absint( $current_id ), $taxonomy, array( 'name' => $term_name ) );
+                        }
 
-                                    if ( ! is_wp_error( $term ) )
-                                    {
-                                        $current_id = isset( $term['term_id'] ) ? $term['term_id'] : 0;
+                        if ( 'availability' === $current_section ) {
+                            $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                            if ( ! is_array( $availability_departments ) ) {
+                                $availability_departments = array();
+                            }
+
+                            $departments = ph_get_departments();
+                            $posted_departments = ( isset( $post_data['department'] ) && is_array( $post_data['department'] ) ) ? $post_data['department'] : array();
+                            $availability_departments[ $current_id ] = array();
+                            foreach ( $departments as $key => $value ) {
+                                if ( isset( $posted_departments[ $key ] ) && is_string( $posted_departments[ $key ] ) && '1' === $posted_departments[ $key ] ) {
+                                    $availability_departments[ $current_id ][] = $key;
+                                }
+                            }
+                            update_option( 'propertyhive_availability_departments', $availability_departments );
+                        }
+
+                        if ( 'management-key-date-type' === $current_section ) {
+                            $options = get_option( 'propertyhive_key_date_type', array() );
+                            if ( ! is_array( $options ) ) {
+                                $options = array();
+                            }
+
+                            $recurrence = array();
+                            $frequency = ( isset( $post_data['management_key_date_type_recurrence_freq'] ) && is_string( $post_data['management_key_date_type_recurrence_freq'] ) ) ? strtoupper( sanitize_text_field( $post_data['management_key_date_type_recurrence_freq'] ) ) : '';
+                            if ( in_array( $frequency, array( 'ONCE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY' ), true ) ) {
+                                $recurrence[] = 'FREQ=' . $frequency;
+                            }
+
+                            $interval = ( isset( $post_data['management_key_date_type_recurrence_interval'] ) && is_string( $post_data['management_key_date_type_recurrence_interval'] ) ) ? trim( $post_data['management_key_date_type_recurrence_interval'] ) : '';
+                            if ( '' !== $interval && preg_match( '/^[1-9][0-9]*$/D', $interval ) ) {
+                                $recurrence[] = 'INTERVAL=' . absint( $interval );
+                            }
+
+                            $recurrence_type = ( isset( $post_data['management_key_date_type_recurrence_type'] ) && is_string( $post_data['management_key_date_type_recurrence_type'] ) ) ? sanitize_key( $post_data['management_key_date_type_recurrence_type'] ) : '';
+                            if ( ! in_array( $recurrence_type, array( 'tenancy_management', 'property_management' ), true ) ) {
+                                $recurrence_type = '';
+                            }
+
+                            $options[ $current_id ]['recurrence_rule'] = join( ';', $recurrence );
+                            $options[ $current_id ]['recurrence_type'] = $recurrence_type;
+                            update_option( 'propertyhive_key_date_type', $options );
+                        }
+                        break;
+
+                    case 'availability-delete':
+                    case 'property-type-delete':
+                    case 'commercial-property-type-delete':
+                    case 'location-delete':
+                    case 'parking-delete':
+                    case 'outside-space-delete':
+                    case 'price-qualifier-delete':
+                    case 'sale-by-delete':
+                    case 'tenure-delete':
+                    case 'commercial-tenure-delete':
+                    case 'furnished-delete':
+                    case 'management-key-date-type-delete':
+                    case 'marketing-flag-delete':
+                    case 'property-feature-delete':
+                        if ( ! isset( $post_data['confirm_removal'] ) || ! is_string( $post_data['confirm_removal'] ) || '1' !== $post_data['confirm_removal'] ) {
+                            break;
+                        }
+
+                        foreach ( $term_ids as $current_id ) {
+                            $query_args = array(
+                                'post_type'   => 'property',
+                                'nopaging'    => true,
+                                'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- Term deletion/reassignment must locate all properties or key dates attached to this selected term before removing it.
+                                'tax_query'   => array(
+                                    array(
+                                        'taxonomy' => $taxonomy,
+                                        'field'    => 'id',
+                                        'terms'    => $current_id,
+                                    ),
+                                ),
+                            );
+                            $property_query = new WP_Query( $query_args );
+
+                            if ( $property_query->have_posts() ) {
+                                while ( $property_query->have_posts() ) {
+                                    $property_query->the_post();
+                                    wp_remove_object_terms( $post->ID, $current_id, $taxonomy );
+
+                                    $new_id = $this->normalize_custom_fields_reassignment( isset( $post_data[ 'reassign_to_' . $current_id ] ) ? $post_data[ 'reassign_to_' . $current_id ] : '', $term_ids );
+                                    if ( null !== $new_id ) {
+                                        wp_set_post_terms( $post->ID, $new_id, $taxonomy, true );
                                     }
                                 }
-                                else
-                                {
-                                    // Editing term
-                                    wp_update_term($current_id, ph_clean($_POST['taxonomy']), array(
-                                        'name' => ph_clean($_POST[ph_clean($_POST['taxonomy']) . '_name'])
-                                    ));
-                                    
-                                    // TODO: Check for errors returned from wp_update_term()
-                                }
+                            }
+                            wp_reset_postdata();
 
-                                if ( $current_section == 'availability' )
-                                {
-                                    $availability_departments = get_option( 'propertyhive_availability_departments', array() );
-                                    if ( !is_array($availability_departments) ) { $availability_departments = array(); }
-
-                                    $departments = ph_get_departments();
-
-                                    $availability_departments[$current_id] = array();
-                                    foreach ( $departments as $key => $value )
-                                    {
-                                        if ( isset($_POST['department'][$key]) && $_POST['department'][$key] == '1' )
-                                        {
-                                            $availability_departments[$current_id][] = $key;
-                                        }
-                                    }
-
+                            if ( 'availability-delete' === $current_section ) {
+                                $availability_departments = get_option( 'propertyhive_availability_departments', array() );
+                                if ( is_array( $availability_departments ) && isset( $availability_departments[ $current_id ] ) ) {
+                                    unset( $availability_departments[ $current_id ] );
                                     update_option( 'propertyhive_availability_departments', $availability_departments );
                                 }
-
-        	                    if ( $current_section == 'management-key-date-type' )
-        	                    {
-        		                    $options = get_option( 'propertyhive_key_date_type', array() );
-        		                    if ( !is_array($options) ) { $options = array(); }
-
-        		                    $recurrence = array();
-        		                    if (isset($_POST['management_key_date_type_recurrence_freq'])) {
-        			                    $recurrence[] = 'FREQ=' . $_POST['management_key_date_type_recurrence_freq'];
-        		                    }
-        		                    if (isset($_POST['management_key_date_type_recurrence_interval'])) {
-        			                    $recurrence[] = 'INTERVAL=' . $_POST['management_key_date_type_recurrence_interval'];
-        		                    }
-
-        	                        $options[$current_id]['recurrence_rule'] = join(';', $recurrence);
-        		                    $options[$current_id]['recurrence_type'] = $_POST['management_key_date_type_recurrence_type'];
-        		                    update_option( 'propertyhive_key_date_type', $options );
-        	                    }
-
-                                break;
                             }
-                            case "availability-delete":
-                            case "property-type-delete":
-                            case "commercial-property-type-delete":
-                            case "location-delete":
-                            case "parking-delete":
-                            case "outside-space-delete":
-                            case "price-qualifier-delete":
-                            case "sale-by-delete":
-                            case "tenure-delete":
-                            case "commercial-tenure-delete":
-                            case "furnished-delete":
-                            case "management-key-date-type-delete":
-                            case "marketing-flag-delete":
-                            case "property-feature-delete":
-                            {
-                                if ( isset($_POST['confirm_removal']) && $_POST['confirm_removal'] == '1' )
-                                {
-                                    $term_ids = explode("-", $current_id);
 
-                                    foreach ( $term_ids as $current_id )
-                                    {
-                                        // Update properties that have this taxonomy term set
-                                        $query_args = array(
-                                            'post_type' => 'property',
-                                            'nopaging' => true,
-                                            'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                                            'tax_query' => array(
-                                                array(
-                                                    'taxonomy' => $_POST['taxonomy'],
-                                                    'field'    => 'id',
-                                                    'terms'    => $current_id,
-                                                ),
-                                            ),
-                                        );
-                                        $property_query = new WP_Query( $query_args );
-                                        
-                                        if ( $property_query->have_posts() )
-                                        {
-                                            while ( $property_query->have_posts() )
-                                            {
-                                                $property_query->the_post();
-                                                
-                                                wp_remove_object_terms( $post->ID, $current_id, ph_clean($_POST['taxonomy']) );
-                                                
-                                                // Re-assign to another term
-                                                if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && $_POST['reassign_to_' . $current_id] != 'none' )
-                                                {
-                                                    $new_id = $_POST['reassign_to_' . $current_id];
-                                                    
-                                                    wp_set_post_terms( $post->ID, $new_id, ph_clean($_POST['taxonomy']), TRUE );
-                                                    
-                                                    // TODO: Check for WP_ERROR
+                            if ( in_array( $taxonomy, array( 'property_type', 'commercial_property_type', 'location' ), true ) ) {
+                                $query_args = array(
+                                    'post_type'   => 'contact',
+                                    'nopaging'    => true,
+                                    'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
+                                    // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Applicant preferences are serialized profile metadata; deletion/reassignment must inspect every applicant profile to preserve its other selections.
+                                    'meta_query'  => array(
+                                        array(
+                                            'key'     => '_contact_types',
+                                            'value'   => 'applicant',
+                                            'compare' => 'LIKE',
+                                        ),
+                                    ),
+                                );
+                                $applicant_query = new WP_Query( $query_args );
+
+                                if ( $applicant_query->have_posts() ) {
+                                    while ( $applicant_query->have_posts() ) {
+                                        $applicant_query->the_post();
+                                        $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', true );
+                                        if ( '' === $num_applicant_profiles ) {
+                                            $num_applicant_profiles = 0;
+                                        }
+
+                                        if ( $num_applicant_profiles > 0 ) {
+                                            for ( $i = 0; $i < $num_applicant_profiles; ++$i ) {
+                                                $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, true );
+                                                $profile_key = $taxonomy . 's';
+                                                if ( ! is_array( $applicant_profile ) || ! isset( $applicant_profile[ $profile_key ] ) || ! is_array( $applicant_profile[ $profile_key ] ) ) {
+                                                    continue;
                                                 }
-                                            }
-                                        }
-                                        
-                                        wp_reset_postdata();
 
-                                        if ( $current_section == 'availability-delete' )
-                                        {
-                                            // Remove from propertyhive_availability_departments option
-                                            $availability_departments = get_option( 'propertyhive_availability_departments', array() );
-
-                                            if ( isset($availability_departments[$current_id]) )
-                                            {
-                                                unset($availability_departments[$current_id]);
-                                                update_option( 'propertyhive_availability_departments', $availability_departments );
-                                            }
-                                        }
-
-                                        if ( $_POST['taxonomy'] == 'property_type' || $_POST['taxonomy'] == 'commercial_property_type' || $_POST['taxonomy'] == 'location' )
-                                        {
-                                            $query_args = array(
-                                                'post_type' => 'contact',
-                                                'nopaging' => true,
-                                                'post_status' => array( 'pending', 'auto-draft', 'draft', 'private', 'publish', 'future', 'trash' ),
-                                                'meta_query' => array(
-                                                    array(
-                                                        'key' => '_contact_types',
-                                                        'value' => 'applicant',
-                                                        'compare' => 'LIKE'
-                                                    ),
-                                                ),
-                                            );
-                                            $applicant_query = new WP_Query( $query_args );
-
-                                            if ( $applicant_query->have_posts() )
-                                            {
-                                                while ( $applicant_query->have_posts() )
-                                                {
-                                                    $applicant_query->the_post();
-                                                
-                                                    $num_applicant_profiles = get_post_meta( get_the_ID(), '_applicant_profiles', TRUE );
-                                                    if ( $num_applicant_profiles == '' )
-                                                    {
-                                                        $num_applicant_profiles = 0;
-                                                    }
-
-                                                    if ( $num_applicant_profiles > 0 )
-                                                    {
-                                                        for ( $i = 0; $i < $num_applicant_profiles; ++$i )
-                                                        {
-                                                            $applicant_profile = get_post_meta( get_the_ID(), '_applicant_profile_' . $i, TRUE );
-
-                                                            if ( isset($applicant_profile[ph_clean($_POST['taxonomy']).'s']) && is_array($applicant_profile[ph_clean($_POST['taxonomy']).'s']) && !empty($applicant_profile[ph_clean($_POST['taxonomy']).'s']) )
-                                                            {
-                                                                if (in_array($current_id, $applicant_profile[ph_clean($_POST['taxonomy']).'s']))
-                                                                {
-                                                                    // This profile has this term set
-                                                                    unset($applicant_profile[ph_clean($_POST['taxonomy']).'s'][$current_id]);
-
-                                                                    if ( isset($_POST['reassign_to_' . $current_id]) && ! empty( $_POST['reassign_to_' . $current_id] ) && ph_clean($_POST['reassign_to_' . $current_id]) != 'none' )
-                                                                    {
-                                                                        $applicant_profile[ph_clean($_POST['taxonomy']).'s'][] = $_POST['reassign_to_' . $current_id];
-                                                                        $applicant_profile[ph_clean($_POST['taxonomy']).'s'] = array_unique($applicant_profile[ph_clean($_POST['taxonomy']).'s']);
-                                                                    }
-
-                                                                    $applicant_profile[ph_clean($_POST['taxonomy']).'s'] = array_values($applicant_profile[ph_clean($_POST['taxonomy']).'s']);
-
-                                                                    update_post_meta( get_the_ID(), '_applicant_profile_' . $i, $applicant_profile );
-                                                                }
-                                                            }
-                                                        }
+                                                $profile_terms = array();
+                                                foreach ( $applicant_profile[ $profile_key ] as $profile_term_id ) {
+                                                    if ( is_scalar( $profile_term_id ) ) {
+                                                        $profile_terms[] = (string) absint( $profile_term_id );
                                                     }
                                                 }
+                                                if ( ! in_array( (string) $current_id, $profile_terms, true ) ) {
+                                                    continue;
+                                                }
+
+                                                $profile_terms = array_values( array_filter( $profile_terms, static function ( $profile_term_id ) use ( $current_id ) {
+                                                    return (string) $profile_term_id !== (string) $current_id;
+                                                } ) );
+                                                $new_id = $this->normalize_custom_fields_reassignment( isset( $post_data[ 'reassign_to_' . $current_id ] ) ? $post_data[ 'reassign_to_' . $current_id ] : '', $term_ids );
+                                                if ( null !== $new_id ) {
+                                                    $profile_terms[] = $new_id;
+                                                }
+                                                $applicant_profile[ $profile_key ] = array_values( array_unique( $profile_terms ) );
+                                                update_post_meta( get_the_ID(), '_applicant_profile_' . $i, wp_slash( $applicant_profile ) );
                                             }
                                         }
-
-                                        wp_reset_postdata();
-
-                                        wp_delete_term( $current_id, ph_clean($_POST['taxonomy']) );
                                     }
                                 }
-
-                                break;
+                                wp_reset_postdata();
                             }
-                            default:
-                            {
-                                $section_found = apply_filters( 'propertyhive_custom_fields_save_section', false, $current_section, $current_id );
 
-                                if ( !($section_found) )
-                                {
-                                    echo 'UNKNOWN CUSTOM FIELD';
-                                }
-                            }
+                            wp_delete_term( absint( $current_id ), $taxonomy );
                         }
-                    }
-                    else
-                    {
-                        // Nothing to save. Should always be an id set when editing custom fields.
-                        // Even blank ids dictate something is being added
-                    }
+                        break;
+
+                    default:
+                        $section_found = apply_filters( 'propertyhive_custom_fields_save_section', false, $current_section, $current_id );
+                        if ( ! $section_found ) {
+                            echo 'UNKNOWN CUSTOM FIELD';
+                        }
+                        break;
                 }
-            }
-        }
-        else
-        {
-            // Nothing to save. Should always be a section when editing custom fields
+                break;
         }
     }
 }
