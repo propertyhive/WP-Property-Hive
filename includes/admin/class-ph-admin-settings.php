@@ -37,12 +37,6 @@ class PH_Admin_Settings {
 			$settings[] = include( 'settings/class-ph-settings-general.php' );
             $settings[] = include( 'settings/class-ph-settings-offices.php' );
             $settings[] = include( 'settings/class-ph-settings-custom-fields.php' );
-            $propertyhive_template_assistant_auto_deactivated = get_option('propertyhive_template_assistant_auto_deactivated', '');
-            if ( !empty($propertyhive_template_assistant_auto_deactivated) )
-            {
-            	// Only show if they had the TA active and we deactived it. Don't want it showing for new users
-	            $settings[] = include( 'settings/class-ph-settings-template-assistant.php' ); // Maybe temporary after migrating TA code into core. Remove in future version
-	        }
 	        $settings[] = include( 'settings/class-ph-settings-frontend.php' );
             $settings[] = include( 'settings/class-ph-settings-emails.php' );
             $settings[] = include( 'settings/class-ph-settings-features.php' );
