@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property import, crm
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 2.2.6
+Stable tag: 2.3.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -193,6 +193,15 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.3.0 - 2026-09-16 =
+* Added more view-related statistics to REST API including views_today and views_yesterday
+* Added filter to change if auto-match works off published or on market change
+* Added filter to disable tracking search analytics
+* Added filter to specify currency support for other slider field types
+* Updated entire plugin to pass Plugin Check review
+* Updated search analytics so admin users aren't included when logging
+* Corrected a couple of security vulnerabilities
 
 = 2.2.6 - 2026-07-16 =
 * Added nonces and verify user capabilities on reset and deletion of search forms for improved security
