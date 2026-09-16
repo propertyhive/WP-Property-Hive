@@ -419,7 +419,7 @@ class PH_Elementor {
             [
                 'label' => '',
                 'type' => \Elementor\Controls_Manager::RAW_HTML,
-                'raw' => /* translators: %s: Template Assistant flags settings URL. */ sprintf( __( 'The flag shown will take its colour and position settings from the <a href="%s" target="_blank">Template Assistant Flags</a> settings area', 'propertyhive' ), esc_url( admin_url( 'admin.php?page=ph-settings&tab=template-assistant&section=flags' ) ) ),
+                'raw' => /* translators: %s: Template Assistant flags settings URL. */ sprintf( __( 'The flag shown will take its colour and position settings from the <a href="%s" target="_blank">Template Assistant Flags</a> settings area', 'propertyhive' ), esc_url( admin_url( 'admin.php?page=ph-settings&tab=frontend&section=flags' ) ) ),
                 'condition' => [
                     'show_flag' => 'yes',
                 ],
