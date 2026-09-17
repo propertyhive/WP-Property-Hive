@@ -151,6 +151,11 @@ class PH_Licenses {
 
 	                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
 	                {
+	                	if ( ( $product_id_and_package['is_trial'] ?? null ) !== false ) 
+	                	{
+						    return false;
+						}
+
 	                    if ( 
 	                        isset($feature['plans']) && 
 	                        isset($product_id_and_package['package']) &&
@@ -827,6 +832,7 @@ class PH_Licenses {
 				{
 					$package = false;
 					$product_id = '';
+					$is_trial = null;
 
 					foreach ( $body['data']['product_list']['wc_subs_resources'] as $resource )
 					{
@@ -841,6 +847,10 @@ class PH_Licenses {
 								$package = 'complete';
 							}
 							$product_id = $resource['product_id'];
+							$is_trial = isset( $resource['is_trial'] )
+							    && is_bool( $resource['is_trial'] )
+							        ? $resource['is_trial']
+							        : null;
 						}
 					}
 
@@ -849,7 +859,8 @@ class PH_Licenses {
 						$return = array(
 			        		'success' => true,
 			        		'package' => $package,
-			        		'product_id' => $product_id
+			        		'product_id' => $product_id,
+			        		'is_trial'   => $is_trial,
 			        	);
 					}
 					else
