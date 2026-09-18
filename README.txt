@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property import, crm
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 2.3.0
+Stable tag: 2.3.1
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -194,6 +194,11 @@ The free core plugin contains the foundations that you need to create a property
 
 == Changelog ==
 
+= 2.3.1 - 2026-09-18 =
+* Added post_status parameter to contact queries in auto-matches to guarantee only published contacts are ever queried
+* Updated email queue to, before sending, do a final check the applicant is still published, has 'Send Matching Properties' ticked and hasn't unsubscribed
+* Updated update logic to exclude updates showing when a user is in a trial
+
 = 2.3.0 - 2026-09-16 =
 * Added more view-related statistics to REST API including views_today and views_yesterday
 * Added filter to change if auto-match works off published or on market change
@@ -202,6 +207,7 @@ The free core plugin contains the foundations that you need to create a property
 * Updated entire plugin to pass Plugin Check review
 * Updated search analytics so admin users aren't included when logging
 * Corrected a couple of security vulnerabilities
+* Declared compatibility for WordPress 7.1
 
 = 2.2.6 - 2026-07-16 =
 * Added nonces and verify user capabilities on reset and deletion of search forms for improved security
@@ -221,16 +227,7 @@ The free core plugin contains the foundations that you need to create a property
 * Corrected security vulnerability in search form slider control
 * Declared compatibility for WordPress 7.0
 
-= 2.2.3 - 2026-05-05 =
-* Added hover options to Elementor Enquiry Form Link widget
-* Added new AI Service class for upcoming AI functionality
-* Updated string output for easier translation including translator comments
-* Updated validation and sanitisation around property enquiries
-* Updated commercial floor and site area so it's cast to float before being output
-* Corrected issue with missing Google API key warning if provider is Mapbox
-* Corrected Back To Search Elementor widget colour not taking effect
-
-Older releases are documented in the [complete changelog](https://github.com/propertyhive/WP-Property-Hive/blob/9a22406f379d41f387efc3108dc470c1fcb175fd/README.txt#changelog).
+Older releases are documented in the [complete changelog](https://github.com/propertyhive/WP-Property-Hive/blob/master/README.txt).
 
 == Upgrade Notice ==
 
