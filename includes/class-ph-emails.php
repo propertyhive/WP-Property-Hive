@@ -420,6 +420,7 @@ class PH_Emails {
 		// Get all contacts that have a type of applicant
 		$args = array(
 			'post_type' => 'contact',
+			'post_status' => 'publish',
 			'nopaging' => true,
 			// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Matching mail must include all eligible applicant profiles; membership and opt-in eligibility are stored in contact metadata.
 			'meta_query' => $meta_query,
