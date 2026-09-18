@@ -230,6 +230,39 @@ class PH_Emails {
 		{
 			$email_id = $email_to_send->email_id;
 
+			$contact_id = (int)$email_to_send->contact_id;
+
+			// Ensure client is still publised, hasn't unsubscribed from emails and that send matching properties is yes
+			// To combat being added to the queue but then the queue only getting processed at a later date
+			$forbidden_contact_methods = get_post_meta( $contact_id, '_forbidden_contact_methods', true );
+
+			$email_forbidden = is_array( $forbidden_contact_methods ) && in_array( 'email', $forbidden_contact_methods, true );
+
+			$applicant_profile = get_post_meta( $contact_id, '_applicant_profile_' . (int)$email_to_send->applicant_profile_id, true );
+
+			$matching_enabled = is_array( $applicant_profile )
+				&& isset( $applicant_profile['send_matching_properties'] )
+				&& 'yes' === $applicant_profile['send_matching_properties'];
+
+			if (
+				'publish' !== get_post_status( $contact_id )
+				|| $email_forbidden
+				|| !$matching_enabled
+			) {
+				$wpdb->update(
+					$wpdb->prefix . 'ph_email_log',
+					array(
+						'status'  => 'fail2',
+						'lock_id' => '',
+					),
+					array( 'email_id' => (int)$email_id ),
+					array( '%s', '%s' ),
+					array( '%d' )
+				);
+
+				continue;
+			}
+
 			$headers = array();
 			$headers[] = 'From: ' . html_entity_decode($email_to_send->from_name) . ' <' . $email_to_send->from_email_address . '>';
 			if ( $email_to_send->cc_email_address != '' )
