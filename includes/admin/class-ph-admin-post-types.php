@@ -481,6 +481,8 @@ class PH_Admin_Post_Types {
         $output .= $this->property_department_filter();
         $output .= $this->property_marketing_filter();
         $output .= $this->property_availability_filter();
+        $output .= $this->property_type_filter();
+        $output .= $this->commercial_property_type_filter();
         $output .= $this->property_location_filter();
         $output .= $this->property_office_filter();
         $output .= $this->negotiator_filter();
@@ -723,6 +725,99 @@ class PH_Admin_Post_Types {
             }
         }
         
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Return hierarchical taxonomy terms for an admin filter.
+     *
+     * @param string $taxonomy Taxonomy slug.
+     * @param int    $parent   Parent term ID.
+     * @param int    $depth    Current hierarchy depth.
+     * @return array
+     */
+    private function get_taxonomy_filter_options( $taxonomy, $parent = 0, $depth = 0 ) {
+
+        $options = array();
+
+        $terms = get_terms(
+            array(
+                'taxonomy'   => $taxonomy,
+                'hide_empty' => false,
+                'parent'     => $parent,
+                'orderby'    => 'name',
+                'order'      => 'ASC',
+            )
+        );
+
+        if ( empty( $terms ) || is_wp_error( $terms ) ) {
+            return $options;
+        }
+
+        foreach ( $terms as $term ) {
+            $options[] = array(
+                'term_id' => $term->term_id,
+                'label'   => str_repeat( '— ', $depth ) . $term->name,
+            );
+
+            $options = array_merge(
+                $options,
+                $this->get_taxonomy_filter_options( $taxonomy, $term->term_id, $depth + 1 )
+            );
+        }
+
+        return $options;
+    }
+
+    /**
+     * Show a property type filter box
+     */
+    public function property_type_filter() {
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $selected_property_type_id = isset( $_GET['_property_type_id'] ) && is_scalar( $_GET['_property_type_id'] )
+            ? absint( $_GET['_property_type_id'] )
+            : 0;
+
+        $options = $this->get_taxonomy_filter_options( 'property_type' );
+
+        $output  = '<select name="_property_type_id" id="dropdown_property_type_id">';
+        $output .= '<option value="">' . esc_html__( 'All Property Types', 'propertyhive' ) . '</option>';
+
+        foreach ( $options as $option ) {
+            $output .= '<option value="' . esc_attr( $option['term_id'] ) . '"';
+            $output .= selected( $option['term_id'], $selected_property_type_id, false );
+            $output .= '>' . esc_html( $option['label'] ) . '</option>';
+        }
+
+        $output .= '</select>';
+
+        return $output;
+    }
+
+    /**
+     * Show a commercial property type filter box
+     */
+    public function commercial_property_type_filter() {
+
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+        $selected_commercial_property_type_id = isset( $_GET['_commercial_property_type_id'] ) && is_scalar( $_GET['_commercial_property_type_id'] )
+            ? absint( $_GET['_commercial_property_type_id'] )
+            : 0;
+
+        $options = $this->get_taxonomy_filter_options( 'commercial_property_type' );
+
+        $output  = '<select name="_commercial_property_type_id" id="dropdown_commercial_property_type_id">';
+        $output .= '<option value="">' . esc_html__( 'All Commercial Property Types', 'propertyhive' ) . '</option>';
+
+        foreach ( $options as $option ) {
+            $output .= '<option value="' . esc_attr( $option['term_id'] ) . '"';
+            $output .= selected( $option['term_id'], $selected_commercial_property_type_id, false );
+            $output .= '>' . esc_html( $option['label'] ) . '</option>';
+        }
+
         $output .= '</select>';
 
         return $output;
@@ -1440,6 +1535,30 @@ class PH_Admin_Post_Types {
                     // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
                     'terms' => ( (is_array($_GET['_availability_id'])) ? (int)$_GET['_availability_id'] : array( (int)$_GET['_availability_id'] ) )
                 );
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( isset( $_GET['_property_type_id'] ) && is_scalar( $_GET['_property_type_id'] ) && ! empty( $_GET['_property_type_id'] ) ) {
+                $property_type_id = absint( $_GET['_property_type_id'] );
+
+                if ( $property_type_id ) {
+                    $vars['tax_query'][] = array(
+                        'taxonomy' => 'property_type',
+                        'field'    => 'term_id',
+                        'terms'    => array( $property_type_id ),
+                    );
+                }
+            }
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
+            if ( isset( $_GET['_commercial_property_type_id'] ) && is_scalar( $_GET['_commercial_property_type_id'] ) && ! empty( $_GET['_commercial_property_type_id'] ) ) {
+                $commercial_property_type_id = absint( $_GET['_commercial_property_type_id'] );
+
+                if ( $commercial_property_type_id ) {
+                    $vars['tax_query'][] = array(
+                        'taxonomy' => 'commercial_property_type',
+                        'field'    => 'term_id',
+                        'terms'    => array( $commercial_property_type_id ),
+                    );
+                }
             }
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
 			if ( 'on_market' === $marketing ) {
