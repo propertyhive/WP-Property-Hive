@@ -38,7 +38,7 @@ class PH_Admin_Onboarding {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'admin_dashboard_pages' ) );
 		add_action( 'admin_head', array( $this, 'hide_dashboard_page_menu_item' ) );
-		add_action( 'admin_init', array( $this, 'maybe_restart_onboarding' ) );
+		//add_action( 'admin_init', array( $this, 'maybe_restart_onboarding' ) );
 		add_action( 'load-dashboard_page_ph-onboarding', array( $this, 'remove_admin_toolbar_html_class' ) );
 		add_filter( 'propertyhive_screen_ids', array( $this, 'add_screen_id' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
@@ -536,11 +536,11 @@ class PH_Admin_Onboarding {
 			wp_die( esc_html__( 'You do not have permission to restart setup.', 'propertyhive' ) );
 		}
 
-		//check_admin_referer( self::RESTART_NONCE_ACTION );
+		check_admin_referer( self::RESTART_NONCE_ACTION );
 
-		/*if ( ! self::can_restart_onboarding() ) {
+		if ( ! self::can_restart_onboarding() ) {
 			wp_die( esc_html__( 'The setup wizard can only be restarted on local, development or staging sites.', 'propertyhive' ) );
-		}*/
+		}
 
 		delete_option( self::OPTION_NAME );
 		self::track_event( 'restarted', array( 'environment_type' => self::get_environment_type() ) );
