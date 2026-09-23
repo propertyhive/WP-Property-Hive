@@ -1760,12 +1760,12 @@ class PH_Admin_Onboarding {
 			}
 		}
 
-		if ( ! empty( $office['telephone_number'] ) ) {
+		/*if ( ! empty( $office['telephone_number'] ) ) {
 			$digits = preg_replace( '/\D+/', '', $office['telephone_number'] );
 			if ( strlen( $digits ) < 7 || ! preg_match( '/^[0-9+\-\s().]+$/', $office['telephone_number'] ) ) {
 				$errors['office_telephone_number'] = __( 'Please enter a valid phone number.', 'propertyhive' );
 			}
-		}
+		}*/
 
 		if ( ! empty( $office['email_address'] ) && ! is_email( $office['email_address'] ) ) {
 			$errors['office_email_address'] = __( 'Please enter a valid email address.', 'propertyhive' );
