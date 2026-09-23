@@ -1166,6 +1166,7 @@ class PH_Admin_Onboarding {
 		$has_license_key     = ! empty( $state['has_license_key'] ) && 'yes' === $state['has_license_key'] ? 'yes' : 'no';
 		$license_key_type    = ! empty( $state['license_key_type'] ) && in_array( $state['license_key_type'], array( 'pro', 'old' ), true ) ? $state['license_key_type'] : 'pro';
 		$license_render_state = $this->get_license_render_state();
+		$license_activated   = ! empty( $state['license_activated'] ) || ! empty( $license_render_state['active'] );
 		$import_feature      = $this->get_import_feature_for_onboarding();
 		$import_feature_active = ! empty( $import_feature['active'] ) || $this->is_import_feature_active();
 		$demo_choice     = ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no';
@@ -1182,7 +1183,7 @@ class PH_Admin_Onboarding {
 		$current_step = $this->get_current_step( $state );
 
 		self::track_event( 'step_viewed', array( 'step' => $current_step ) );
-		$this->localize_script( $demo_active, $import_feature, $import_feature_active );
+		$this->localize_script( $demo_active, $import_feature, $import_feature_active, $license_activated );
 		?>
 		<div class="ph-onboarding" data-current-step="<?php echo esc_attr( $current_step ); ?>" data-demo-imported="<?php echo ! empty( $state['demo_data_imported'] ) ? 'yes' : 'no'; ?>">
 			<div class="ph-onboarding__chrome">
@@ -1400,19 +1401,16 @@ class PH_Admin_Onboarding {
 
 						<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="demo-data-choice" data-validation-field="demo_data_choice">
 							<?php $this->output_radio_card( 'demo_data_choice', 'no', __( 'No', 'propertyhive' ), __( 'Skip the demo data and use my own.', 'propertyhive' ), 'no' === $demo_choice, false ); ?>
-							<?php $this->output_radio_card( 'demo_data_choice', 'yes', __( 'Yes', 'propertyhive' ), __( 'Add example data so I can explore Property Hive first.', 'propertyhive' ), 'yes' === $demo_choice, ! $demo_active ); ?>
+							<?php $this->output_radio_card( 'demo_data_choice', 'yes', __( 'Yes', 'propertyhive' ), __( 'Add example data so I can explore Property Hive first.', 'propertyhive' ), 'yes' === $demo_choice, false ); ?>
 						</div>
 						<?php $this->output_field_error( 'demo_data_choice' ); ?>
 
 						<div class="ph-onboarding__demo-box" data-demo-progress-box>
-							<?php if ( $demo_active ) : ?>
-								<div class="ph-onboarding__demo-status" data-demo-status><?php esc_html_e( 'Demo data will import when you continue.', 'propertyhive' ); ?></div>
-								<div class="ph-onboarding__demo-progress" aria-hidden="true"><span data-demo-progress-bar></span></div>
-								<div class="ph-onboarding__demo-results" data-demo-results></div>
-							<?php else : ?>
-								<p><?php esc_html_e( 'The Demo Data feature is not active on this site yet.', 'propertyhive' ); ?></p>
-								<a class="button button-primary" href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings&tab=features&profilter=free' ) ); ?>"><?php esc_html_e( 'Activate Demo Data Feature', 'propertyhive' ); ?></a>
-							<?php endif; ?>
+							<div class="ph-onboarding__demo-status" data-demo-status>
+								<?php echo esc_html( $demo_active ? __( 'Demo data will import when you continue.', 'propertyhive' ) : __( 'The Demo Data feature will be activated and the data imported when you continue.', 'propertyhive' ) ); ?>
+							</div>
+							<div class="ph-onboarding__demo-progress" aria-hidden="true"><span data-demo-progress-bar></span></div>
+							<div class="ph-onboarding__demo-results" data-demo-results></div>
 						</div>
 						<?php $this->output_settings_note( __( 'Demo Data', 'propertyhive' ) ); ?>
 					</section>
@@ -1433,12 +1431,17 @@ class PH_Admin_Onboarding {
 
 						<div class="ph-onboarding__exits">
 
-							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" <?php echo $import_feature_active ? '' : 'hidden'; ?>>
-								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Create a property import', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring properties in from your CRM', 'propertyhive' ); ?></span>
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $this->get_url( '/import-properties', 'exit' ) ); ?>" target="_blank" rel="noopener noreferrer" data-onboarding-exit data-exit="import" data-recommendation="import" <?php echo ! $license_activated && in_array( 'import_properties', $usage, true ) ? '' : 'hidden'; ?>>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Learn about property imports', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and check if your CRM is supported.', 'propertyhive' ); ?></span>
 							</a>
 
-							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" <?php echo $import_feature_active ? '' : 'hidden'; ?>>
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $this->get_url( '/export-properties', 'exit' ) ); ?>" target="_blank" rel="noopener noreferrer" data-onboarding-exit data-exit="import" data-recommendation="portal" <?php echo ! $license_activated && in_array( 'portal_uploads', $usage, true ) ? '' : 'hidden'; ?>>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Learn about portal exports', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and where you can send your properties.', 'propertyhive' ); ?></span>
+							</a>
+
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" data-import-setup <?php echo $import_feature_active ? '' : 'hidden'; ?>>
 								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Create a property import', 'propertyhive' ); ?></span>
 								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring properties in from your CRM', 'propertyhive' ); ?></span>
 							</a>
@@ -1566,8 +1569,9 @@ class PH_Admin_Onboarding {
 	 * @param bool  $demo_active           Whether demo data add-on is active.
 	 * @param array $import_feature        Cached Property Import feature data.
 	 * @param bool  $import_feature_active Whether Property Import is active.
+	 * @param bool  $license_activated     Whether a license is active.
 	 */
-	private function localize_script( $demo_active, $import_feature = array(), $import_feature_active = false ) {
+	private function localize_script( $demo_active, $import_feature = array(), $import_feature_active = false, $license_activated = false ) {
 		wp_localize_script(
 			'propertyhive_admin_onboarding',
 			'propertyhive_onboarding',
@@ -1581,6 +1585,9 @@ class PH_Admin_Onboarding {
 				'import_setup_url'       => admin_url( 'admin.php?page=propertyhive_import_properties' ),
 				'license_trial_url'      => $this->get_url( '/pricing', 'license-step-trial' ),
 				'demo_data_active'       => $demo_active ? 'yes' : 'no',
+				'demo_data_nonce'        => wp_create_nonce( 'propertyhive_demo_data' ),
+				'demo_data_feature_slug' => 'propertyhive-demo-data',
+				'license_activated'      => $license_activated ? 'yes' : 'no',
 				'updates_nonce'          => wp_create_nonce( 'updates' ),
 				'can_install_plugins'    => current_user_can( 'install_plugins' ) ? 'yes' : 'no',
 				'import_feature_slug'    => ! empty( $import_feature['slug'] ) ? $import_feature['slug'] : '',
@@ -1594,9 +1601,10 @@ class PH_Admin_Onboarding {
 					'continue'          => __( 'Continue', 'propertyhive' ),
 					'saving'            => __( 'Saving...', 'propertyhive' ),
 					'importing'         => __( 'Importing demo data...', 'propertyhive' ),
+					'activatingDemoData' => __( 'Activating Demo Data...', 'propertyhive' ),
 					'importComplete'    => __( 'Demo data imported.', 'propertyhive' ),
 					'importFailed'      => __( 'Demo data could not be imported. You can continue setup and try again later.', 'propertyhive' ),
-					'demoDataInactive'  => __( 'The Demo Data feature is not active on this site yet.', 'propertyhive' ),
+					'demoDataInactive'  => __( 'The Demo Data feature could not be activated on this site.', 'propertyhive' ),
 					'licenseKeyRequired' => __( 'Please enter your license key.', 'propertyhive' ),
 					'licenseChecking'   => __( 'Checking your key... Contacting wp-property-hive.com - a couple of seconds.', 'propertyhive' ),
 					'licenseProSuccess' => __( 'Pro activated. The features in your plan are ready to use.', 'propertyhive' ),

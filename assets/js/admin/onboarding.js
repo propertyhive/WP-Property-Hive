@@ -13,6 +13,7 @@ jQuery( function( $ ) {
 	var currentStep = $wizard.data( 'current-step' ) || 'intro';
 	var demoImported = $wizard.data( 'demo-imported' ) === 'yes';
 	var demoImporting = false;
+	var licenseActivated = config.license_activated === 'yes';
 	var licenseActivating = false;
 	var addressLookupTimer = null;
 	var addressLookupXhr = null;
@@ -311,6 +312,9 @@ jQuery( function( $ ) {
 		$( '[data-ph-onboarding-skip]' ).toggle( step !== 'complete' );
 		setMessage( '' );
 		clearValidation( step );
+		if ( step === 'complete' ) {
+			updateExitRecommendations();
+		}
 		track( 'step_viewed', step );
 	}
 
@@ -412,8 +416,6 @@ jQuery( function( $ ) {
 		if ( step === 'demo-data' ) {
 			if ( ! $( 'input[name="demo_data_choice"]:checked' ).length ) {
 				errors.demo_data_choice = text( 'chooseDemoData', 'Please choose whether to import demo data.' );
-			} else if ( $( 'input[name="demo_data_choice"]:checked' ).val() === 'yes' && config.demo_data_active !== 'yes' ) {
-				errors.demo_data_choice = text( 'demoDataInactive', 'The Demo Data feature is not active on this site yet.' );
 			}
 		}
 
@@ -503,6 +505,7 @@ jQuery( function( $ ) {
 			dataType: 'json',
 			data: {
 				action: 'propertyhive_get_section_demo_data',
+				nonce: config.demo_data_nonce,
 				section: section
 			}
 		} );
@@ -515,6 +518,7 @@ jQuery( function( $ ) {
 			dataType: 'json',
 			data: {
 				action: 'propertyhive_create_demo_data_records',
+				nonce: config.demo_data_nonce,
 				data_items: dataItems
 			}
 		} );
@@ -658,16 +662,34 @@ jQuery( function( $ ) {
 	}
 
 	function lockLicenseSuccess() {
+		licenseActivated = true;
 		$( 'input[name="has_license_key"][value="yes"]' ).prop( 'checked', true ).trigger( 'change' );
 		$( 'input[name="has_license_key"], input[name="license_key_type"]' ).prop( 'disabled', true ).closest( '.ph-onboarding__choice' ).addClass( 'is-disabled' );
 		$( '[data-license-entry]' ).hide();
 		$( '[data-license-old-note]' ).hide();
+		updateExitRecommendations();
 	}
 
 	function revealImportExit() {
-		$( '[data-exit="import"]' )
+		$( '[data-import-setup]' )
 			.attr( 'href', config.import_setup_url || 'admin.php?page=propertyhive_import_properties' )
 			.removeAttr( 'hidden' );
+	}
+
+	function updateExitRecommendations() {
+		var usage = selectedValues( 'usage' );
+		var canRecommend = ! licenseActivated;
+
+		$( '[data-recommendation="import"]' ).attr( 'hidden', 'hidden' );
+		$( '[data-recommendation="portal"]' ).attr( 'hidden', 'hidden' );
+
+		if ( canRecommend && $.inArray( 'import_properties', usage ) >= 0 ) {
+			$( '[data-recommendation="import"]' ).removeAttr( 'hidden' );
+		}
+
+		if ( canRecommend && $.inArray( 'portal_uploads', usage ) >= 0 ) {
+			$( '[data-recommendation="portal"]' ).removeAttr( 'hidden' );
+		}
 	}
 
 	function revealSiteExit() {
@@ -787,12 +809,57 @@ jQuery( function( $ ) {
 			return $.Deferred().resolve().promise();
 		}
 
-		if ( config.demo_data_active !== 'yes' ) {
-			setMessage( config.i18n.demoDataInactive, 'error' );
+		if ( config.demo_data_active === 'yes' ) {
+			return importDemoData();
+		}
+
+		$( '[data-next]' ).prop( 'disabled', true ).addClass( 'is-busy' ).text( text( 'activatingDemoData', 'Activating Demo Data...' ) );
+		updateDemoProgress( 0, 1, text( 'activatingDemoData', 'Activating Demo Data...' ) );
+
+		function activationSucceeded() {
+			config.demo_data_active = 'yes';
+			return importDemoData();
+		}
+
+		function activationFailed( message ) {
+			setSaving( false );
+			setMessage( message || text( 'demoDataInactive', 'The Demo Data feature could not be activated on this site.' ), 'error' );
 			return $.Deferred().reject().promise();
 		}
 
-		return importDemoData();
+		if ( config.can_install_plugins !== 'yes' || ! config.demo_data_feature_slug || ! config.updates_nonce ) {
+			return activationFailed();
+		}
+
+		return $.ajax( {
+			url: config.ajax_url,
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				action: 'propertyhive_activate_pro_feature',
+				slug: config.demo_data_feature_slug,
+				_ajax_nonce: config.updates_nonce
+			}
+		} ).then( function( response ) {
+			if ( response && response.success === true ) {
+				if ( response.data && response.data.activateUrl ) {
+					return $.get( response.data.activateUrl ).then( activationSucceeded, function() {
+						return activationFailed();
+					} );
+				}
+
+				return activationSucceeded();
+			}
+
+			if ( response && response.data && response.data.errorMessage === 'Plugin already active' ) {
+				return activationSucceeded();
+			}
+
+			return activationFailed( response && response.data ? response.data.errorMessage : '' );
+		}, function( xhr ) {
+			var message = xhr.responseJSON && xhr.responseJSON.data ? xhr.responseJSON.data.errorMessage : '';
+			return activationFailed( message );
+		} );
 	}
 
 	$( document ).on( 'change', 'input[name="demo_data_choice"]', updateDemoChoice );
@@ -800,15 +867,21 @@ jQuery( function( $ ) {
 	$( document ).on( 'change', 'input[name="license_key_type"]', updateLicenseType );
 	$( document ).on( 'click', '[data-license-activate]', activateLicense );
 	$( document ).on( 'click', '[data-onboarding-exit]', function( event ) {
-		event.preventDefault();
-
 		var $exit = $( this );
 		var destination = $exit.attr( 'href' );
 		var completedVia = $exit.attr( 'data-exit' ) || '';
+		var opensInNewTab = $exit.attr( 'target' ) === '_blank';
 
 		if ( $exit.attr( 'aria-disabled' ) === 'true' || ! destination ) {
+			event.preventDefault();
 			return;
 		}
+
+		if ( opensInNewTab ) {
+			return;
+		}
+
+		event.preventDefault();
 
 		$( '[data-onboarding-exit]' ).attr( 'aria-disabled', 'true' ).addClass( 'is-disabled' );
 		$exit.addClass( 'is-busy' );
@@ -899,6 +972,7 @@ jQuery( function( $ ) {
 		if ( name === 'usage[]' ) {
 			clearFieldError( 'usage' );
 			setMessage( '' );
+			updateExitRecommendations();
 		}
 
 		if ( name === 'demo_data_choice' ) {
@@ -928,4 +1002,5 @@ jQuery( function( $ ) {
 	refreshDemoState();
 	updateLicenseChoice();
 	updateLicenseType();
+	updateExitRecommendations();
 } );
