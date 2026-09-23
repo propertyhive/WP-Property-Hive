@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property import, crm
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 2.3.1
+Stable tag: 2.4.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -193,6 +193,10 @@ The free core plugin contains the foundations that you need to create a property
 
 == Changelog ==
 
+= 2.4.0 - 2026-09-23 =
+* Added new onboarding wizard when people activate the plugin for the first time
+* Updated menu icon to reflect latest branding release
+
 = 2.3.1 - 2026-09-18 =
 * Added post_status parameter to contact queries in auto-matches to guarantee only published contacts are ever queried
 * Updated email queue to, before sending, do a final check the applicant is still published, has 'Send Matching Properties' ticked and hasn't unsubscribed
@@ -219,12 +223,6 @@ The free core plugin contains the foundations that you need to create a property
 = 2.2.5 - 2026-06-18 =
 * Corrected various translation strings
 * Corrected issue with flag setting in Elementor Image widget
-
-= 2.2.4 - 2026-06-11 =
-* Added flag setting back in to Elementor Image widget lost during Template Assistant merger
-* Corrected label text in Avada brochures shortcode and add default value
-* Corrected security vulnerability in search form slider control
-* Declared compatibility for WordPress 7.0
 
 Older releases are documented in the [complete changelog](https://github.com/propertyhive/WP-Property-Hive/blob/master/README.txt).
 
