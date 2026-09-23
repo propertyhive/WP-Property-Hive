@@ -952,7 +952,7 @@ class PH_Admin {
 
             // Don't do redirect if part of multisite, doing batch-activate, or if no permission
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
-            if ( is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_propertyhive' ) ) {
+            if ( is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_options' ) ) {
                 return;
             }
 
