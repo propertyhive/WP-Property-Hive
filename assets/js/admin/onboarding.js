@@ -692,6 +692,13 @@ jQuery( function( $ ) {
 		}
 	}
 
+	function updateUsageProNote() {
+		var usage = selectedValues( 'usage' );
+		var needsPro = $.inArray( 'import_properties', usage ) >= 0 || $.inArray( 'portal_uploads', usage ) >= 0;
+
+		$( '[data-usage-pro-note]' ).prop( 'hidden', ! needsPro );
+	}
+
 	function revealSiteExit() {
 		$( '[data-exit="site"]' ).removeAttr( 'hidden' );
 	}
@@ -973,6 +980,7 @@ jQuery( function( $ ) {
 			clearFieldError( 'usage' );
 			setMessage( '' );
 			updateExitRecommendations();
+			updateUsageProNote();
 		}
 
 		if ( name === 'demo_data_choice' ) {
@@ -1003,4 +1011,5 @@ jQuery( function( $ ) {
 	updateLicenseChoice();
 	updateLicenseType();
 	updateExitRecommendations();
+	updateUsageProNote();
 } );

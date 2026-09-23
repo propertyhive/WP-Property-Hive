@@ -1303,7 +1303,7 @@ class PH_Admin_Onboarding {
 							<?php $this->output_choice_card( 'usage', 'not_sure', __( 'Just the website for now', 'propertyhive' ), __( 'No problem. You can always choose later.', 'propertyhive' ), in_array( 'not_sure', $usage, true ) ); ?>
 						</div>
 						<?php $this->output_field_error( 'usage' ); ?>
-						<div class="ph-onboarding__pro-note">
+						<div class="ph-onboarding__pro-note" data-usage-pro-note <?php echo in_array( 'import_properties', $usage, true ) || in_array( 'portal_uploads', $usage, true ) ? '' : 'hidden'; ?>>
 							<p>
 								<strong><?php esc_html_e( 'Pro features are included with our paid plans.', 'propertyhive' ); ?></strong>
 								<?php esc_html_e( 'You can try them free for 7 days.', 'propertyhive' ); ?>
