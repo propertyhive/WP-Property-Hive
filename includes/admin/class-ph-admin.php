@@ -671,6 +671,7 @@ class PH_Admin {
 
         // Classes
         include_once( 'class-ph-admin-post-types.php' );
+        include_once( 'class-ph-admin-onboarding.php' );
         include_once( dirname(PH_PLUGIN_FILE) . '/includes/class-ph-ai-service.php' );
 
         // Classes we only need if the ajax is not-ajax
@@ -951,11 +952,11 @@ class PH_Admin {
 
             // Don't do redirect if part of multisite, doing batch-activate, or if no permission
             // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only admin list display or query; no state change.
-            if ( is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_propertyhive' ) ) {
+            if ( is_network_admin() || isset( $_GET['activate-multi'] ) || ! current_user_can( 'manage_options' ) ) {
                 return;
             }
 
-            wp_safe_redirect( admin_url( 'index.php?page=ph-installed' ) );
+            wp_safe_redirect( admin_url( 'index.php?page=ph-onboarding' ) );
             exit;
         }
     }

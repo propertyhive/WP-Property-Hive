@@ -443,6 +443,44 @@ class PH_Licenses {
 				wp_reset_postdata();
 			}
 
+			// Onboarding wizard step
+			$onboarding_state = get_option( 'propertyhive_onboarding', false );
+
+			if ( is_array( $onboarding_state ) && ! empty( $onboarding_state ) )
+			{
+				$onboarding_status = isset( $onboarding_state['status'] )
+					? sanitize_key( $onboarding_state['status'] )
+					: 'not_started';
+
+				$onboarding_step = isset( $onboarding_state['last_step'] )
+					? sanitize_key( $onboarding_state['last_step'] )
+					: '';
+
+				// When skipped, last_step is the exact step on which Skip was clicked.
+				// Otherwise, use the most recently viewed step so abandonment is captured.
+				if (
+					$onboarding_status !== 'skipped' &&
+					! empty( $onboarding_state['events'] ) &&
+					is_array( $onboarding_state['events'] )
+				)
+				{
+					foreach ( array_reverse( $onboarding_state['events'] ) as $event )
+					{
+						if (
+							isset( $event['event'], $event['data']['step'] ) &&
+							$event['event'] === 'step_viewed'
+						)
+						{
+							$onboarding_step = sanitize_key( $event['data']['step'] );
+							break;
+						}
+					}
+				}
+
+				$data['onboarding_status'] = $onboarding_status;
+				$data['onboarding_step']   = $onboarding_step;
+			}
+
 			$data = apply_filters( 'propertyhive_license_check_data', $data );
 		}
 
