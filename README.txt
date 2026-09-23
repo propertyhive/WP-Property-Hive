@@ -53,12 +53,11 @@ Hey you. Are you looking to showcase and sell your properties? YOUR website is y
 
 = Extendable Pro features: =
 
-* Import property listings from the leading CRMs including Alto, Street, Loop, Reapit, 10Ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Juxpix, Arthur Online, VaultEA, Kato and more
+* Import property listings from the leading CRMs including Alto, Street, Loop, Reapit, 10ninety, SME Professional, dezrez, Kyero, agentOS, Juvo, Jupix, Arthur Online, VaultEA, Kato and more
 * Export property listings to property portals such as Rightmove, Zoopla, OnTheMarket and many more
 * Map Search
 * Draw-a-search
 * Radial Search
-* AI functionality to write and re-write property descriptions
 * Shortlist
 * Saved searches
 * Search results promos
