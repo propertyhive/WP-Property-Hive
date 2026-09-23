@@ -683,7 +683,7 @@ jQuery( function( $ ) {
 
 		$( '<p />', {
 			'data-license-import-enabled': 'yes',
-			text: text( 'importFeatureEnabled', 'Property Import feature enabled' ) + ' \u2713'
+			text: '\u2713 ' + text( 'importFeatureEnabled', 'Property Import feature enabled' ) 
 		} ).appendTo( $state );
 	}
 

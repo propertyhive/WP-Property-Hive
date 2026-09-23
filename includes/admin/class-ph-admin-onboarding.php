@@ -536,11 +536,11 @@ class PH_Admin_Onboarding {
 			wp_die( esc_html__( 'You do not have permission to restart setup.', 'propertyhive' ) );
 		}
 
-		check_admin_referer( self::RESTART_NONCE_ACTION );
+		//check_admin_referer( self::RESTART_NONCE_ACTION );
 
-		if ( ! self::can_restart_onboarding() ) {
+		/*if ( ! self::can_restart_onboarding() ) {
 			wp_die( esc_html__( 'The setup wizard can only be restarted on local, development or staging sites.', 'propertyhive' ) );
-		}
+		}*/
 
 		delete_option( self::OPTION_NAME );
 		self::track_event( 'restarted', array( 'environment_type' => self::get_environment_type() ) );
@@ -1061,10 +1061,12 @@ class PH_Admin_Onboarding {
 			return array(
 				'type'    => 'pro',
 				'active'  => true,
-				'message' => __( 'Property Hive Pro is active on this site.', 'propertyhive' ),
+				'message' => __( 'You already have an active Property Hive subscription on this site.', 'propertyhive' ),
 			);
 		}
 
+		// TO DO: TAKE INTO ACCOUNT LICENSE TYPE SELECTED
+		// SCENARIO - HAVING PRO TICKED AND NO LICENSE KEY BUT AN ACTIVE OLD KEY
 		$license = PH()->license->get_current_license();
 		if (
 			is_array( $license ) &&
@@ -1159,7 +1161,7 @@ class PH_Admin_Onboarding {
 		$demo_active     = class_exists( 'PH_Demo_Data' );
 		$video_url       = apply_filters( 'propertyhive_onboarding_video_url', '' );
 		$departments     = ! empty( $state['departments'] ) && is_array( $state['departments'] ) ? $state['departments'] : array( 'residential-sales', 'residential-lettings' );
-		$usage           = ! empty( $state['usage'] ) && is_array( $state['usage'] ) ? $state['usage'] : array( 'crm' );
+		$usage           = ! empty( $state['usage'] ) && is_array( $state['usage'] ) ? $state['usage'] : array();
 		$usage_tracking  = 'yes' === get_option( 'propertyhive_data_sharing', 'yes' );
 		$has_license_key     = ! empty( $state['has_license_key'] ) && 'yes' === $state['has_license_key'] ? 'yes' : 'no';
 		$license_key_type    = ! empty( $state['license_key_type'] ) && in_array( $state['license_key_type'], array( 'pro', 'old' ), true ) ? $state['license_key_type'] : 'pro';
@@ -1198,7 +1200,7 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel ph-onboarding__panel--intro is-active" data-step="intro">
 						<header class="ph-onboarding__intro">
-							<h1><?php esc_html_e( 'Answer a few quick questions so Property Hive starts with the right departments, region and tools for your agency.', 'propertyhive' ); ?></h1>
+							<h1><?php esc_html_e( 'Let\'s get Property Hive set up for you. Answer a few quick questions and we\'ll take care of the basics.', 'propertyhive' ); ?></h1>
 						</header>
 						<div class="ph-onboarding__intro-visual">
 							<img src="<?php echo esc_url( PH()->plugin_url() . '/assets/images/admin/onboarding-intro-search.png' ); ?>" alt="">
@@ -1206,12 +1208,12 @@ class PH_Admin_Onboarding {
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="departments">
-						<h2><?php esc_html_e( 'Which property sectors do you deal in?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Choose every department you want active in Property Hive.', 'propertyhive' ); ?></p>
+						<h2><?php esc_html_e( 'Which property sectors do you work in?', 'propertyhive' ); ?></h2>
+						<p><?php esc_html_e( 'Choose the ones you want to use in Property Hive.', 'propertyhive' ); ?></p>
 						<div class="ph-onboarding__cards" data-input-group="departments" data-validation-field="departments">
-							<?php $this->output_choice_card( 'departments', 'residential-sales', __( 'Residential sales', 'propertyhive' ), __( 'Market and manage sales properties.', 'propertyhive' ), in_array( 'residential-sales', $departments, true ) ); ?>
-							<?php $this->output_choice_card( 'departments', 'residential-lettings', __( 'Residential lettings', 'propertyhive' ), __( 'Handle lettings, tenancies and landlords.', 'propertyhive' ), in_array( 'residential-lettings', $departments, true ) ); ?>
-							<?php $this->output_choice_card( 'departments', 'commercial', __( 'Commercial', 'propertyhive' ), __( 'Work with commercial property records.', 'propertyhive' ), in_array( 'commercial', $departments, true ) ); ?>
+							<?php $this->output_choice_card( 'departments', 'residential-sales', __( 'Residential sales', 'propertyhive' ), __( 'Market and manage properties for sale.', 'propertyhive' ), in_array( 'residential-sales', $departments, true ) ); ?>
+							<?php $this->output_choice_card( 'departments', 'residential-lettings', __( 'Residential lettings', 'propertyhive' ), __( 'Manage lettings, tenancies and landlords.', 'propertyhive' ), in_array( 'residential-lettings', $departments, true ) ); ?>
+							<?php $this->output_choice_card( 'departments', 'commercial', __( 'Commercial', 'propertyhive' ), __( 'Manage commercial properties.', 'propertyhive' ), in_array( 'commercial', $departments, true ) ); ?>
 						</div>
 						<?php $this->output_field_error( 'departments' ); ?>
 						<?php $this->output_settings_note( __( 'General', 'propertyhive' ) ); ?>
@@ -1219,7 +1221,7 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel" data-step="country">
 						<h2><?php esc_html_e( 'Where does your agency operate?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'This sets your default country and currency defaults for Property Hive.', 'propertyhive' ); ?></p>
+						<p><?php esc_html_e( 'Choose your country and we\'ll set the right currency and regional settings for Property Hive.', 'propertyhive' ); ?></p>
 						<label class="ph-onboarding__field" data-validation-field="country">
 							<span><?php esc_html_e( 'Country', 'propertyhive' ); ?></span>
 							<select name="country" data-country-select required aria-describedby="ph-onboarding-error-country">
@@ -1234,7 +1236,7 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel" data-step="office">
 						<h2><?php esc_html_e( 'What are your office details?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'These details will be used for your primary office in Property Hive.', 'propertyhive' ); ?></p>
+						<p><?php esc_html_e( 'Tell us about your main office and we\'ll get it set up in Property Hive.', 'propertyhive' ); ?></p>
 						<?php if ( $address_lookup_enabled ) : ?>
 							<div class="ph-onboarding__address-lookup" data-address-lookup>
 								<label class="ph-onboarding__field ph-onboarding__field--wide">
@@ -1291,31 +1293,31 @@ class PH_Admin_Onboarding {
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="usage">
-						<h2><?php esc_html_e( 'How will you use Property Hive?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Pick every option that applies. This helps keep the admin area focused.', 'propertyhive' ); ?></p>
+						<h2><?php esc_html_e( 'What else do you need?', 'propertyhive' ); ?></h2>
+						<p><?php esc_html_e( 'You\'ve got the property website foundations. Now choose how else you\'d like to use Property Hive.', 'propertyhive' ); ?></p>
 						<div class="ph-onboarding__cards ph-onboarding__cards--usage" data-input-group="usage" data-validation-field="usage">
-							<?php $this->output_choice_card( 'usage', 'import_properties', __( 'Import properties', 'propertyhive' ), __( 'Bring listings in from another CRM or feed.', 'propertyhive' ), in_array( 'import_properties', $usage, true ), true ); ?>
+							<?php $this->output_choice_card( 'usage', 'import_properties', __( 'Import properties', 'propertyhive' ), __( 'Keep your website in sync with properties from your CRM.', 'propertyhive' ), in_array( 'import_properties', $usage, true ), true ); ?>
 							<?php $this->output_choice_card( 'usage', 'crm', __( 'Use it as a CRM', 'propertyhive' ), __( 'Manage contacts, appraisals, viewings, offers and tenancies.', 'propertyhive' ), in_array( 'crm', $usage, true ) ); ?>
-							<?php $this->output_choice_card( 'usage', 'portal_uploads', __( 'Upload to portals', 'propertyhive' ), __( 'Send property data to third-party portals.', 'propertyhive' ), in_array( 'portal_uploads', $usage, true ), true ); ?>
-							<?php $this->output_choice_card( 'usage', 'not_sure', __( 'Not sure yet', 'propertyhive' ), __( 'Keep exploring before deciding.', 'propertyhive' ), in_array( 'not_sure', $usage, true ) ); ?>
+							<?php $this->output_choice_card( 'usage', 'portal_uploads', __( 'Upload to portals', 'propertyhive' ), __( 'Automatically send your properties to third party portals.', 'propertyhive' ), in_array( 'portal_uploads', $usage, true ), true ); ?>
+							<?php $this->output_choice_card( 'usage', 'not_sure', __( 'Just the website for now', 'propertyhive' ), __( 'No problem. You can always choose later.', 'propertyhive' ), in_array( 'not_sure', $usage, true ) ); ?>
 						</div>
 						<?php $this->output_field_error( 'usage' ); ?>
 						<div class="ph-onboarding__pro-note">
 							<p>
-								<strong><?php esc_html_e( 'Importing properties and uploading to portals require a Pro subscription.', 'propertyhive' ); ?></strong>
-								<?php esc_html_e( 'Try every Pro feature free for 7 days.', 'propertyhive' ); ?>
+								<strong><?php esc_html_e( 'Pro features are included with our paid plans.', 'propertyhive' ); ?></strong>
+								<?php esc_html_e( 'You can try them free for 7 days.', 'propertyhive' ); ?>
 							</p>
 							<span class="ph-onboarding__pro-note-actions">
-								<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'trial-cta' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
-								<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'view-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+								<a class="button button-primary" href="<?php echo esc_url( $this->get_url( '/pricing', 'trial-cta' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+								<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_url( '/pricing', 'whats-included' ) ); ?>#compare" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'What\'s included?', 'propertyhive' ); ?></a>
 							</span>
 						</div>
 						<?php /*$this->output_settings_note( __( 'General > Modules', 'propertyhive' ) );*/ ?>
 					</section>
 
 					<section class="ph-onboarding__panel" data-step="license">
-						<h2><?php esc_html_e( 'Do you have a Pro license key?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Pro unlocks importing, portal uploads and premium add-ons. You can always add a key later.', 'propertyhive' ); ?></p>
+						<h2><?php esc_html_e( 'Do you have a Property Hive subscription?', 'propertyhive' ); ?></h2>
+						<?php /*<p><?php esc_html_e( 'If you already have a paid Property Hive plan, enter your licence key below. You can always add it later.', 'propertyhive' ); ?></p>*/ ?>
 
 						<?php if ( ! empty( $license_render_state['active'] ) ) : ?>
 							<input type="hidden" name="has_license_key" value="yes">
@@ -1327,24 +1329,24 @@ class PH_Admin_Onboarding {
 								<div class="ph-onboarding__pro-note">
 									<p>
 										<strong><?php esc_html_e( 'Try Property Hive Pro free for 7 days.', 'propertyhive' ); ?></strong>
-										<?php esc_html_e( 'Pro features need a Pro subscription.', 'propertyhive' ); ?>
+										<?php esc_html_e( 'Pro features need a subscription.', 'propertyhive' ); ?>
 									</p>
 									<span class="ph-onboarding__pro-note-actions">
-										<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
-										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+										<a class="button button-primary" href="<?php echo esc_url( $this->get_url( '/pricing', 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_url( '/pricing', 'license-step-whats-included' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
 									</span>
 								</div>
 							<?php endif; ?>
 						<?php else : ?>
 							<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="license-choice">
-								<?php $this->output_radio_card( 'has_license_key', 'yes', __( 'Yes, I have a key', 'propertyhive' ), __( 'Activate it now so Pro features are ready to use.', 'propertyhive' ), 'yes' === $has_license_key, false ); ?>
-								<?php $this->output_radio_card( 'has_license_key', 'no', __( 'Not yet', 'propertyhive' ), __( 'Keep going - you can start a free trial or add a key later.', 'propertyhive' ), 'no' === $has_license_key, false ); ?>
+								<?php $this->output_radio_card( 'has_license_key', 'yes', __( 'Yes, I already have a subscription', 'propertyhive' ), __( 'Enter your licence key to connect it to this site.', 'propertyhive' ), 'yes' === $has_license_key, false ); ?>
+								<?php $this->output_radio_card( 'has_license_key', 'no', __( 'No, not yet', 'propertyhive' ), __( 'That\'s fine. You can carry on with the free version.', 'propertyhive' ), 'no' === $has_license_key, false ); ?>
 							</div>
 
 							<div class="ph-onboarding__license-panel <?php echo 'yes' === $has_license_key ? 'is-open' : ''; ?>" data-license-panel="yes">
-								<div class="ph-onboarding__license-type" data-input-group="license-key-type">
+								<div class="ph-onboarding__license-type" data-input-group="license-key-type" style="display:none">
 									<label class="ph-onboarding__choice ph-onboarding__choice--compact">
-										<input type="radio" name="license_key_type" value="pro" <?php checked( 'pro', $license_key_type ); ?>>
+										<input type="radio" name="license_key_type" value="pro" checked <?php /*checked( 'pro', $license_key_type );*/ ?>>
 										<span class="ph-onboarding__choice-check" aria-hidden="true"></span>
 										<span class="ph-onboarding__choice-copy">
 											<strong><?php esc_html_e( 'Pro subscription key', 'propertyhive' ); ?></strong>
@@ -1367,7 +1369,7 @@ class PH_Admin_Onboarding {
 											<button type="button" class="button button-primary" data-license-activate><?php esc_html_e( 'Activate', 'propertyhive' ); ?></button>
 										</div>
 										<?php $this->output_field_error( 'license_key' ); ?>
-										<small><?php esc_html_e( 'Your key is in your purchase email and your wp-property-hive.com account.', 'propertyhive' ); ?></small>
+										<small><?php esc_html_e( 'You can find your license key in your order confirmation email or your account on the Property Hive website.', 'propertyhive' ); ?></small>
 									</div>
 								</div>
 
@@ -1378,12 +1380,12 @@ class PH_Admin_Onboarding {
 							<div class="ph-onboarding__license-panel <?php echo 'no' === $has_license_key ? 'is-open' : ''; ?>" data-license-panel="no">
 								<div class="ph-onboarding__pro-note">
 									<p>
-										<strong><?php esc_html_e( 'Try Property Hive Pro free for 7 days.', 'propertyhive' ); ?></strong>
-										<?php esc_html_e( 'Every Pro feature.', 'propertyhive' ); ?>
+										<strong><?php esc_html_e( 'Want to try the paid features?', 'propertyhive' ); ?></strong>
+										<?php esc_html_e( 'Try all Property Hive features free for 7 days.', 'propertyhive' ); ?>
 									</p>
 									<span class="ph-onboarding__pro-note-actions">
-										<a class="button button-primary" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
-										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_pricing_url( 'license-step-pricing' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'View pricing', 'propertyhive' ); ?></a>
+										<a class="button button-primary" href="<?php echo esc_url( $this->get_url( '/pricing', 'license-step-trial' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Start your free 7-day trial', 'propertyhive' ); ?></a>
+										<a class="ph-onboarding__pro-note-link" href="<?php echo esc_url( $this->get_url( '/pricing', 'license-step-whats-included' ) ); ?>#compare" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'What\'s included?', 'propertyhive' ); ?></a>
 									</span>
 								</div>
 							</div>
@@ -1394,11 +1396,11 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel" data-step="demo-data">
 						<h2><?php esc_html_e( 'Would you like to import demo data?', 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Demo data gives you sample properties and related records so you can see how Property Hive works before adding real listings.', 'propertyhive' ); ?></p>
+						<p><?php esc_html_e( 'Add sample properties, contacts and other data so you can explore how Property Hive works before using your own.', 'propertyhive' ); ?></p>
 
 						<div class="ph-onboarding__cards ph-onboarding__cards--radio" data-input-group="demo-data-choice" data-validation-field="demo_data_choice">
-							<?php $this->output_radio_card( 'demo_data_choice', 'no', __( 'No', 'propertyhive' ), __( 'I will add real properties and contacts myself.', 'propertyhive' ), 'no' === $demo_choice, false ); ?>
-							<?php $this->output_radio_card( 'demo_data_choice', 'yes', __( 'Yes', 'propertyhive' ), __( 'Add example records so I can explore the product first.', 'propertyhive' ), 'yes' === $demo_choice, ! $demo_active ); ?>
+							<?php $this->output_radio_card( 'demo_data_choice', 'no', __( 'No', 'propertyhive' ), __( 'Skip the demo data and use my own.', 'propertyhive' ), 'no' === $demo_choice, false ); ?>
+							<?php $this->output_radio_card( 'demo_data_choice', 'yes', __( 'Yes', 'propertyhive' ), __( 'Add example data so I can explore Property Hive first.', 'propertyhive' ), 'yes' === $demo_choice, ! $demo_active ); ?>
 						</div>
 						<?php $this->output_field_error( 'demo_data_choice' ); ?>
 
@@ -1417,7 +1419,7 @@ class PH_Admin_Onboarding {
 
 					<section class="ph-onboarding__panel" data-step="complete">
 						<h2><?php esc_html_e( "You're all set", 'propertyhive' ); ?></h2>
-						<p><?php esc_html_e( 'Property Hive is configured. Where would you like to start?', 'propertyhive' ); ?></p>
+						<p><?php esc_html_e( 'Property Hive is ready to go. What would you like to do next?', 'propertyhive' ); ?></p>
 
 						<?php /*if ( ! empty( $video_url ) ) : ?>
 							<div class="ph-onboarding__video">
@@ -1430,21 +1432,27 @@ class PH_Admin_Onboarding {
 						<?php endif;*/ ?>
 
 						<div class="ph-onboarding__exits">
+
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" <?php echo $import_feature_active ? '' : 'hidden'; ?>>
 								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Create a property import', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring listings in from your current CRM or feed', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring properties in from your CRM', 'propertyhive' ); ?></span>
+							</a>
+
+							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" <?php echo $import_feature_active ? '' : 'hidden'; ?>>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Create a property import', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Bring properties in from your CRM', 'propertyhive' ); ?></span>
 							</a>
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'edit.php?post_type=property' ) ); ?>" data-onboarding-exit data-exit="properties">
-								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Go to properties', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'View and manage properties', 'propertyhive' ); ?></span>
 								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Open the property list in the dashboard', 'propertyhive' ); ?></span>
 							</a>
-							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $site_preview_url ); ?>" data-onboarding-exit data-exit="site" <?php echo ! empty( $state['demo_data_imported'] ) ? '' : 'hidden'; ?>>
+							<?php /*<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $site_preview_url ); ?>" data-onboarding-exit data-exit="site" <?php echo ! empty( $state['demo_data_imported'] ) ? '' : 'hidden'; ?>>
 								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'See properties on your site', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'View the demo listings on your live site', 'propertyhive' ); ?></span>
-							</a>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'View the demo properties on your website', 'propertyhive' ); ?></span>
+							</a>*/ ?>
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=ph-settings' ) ); ?>" data-onboarding-exit data-exit="settings">
-								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Open settings', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Fine-tune everything you set up today', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Explore more settings', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'Take a look at your setup and make any changes', 'propertyhive' ); ?></span>
 							</a>
 						</div>
 					</section>
@@ -1461,7 +1469,7 @@ class PH_Admin_Onboarding {
 							<input type="checkbox" name="usage_tracking" value="yes" data-usage-tracking <?php checked( $usage_tracking ); ?>>
 							<span class="ph-onboarding__tracking-copy">
 								<strong><?php esc_html_e( 'Help improve Property Hive', 'propertyhive' ); ?></strong>
-								<small><?php esc_html_e( 'Share non-sensitive setup and feature usage data so we can improve the product. No personal, contact or property details are collected.', 'propertyhive' ); ?></small>
+								<small><?php esc_html_e( 'Share non-sensitive setup and feature usage data to help us improve Property Hive. We don\'t collect personal, contact or property details.', 'propertyhive' ); ?></small>
 							</span>
 						</label>
 					</div>
@@ -1544,7 +1552,7 @@ class PH_Admin_Onboarding {
 			<?php
 			printf(
 				/* translators: %s: settings location, for example General > International. */
-				esc_html__( "These can later be edited under 'Property Hive > Settings > %s'.", 'propertyhive' ),
+				esc_html__( "You can change this later under 'Property Hive > Settings > %s'.", 'propertyhive' ),
 				esc_html( $location )
 			);
 			?>
@@ -1571,7 +1579,7 @@ class PH_Admin_Onboarding {
 				'features_url'           => admin_url( 'admin.php?page=ph-settings&tab=features&profilter=free' ),
 				'import_features_url'    => admin_url( 'admin.php?page=ph-settings&tab=features&profilter=import' ),
 				'import_setup_url'       => admin_url( 'admin.php?page=propertyhive_import_properties' ),
-				'license_trial_url'      => $this->get_pricing_url( 'license-step-trial' ),
+				'license_trial_url'      => $this->get_url( '/pricing', 'license-step-trial' ),
 				'demo_data_active'       => $demo_active ? 'yes' : 'no',
 				'updates_nonce'          => wp_create_nonce( 'updates' ),
 				'can_install_plugins'    => current_user_can( 'install_plugins' ) ? 'yes' : 'no',
@@ -1580,8 +1588,6 @@ class PH_Admin_Onboarding {
 				'import_feature_active'  => $import_feature_active ? 'yes' : 'no',
 				'address_lookup_enabled' => ( function_exists( 'ph_is_development_environment' ) && ph_is_development_environment() && '' !== trim( (string) get_option( 'propertyhive_getaddress_api_key', '' ) ) ) ? 'yes' : 'no',
 				'address_lookup_nonce'   => wp_create_nonce( 'propertyhive_getaddress_lookup' ),
-				'import_url'             => $this->get_import_url(),
-				'export_url'             => $this->get_export_url(),
 				'demo_base_sections'     => array( 'applicant', 'property' ),
 				'demo_crm_sub_sections'  => apply_filters( 'propertyhive_onboarding_demo_crm_sub_sections', array( 'appraisal', 'viewing', 'offer', 'sale', 'tenancy', 'enquiry' ) ),
 				'i18n'                   => array(
@@ -1896,30 +1902,12 @@ class PH_Admin_Onboarding {
 	}
 
 	/**
-	 * Get import guidance URL.
-	 *
-	 * @return string
-	 */
-	private function get_import_url() {
-		return apply_filters( 'propertyhive_onboarding_import_url', 'https://docs.wp-property-hive.com/article/56-importing-properties' );
-	}
-
-	/**
-	 * Get export guidance URL.
-	 *
-	 * @return string
-	 */
-	private function get_export_url() {
-		return apply_filters( 'propertyhive_onboarding_export_url', 'https://docs.wp-property-hive.com/article/404-managing-portal-feeds' );
-	}
-
-	/**
 	 * Get pricing page URL.
 	 *
 	 * @param string $utm_content UTM content value identifying which link was clicked.
 	 * @return string
 	 */
-	private function get_pricing_url( $utm_content = '' ) {
+	private function get_url( $url, $utm_content = '' ) {
 		$args = array(
 			'src'          => 'plugin-onboarding',
 			'utm_source'   => 'propertyhive-plugin',
@@ -1931,9 +1919,9 @@ class PH_Admin_Onboarding {
 			$args['utm_content'] = $utm_content;
 		}
 
-		$url = add_query_arg( $args, 'https://wp-property-hive.com/pricing/' );
+		$url = add_query_arg( $args, 'https://wp-property-hive.com' . $url );
 
-		return apply_filters( 'propertyhive_onboarding_pricing_url', $url, $utm_content );
+		return apply_filters( 'propertyhive_onboarding_external_url', $url, $utm_content );
 	}
 }
 
