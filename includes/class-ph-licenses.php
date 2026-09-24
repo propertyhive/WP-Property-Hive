@@ -283,6 +283,13 @@ class PH_Licenses {
             		{
             			$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
             		}
+            		elseif ( 
+            			$options['format'] == 'rtdf' &&
+            			get_option( 'propertyhive_rtdf_crm', '' )  != ''
+            		)
+            		{
+            			$options['format'] .= ' (' . get_option( 'propertyhive_rtdf_crm', '' ) . ')';
+            		}
             		$formats[] = $options['format'];
             	}
 			}
