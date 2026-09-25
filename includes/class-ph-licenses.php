@@ -1171,11 +1171,11 @@ class PH_Licenses {
 					{
 						if ( isset($resource['product_id']) )
 						{
-							if ( in_array($resource['product_id'], array(14492, 14493, 14494)) )
+							if ( in_array($resource['product_id'], array(14492, 14493, 14494, 23794)) )
 							{
 								$package = 'import';
 							}
-							elseif ( in_array($resource['product_id'], array(14495, 14496, 14497)) )
+							elseif ( in_array($resource['product_id'], array(14495, 14496, 14497, 23792)) )
 							{
 								$package = 'complete';
 							}
