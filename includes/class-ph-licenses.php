@@ -360,6 +360,18 @@ class PH_Licenses {
 			if ( !empty($locrating_settings) && isset($locrating_settings['enabled']) )
 			{
 				$data['locrating_enabled'] = ( $locrating_settings['enabled'] == 1 ? $locrating_settings['enabled'] : 0 );
+			// Visi homes
+			if ( is_plugin_active( 'propertyhive-visihomes/propertyhive-visihomes.php' ) )
+			{
+				$visihomes_settings = get_option( 'propertyhive_visihomes', array() );
+				if ( 
+					!empty($visihomes_settings) && 
+					isset( $visihomes_settings['embed_code'] ) &&
+	            	!empty($visihomes_settings['embed_code']) 
+				)
+				{
+					$data['visihomes_enabled'] = 1;
+				}
 			}
 
 			// Search analytics
