@@ -195,6 +195,260 @@ class PH_Licenses {
 		return $license_type; // pro / old
 	}
 
+	/**
+	 * Get SHA-256 checksums for selected PHP files belonging to active
+	 * Property Hive plugins.
+	 *
+	 * Includes:
+	 * - PHP files directly within the plugin root.
+	 * - PHP files directly within the plugin's /includes directory.
+	 *
+	 * Does not scan subdirectories within /includes.
+	 *
+	 * @return array
+	 */
+	private function get_active_propertyhive_plugin_checksums()
+	{
+		if (
+			! class_exists( 'FilesystemIterator' ) ||
+			! function_exists( 'hash_file' )
+		) {
+			return array(
+				'_environment' => array(
+					'status' => 'unavailable',
+					'error'  => 'checksum_requirements_unavailable',
+				),
+			);
+		}
+
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$installed_plugins_raw = get_plugins();
+		$installed_plugins     = array();
+
+		/*
+		 * Normalise paths for consistency across Windows and Unix-like servers.
+		 */
+		foreach ( $installed_plugins_raw as $plugin_file => $plugin_data ) {
+			$installed_plugins[ wp_normalize_path( $plugin_file ) ] = $plugin_data;
+		}
+
+		$active_plugins = (array) get_option( 'active_plugins', array() );
+
+		/*
+		 * Include network-activated plugins on multisite.
+		 */
+		if ( is_multisite() ) {
+			$network_active_plugins = (array) get_site_option(
+				'active_sitewide_plugins',
+				array()
+			);
+
+			$active_plugins = array_merge(
+				$active_plugins,
+				array_keys( $network_active_plugins )
+			);
+		}
+
+		/*
+		 * Normalise and deduplicate active plugin paths.
+		 */
+		$normalised_active_plugins = array();
+
+		foreach ( $active_plugins as $plugin_file ) {
+			if ( ! is_string( $plugin_file ) || '' === $plugin_file ) {
+				continue;
+			}
+
+			$normalised_active_plugins[] = wp_normalize_path(
+				plugin_basename( $plugin_file )
+			);
+		}
+
+		$active_plugins = array_values(
+			array_unique( $normalised_active_plugins )
+		);
+
+		$plugin_checksums = array();
+
+		foreach ( $active_plugins as $plugin_file ) {
+			if ( ! isset( $installed_plugins[ $plugin_file ] ) ) {
+				continue;
+			}
+
+			$plugin_path_parts = explode( '/', $plugin_file );
+			$plugin_slug       = isset( $plugin_path_parts[0] )
+				? $plugin_path_parts[0]
+				: '';
+
+			if ( '' === $plugin_slug ) {
+				continue;
+			}
+
+			/*
+			 * Match Property Hive core and add-ons whose directory starts
+			 * with "propertyhive-".
+			 */
+			if (
+				'propertyhive' !== $plugin_slug &&
+				0 !== strpos( $plugin_slug, 'propertyhive-' )
+			) {
+				continue;
+			}
+
+			$plugin_root = wp_normalize_path(
+				trailingslashit( WP_PLUGIN_DIR ) . $plugin_slug
+			);
+
+			if ( ! is_dir( $plugin_root ) ) {
+				continue;
+			}
+
+			$directories_to_scan = array(
+				'plugin_root' => $plugin_root,
+			);
+
+			$includes_directory = wp_normalize_path(
+				trailingslashit( $plugin_root ) . 'includes'
+			);
+
+			if ( is_dir( $includes_directory ) ) {
+				$directories_to_scan['includes'] = $includes_directory;
+			}
+
+			$files_to_hash = array();
+			$scan_errors   = array();
+			$hash_errors   = array();
+
+			/*
+			 * Scan only the immediate contents of each directory.
+			 * FilesystemIterator does not recurse into subdirectories.
+			 */
+			foreach ( $directories_to_scan as $directory_type => $directory ) {
+				try {
+					$iterator = new FilesystemIterator(
+						$directory,
+						FilesystemIterator::SKIP_DOTS |
+						FilesystemIterator::CURRENT_AS_FILEINFO |
+						FilesystemIterator::KEY_AS_PATHNAME
+					);
+
+					foreach ( $iterator as $file_info ) {
+						if (
+							! $file_info instanceof SplFileInfo ||
+							! $file_info->isFile() ||
+							$file_info->isLink() ||
+							'php' !== strtolower( $file_info->getExtension() )
+						) {
+							continue;
+						}
+
+						/*
+						 * For the /includes directory, only include PHP files
+						 * relating to licensing, installation or AJAX.
+						 *
+						 * All root-level PHP files are still included.
+						 */
+						if (
+							'includes' === $directory_type &&
+							1 !== preg_match(
+								'/(?:licen[cs]e|install|ajax)/i',
+								$file_info->getFilename()
+							)
+						) {
+							continue;
+						}
+
+						$files_to_hash[] = wp_normalize_path(
+							$file_info->getPathname()
+						);
+					}
+				} catch ( Throwable $exception ) {
+					$scan_errors[] = $directory_type . '_scan_failed';
+				}
+			}
+
+			$files_to_hash = array_values(
+				array_unique( $files_to_hash )
+			);
+
+			sort( $files_to_hash, SORT_STRING );
+
+			$plugin_root_prefix = trailingslashit( $plugin_root );
+			$checksums          = array();
+
+			foreach ( $files_to_hash as $php_file ) {
+				if ( 0 !== strpos( $php_file, $plugin_root_prefix ) ) {
+					$scan_errors[] = 'file_outside_plugin_root';
+					continue;
+				}
+
+				$relative_path = substr(
+					$php_file,
+					strlen( $plugin_root_prefix )
+				);
+
+				$relative_path = wp_normalize_path( $relative_path );
+
+				if ( '' === $relative_path ) {
+					continue;
+				}
+
+				if (
+					! is_file( $php_file ) ||
+					! is_readable( $php_file )
+				) {
+					$hash_errors[] = $relative_path;
+					continue;
+				}
+
+				$checksum = hash_file( 'sha256', $php_file );
+
+				if ( false === $checksum ) {
+					$hash_errors[] = $relative_path;
+					continue;
+				}
+
+				$checksums[ $relative_path ] = $checksum;
+			}
+
+			ksort( $checksums, SORT_STRING );
+
+			$scan_errors = array_values(
+				array_unique( $scan_errors )
+			);
+
+			$hash_errors = array_values(
+				array_unique( $hash_errors )
+			);
+
+			sort( $scan_errors, SORT_STRING );
+			sort( $hash_errors, SORT_STRING );
+
+			$plugin_data = $installed_plugins[ $plugin_file ];
+
+			$plugin_checksums[ $plugin_slug ] = array(
+				'name'        => isset( $plugin_data['Name'] )
+					? sanitize_text_field( $plugin_data['Name'] )
+					: '',
+				'version'     => isset( $plugin_data['Version'] )
+					? sanitize_text_field( $plugin_data['Version'] )
+					: '',
+				'plugin_file' => $plugin_file,
+				'file_count'  => count( $checksums ),
+				'files'       => $checksums,
+				'hash_errors' => $hash_errors,
+				'scan_errors' => $scan_errors,
+			);
+		}
+
+		ksort( $plugin_checksums, SORT_STRING );
+
+		return $plugin_checksums;
+	}
+
 	private function get_data_for_license_check()
 	{
 		global $wpdb;
@@ -205,6 +459,23 @@ class PH_Licenses {
 		$data['license_key_type'] = $license_type;
 		$data['license_key'] = ( $license_type == 'old' ? get_option( 'propertyhive_license_key', '' ) : get_option( 'propertyhive_pro_license_key', '' ) );
 		$data['url']         = home_url();
+
+		/*
+		 * Integrity information is part of license validation and is therefore
+		 * collected independently of the optional usage/data-sharing setting.
+		 */
+		$plugin_integrity = array(
+			'schema_version' => 1,
+			'algorithm'      => 'sha256',
+			'plugins'        => $this->get_active_propertyhive_plugin_checksums(),
+		);
+
+		$plugin_integrity_json = wp_json_encode( $plugin_integrity );
+
+		if ( false !== $plugin_integrity_json ) 
+		{
+			$data['propertyhive_plugin_integrity'] = $plugin_integrity_json;
+		}
 
 		if ( get_option( 'propertyhive_data_sharing' ) != 'no' )
 		{
