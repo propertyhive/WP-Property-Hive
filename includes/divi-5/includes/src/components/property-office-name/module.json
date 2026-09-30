@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-office-name",
+  "d4Shortcode": "et_pb_property_office_name_widget",
   "title": "Office Name",
   "titles": "Office Name",
   "category": "module",

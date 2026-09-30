@@ -160,48 +160,85 @@ abstract class PropertyMetaModule {
     }
 
     protected static function get_icon_value( $attrs, $default = '' ) {
-        $value = $attrs['icon']['desktop']['value'] ?? $attrs['icon']['value'] ?? $attrs['icon'] ?? $default;
-
-        if ( is_array( $value ) ) {
-            return self::get_icon_raw_value( $value, $default );
-        }
-
-        return is_string( $value ) ? $value : $default;
+        return self::get_icon_raw_value( $attrs['icon'] ?? $default, $default );
     }
 
     protected static function get_icon_raw_value( $icon_attr, $default = '' ) {
         if ( is_string( $icon_attr ) ) {
-            return $icon_attr;
+            if ( '' === $icon_attr ) {
+                return $default;
+            }
+
+            $parts = explode( '||', $icon_attr );
+
+            return array(
+                'unicode' => $parts[0],
+                'type'    => static::normalize_icon_type( $parts[1] ?? 'divi' ),
+                'weight'  => (string) ( $parts[2] ?? '400' ),
+            );
         }
 
         if ( ! is_array( $icon_attr ) ) {
             return $default;
         }
 
+        if ( isset( $icon_attr['unicode'] ) && is_string( $icon_attr['unicode'] ) && '' !== $icon_attr['unicode'] ) {
+            $icon_attr['type']   = static::normalize_icon_type( $icon_attr['type'] ?? $icon_attr['fontFamily'] ?? 'divi' );
+            $icon_attr['weight'] = (string) ( $icon_attr['weight'] ?? $icon_attr['fontWeight'] ?? '400' );
+
+            return $icon_attr;
+        }
+
+        $nested_icon = $icon_attr['icon'] ?? $icon_attr['fontIcon'] ?? $icon_attr['value'] ?? $icon_attr['selectedIcon'] ?? null;
+        if ( is_string( $nested_icon ) && '' !== $nested_icon ) {
+            $normalized_icon = self::get_icon_raw_value( $nested_icon, $default );
+
+            if ( is_array( $normalized_icon ) ) {
+                $normalized_icon['type']   = static::normalize_icon_type( $icon_attr['type'] ?? $icon_attr['fontFamily'] ?? $normalized_icon['type'] );
+                $normalized_icon['weight'] = (string) ( $icon_attr['weight'] ?? $icon_attr['fontWeight'] ?? $normalized_icon['weight'] );
+            }
+
+            return $normalized_icon;
+        }
+
         $candidates = array(
+            $icon_attr['innerContent']['desktop']['value'] ?? null,
             $icon_attr['desktop']['value']['icon'] ?? null,
             $icon_attr['desktop']['value']['value'] ?? null,
-            $icon_attr['desktop']['value']['unicode'] ?? null,
             $icon_attr['desktop']['value'] ?? null,
             $icon_attr['value']['icon'] ?? null,
             $icon_attr['value']['value'] ?? null,
-            $icon_attr['value']['unicode'] ?? null,
             $icon_attr['value'] ?? null,
             $icon_attr['icon'] ?? null,
-            $icon_attr['unicode'] ?? null,
+            $icon_attr['fontIcon'] ?? null,
             $icon_attr['selectedIcon'] ?? null,
         );
 
         foreach ( $candidates as $candidate ) {
-            if ( is_string( $candidate ) && '' !== $candidate ) {
-                return $candidate;
+            $value = self::get_icon_raw_value( $candidate, '' );
+            if ( '' !== $value ) {
+                return $value;
             }
         }
 
         return $default;
     }
 
+    protected static function normalize_icon_type( $type ) {
+        $type = strtolower( (string) $type );
+
+        if ( '' === $type || 'etmodules' === $type ) {
+            return 'divi';
+        }
+
+        return false !== strpos( $type, 'fontawesome' ) ? 'fa' : $type;
+    }
+
     protected static function get_icon_font_family( $icon ) {
+        if ( is_array( $icon ) ) {
+            return ! empty( $icon['type'] ) && 'divi' !== $icon['type'] ? 'FontAwesome' : 'ETmodules';
+        }
+
         if ( ! is_string( $icon ) || '' === $icon || ! function_exists( 'et_pb_get_icon_font_family' ) ) {
             return '';
         }
@@ -210,13 +247,20 @@ abstract class PropertyMetaModule {
     }
 
     protected static function process_icon( $icon ) {
-        if ( ! is_string( $icon ) || '' === $icon ) {
+        if ( empty( $icon ) ) {
             return '';
         }
 
-        $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $icon ) : $icon;
+        if ( class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' ) ) {
+            $processed_icon = \ET\Builder\Packages\IconLibrary\IconFont\Utils::process_font_icon( $icon );
+        } else {
+            $legacy_icon    = is_array( $icon )
+                ? ( $icon['unicode'] ?? '' ) . '||' . ( $icon['type'] ?? 'divi' ) . '||' . ( $icon['weight'] ?? '400' )
+                : $icon;
+            $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $legacy_icon ) : $legacy_icon;
+        }
 
-        return html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' );
+        return is_string( $processed_icon ) ? html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' ) : '';
     }
 
     protected static function css_rule( $property, $value ) {
@@ -270,6 +314,10 @@ abstract class PropertyMetaModule {
         $font_family = static::get_icon_font_family( $icon );
         if ( '' !== $font_family ) {
             $style .= 'font-family:' . esc_attr( $font_family ) . ';';
+        }
+
+        if ( is_array( $icon ) && ! empty( $icon['weight'] ) ) {
+            $style .= 'font-weight:' . esc_attr( $icon['weight'] ) . ';';
         }
 
         return $style;

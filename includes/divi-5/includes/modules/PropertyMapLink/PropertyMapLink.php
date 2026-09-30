@@ -20,7 +20,27 @@ class PropertyMapLink extends PropertyContentModule implements DependencyInterfa
 
     protected static function get_output( $property, $attrs ) {
         if ( ! $property ) { return ''; }
-        $label = static::get_attr_value( $attrs, 'label', __( 'View Map', 'propertyhive' ) ); if ( ! empty( $property->latitude ) && ! empty( $property->longitude ) ) { return '<a href="https://www.google.com/maps/?q=' . (float)$property->latitude . ',' . (float)$property->longitude . '&ll=' . (float)$property->latitude . ',' . (float)$property->longitude . '" target="_blank" rel="nofollow">' . esc_html( $label ) . '</a>'; } return '';
+        if ( empty( $property->latitude ) || empty( $property->longitude ) ) { return ''; }
+
+        $label     = static::get_attr_value( $attrs, 'label', __( 'View Map', 'propertyhive' ) );
+        $link_type = static::get_attr_value( $attrs, 'mapLinkType', '_blank' );
+        $latitude  = (float) $property->latitude;
+        $longitude = (float) $property->longitude;
+
+        if ( 'embedded' === $link_type ) {
+            return '<a href="#map_lightbox" data-fancybox>' . esc_html( $label ) . '</a>'
+                . '<div id="map_lightbox" style="display:none;width:90%;max-width:800px;">'
+                . do_shortcode( '[property_map]' )
+                . '</div>';
+        }
+
+        if ( 'iframe' === $link_type ) {
+            $map_url = 'https://maps.google.com/?output=embed&f=q&q=' . $latitude . ',' . $longitude . '&ll=' . $latitude . ',' . $longitude . '&layer=t&hq=&t=m&z=15';
+            return '<a href="#" data-fancybox data-type="iframe" data-src="' . esc_url( $map_url ) . '">' . esc_html( $label ) . '</a>';
+        }
+
+        $map_url = 'https://www.google.com/maps/?q=' . $latitude . ',' . $longitude . '&ll=' . $latitude . ',' . $longitude;
+        return '<a href="' . esc_url( $map_url ) . '" target="_blank" rel="nofollow noopener">' . esc_html( $label ) . '</a>';
     }
 }
 

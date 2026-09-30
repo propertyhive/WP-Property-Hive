@@ -4,6 +4,7 @@ import ModulePreviewWrapper, {
   getRawIconAttrValue,
   processDiviIconAttr,
   getDiviIconFontFamily,
+  getDiviIconFontWeight,
   getFontDecorationStyle,
   getTextStyle,
   getCssSizeValue,
@@ -26,6 +27,7 @@ const createPropertyMetaPreview = ({
     const rawIcon = hasIcon ? getRawIconAttrValue(attrs?.icon, device, '') : '';
     const icon = hasIcon ? processDiviIconAttr(attrs?.icon, device, '') : '';
     const iconFontFamily = hasIcon ? getDiviIconFontFamily(attrs?.icon, device) : undefined;
+    const iconFontWeight = hasIcon ? getDiviIconFontWeight(attrs?.icon, device) : undefined;
     const before = getResponsiveAttrValue(attrs?.before, device, '');
     const after = getResponsiveAttrValue(
       attrs?.after?.innerContent || attrs?.after,
@@ -50,6 +52,7 @@ const createPropertyMetaPreview = ({
       ...(iconColor ? { color: iconColor } : {}),
       ...(iconSize ? { fontSize: iconSize } : {}),
       ...(iconFontFamily ? { fontFamily: iconFontFamily } : {}),
+      ...(iconFontWeight ? { fontWeight: iconFontWeight } : {}),
       verticalAlign: 'middle',
       marginRight: '7px',
     };

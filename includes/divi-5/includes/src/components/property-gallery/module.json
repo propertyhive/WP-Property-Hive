@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-gallery",
+  "d4Shortcode": "et_pb_property_gallery_widget",
   "title": "Property Gallery",
   "titles": "Property Gallery",
   "category": "module",

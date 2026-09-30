@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-image",
+  "d4Shortcode": "et_pb_property_image_widget",
   "title": "Property Image",
   "titles": "Property Image",
   "category": "module",

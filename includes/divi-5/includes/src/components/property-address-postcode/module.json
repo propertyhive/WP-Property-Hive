@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-address-postcode",
+  "d4Shortcode": "et_pb_property_address_postcode_widget",
   "title": "Property Address Postcode",
   "titles": "Property Address Postcode",
   "category": "module",

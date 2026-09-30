@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-let-available-date",
+  "d4Shortcode": "et_pb_property_let_available_date_widget",
   "title": "Property Let Available Date",
   "titles": "Property Let Available Date",
   "category": "module",
@@ -37,9 +38,9 @@
     "icon": {
       "type": "object",
       "default": {
-        "desktop": {
-          "value": {
-            "icon": ""
+        "innerContent": {
+          "desktop": {
+            "value": null
           }
         }
       },
@@ -50,7 +51,7 @@
             "groupSlug": "propertyLetAvailableDate",
             "priority": 10,
             "render": true,
-            "attrName": "icon",
+            "attrName": "icon.innerContent",
             "label": "Icon",
             "component": {
               "name": "divi/icon-picker",

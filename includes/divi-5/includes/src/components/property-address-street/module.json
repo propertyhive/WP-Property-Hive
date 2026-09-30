@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-address-street",
+  "d4Shortcode": "et_pb_property_address_street_widget",
   "title": "Property Address Street",
   "titles": "Property Address Street",
   "category": "module",

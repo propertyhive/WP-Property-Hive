@@ -247,31 +247,93 @@ export const getFontDecorationStyle = (attr = {}, device = 'desktop') => {
 };
 
 
+const normalizeIconType = (type = '') => {
+  const normalizedType = String(type).toLowerCase();
+
+  if (!normalizedType || normalizedType === 'etmodules') {
+    return 'divi';
+  }
+
+  if (normalizedType.includes('fontawesome')) {
+    return 'fa';
+  }
+
+  return normalizedType;
+};
+
+const normalizeIconValue = (value) => {
+  if (typeof value === 'string' && value !== '') {
+    const [unicode, type = 'divi', weight = '400'] = value.split('||');
+
+    return unicode
+      ? { unicode, type: normalizeIconType(type), weight: String(weight || '400') }
+      : null;
+  }
+
+  if (
+    value &&
+    typeof value === 'object' &&
+    typeof value.unicode === 'string' &&
+    value.unicode !== ''
+  ) {
+    return {
+      ...value,
+      type: normalizeIconType(value.type || value.fontFamily),
+      weight: String(value.weight || value.fontWeight || '400'),
+    };
+  }
+
+  if (value && typeof value === 'object') {
+    const nestedValue = value.icon || value.fontIcon || value.value || value.selectedIcon;
+
+    if (typeof nestedValue === 'string' && nestedValue !== '') {
+      const normalizedNestedValue = normalizeIconValue(nestedValue);
+
+      return {
+        ...normalizedNestedValue,
+        type: normalizeIconType(value.type || value.fontFamily || normalizedNestedValue.type),
+        weight: String(value.weight || value.fontWeight || normalizedNestedValue.weight || '400'),
+      };
+    }
+
+    if (nestedValue && nestedValue !== value) {
+      return normalizeIconValue(nestedValue);
+    }
+  }
+
+  return null;
+};
+
 export const getRawIconAttrValue = (attr, device = 'desktop', fallback = '') => {
-  const responsiveValue = getResponsiveAttrValue(attr, device, fallback);
+  const responsiveValue = getResponsiveAttrValue(
+    attr?.innerContent || attr,
+    device,
+    fallback
+  );
 
   const candidates = [
     responsiveValue,
+    attr?.innerContent?.[device]?.value,
+    attr?.innerContent?.desktop?.value,
     attr?.[device]?.value?.icon,
     attr?.[device]?.value?.value,
-    attr?.[device]?.value?.unicode,
     attr?.[device]?.value,
     attr?.desktop?.value?.icon,
     attr?.desktop?.value?.value,
-    attr?.desktop?.value?.unicode,
     attr?.desktop?.value,
     attr?.value?.icon,
     attr?.value?.value,
-    attr?.value?.unicode,
     attr?.value,
     attr?.icon,
-    attr?.unicode,
     attr?.selectedIcon,
+    attr,
   ];
 
   for (const candidate of candidates) {
-    if (typeof candidate === 'string' && candidate !== '') {
-      return candidate;
+    const icon = normalizeIconValue(candidate);
+
+    if (icon) {
+      return icon;
     }
   }
 
@@ -291,6 +353,12 @@ export const processDiviIconAttr = (attr, device = 'desktop', fallback = '') => 
     return processFontIcon(rawIcon) || fallback;
   }
 
+  if (typeof rawIcon === 'object' && rawIcon.unicode) {
+    const decoder = document.createElement('textarea');
+    decoder.innerHTML = rawIcon.unicode;
+    return decoder.value || fallback;
+  }
+
   return rawIcon;
 };
 
@@ -303,6 +371,14 @@ export const getDiviIconFontFamily = (attr, device = 'desktop') => {
   }
 
   return undefined;
+};
+
+export const getDiviIconFontWeight = (attr, device = 'desktop') => {
+  const rawIcon = getRawIconAttrValue(attr, device, '');
+
+  return rawIcon && typeof rawIcon === 'object' && rawIcon.weight
+    ? rawIcon.weight
+    : undefined;
 };
 
 export const getModuleStyle = (

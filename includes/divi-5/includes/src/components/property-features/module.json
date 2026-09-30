@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-features",
+  "d4Shortcode": "et_pb_property_features_widget",
   "title": "Property Features",
   "titles": "Property Features",
   "category": "module",
@@ -237,8 +238,10 @@
     "bulletIcon": {
       "type": "object",
       "default": {
-        "desktop": {
-          "value": null
+        "innerContent": {
+          "desktop": {
+            "value": null
+          }
         }
       },
       "settings": {
@@ -248,7 +251,7 @@
             "groupSlug": "propertyFeatures",
             "priority": 70,
             "render": true,
-            "attrName": "bulletIcon",
+            "attrName": "bulletIcon.innerContent",
             "label": "Bullet Icon",
             "component": {
               "name": "divi/icon-picker",

@@ -19,10 +19,14 @@ class PropertyFeatures extends PropertyContentModule implements DependencyInterf
     public function load() { add_action( 'init', [ self::class, 'register_module' ] ); }
 
     private static function get_icon_value( $attrs, $name, $default = '' ) {
-        $value = $attrs[ $name ]['desktop']['value'] ?? $default;
+        $value = $attrs[ $name ]['innerContent']['desktop']['value'] ?? $attrs[ $name ]['desktop']['value'] ?? $default;
 
         if ( is_array( $value ) ) {
-            return $value['icon'] ?? $value['value'] ?? $value['unicode'] ?? $default;
+            if ( ! empty( $value['unicode'] ) ) {
+                return $value;
+            }
+
+            return $value['icon'] ?? $value['value'] ?? $default;
         }
 
         return $value;
@@ -52,18 +56,24 @@ class PropertyFeatures extends PropertyContentModule implements DependencyInterf
         $ul_style = 'columns:' . $columns . ';';
 
         if ( 'icon' === $bullet_type ) {
-            $icon_attr = $attrs['bulletIcon']['desktop']['value'] ?? '';
-            if ( is_array( $icon_attr ) ) {
-                $icon_attr = $icon_attr['icon'] ?? $icon_attr['value'] ?? $icon_attr['unicode'] ?? '';
-            }
+            $icon_attr = static::get_icon_value( $attrs, 'bulletIcon', '' );
             $processed_icon = '';
-            if ( '' !== $icon_attr ) {
-                $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $icon_attr ) : $icon_attr;
+            if ( ! empty( $icon_attr ) ) {
+                if ( class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' ) ) {
+                    $processed_icon = \ET\Builder\Packages\IconLibrary\IconFont\Utils::process_font_icon( $icon_attr );
+                } else {
+                    $legacy_icon    = is_array( $icon_attr ) ? ( $icon_attr['unicode'] ?? '' ) : $icon_attr;
+                    $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $legacy_icon ) : $legacy_icon;
+                }
             }
             if ( '' === $processed_icon ) { $processed_icon = '✓'; }
 
             $ul_style .= 'list-style:none;padding-left:0;';
             $icon_style = 'display:inline-block;margin-right:8px;line-height:1;font-size:1em;';
+            if ( is_array( $icon_attr ) ) {
+                $icon_style .= 'font-family:' . ( ! empty( $icon_attr['type'] ) && 'divi' !== $icon_attr['type'] ? 'FontAwesome' : 'ETmodules' ) . ';';
+                if ( ! empty( $icon_attr['weight'] ) ) { $icon_style .= 'font-weight:' . absint( $icon_attr['weight'] ) . ';'; }
+            }
             if ( '' !== $bullet_color ) { $icon_style .= 'color:' . esc_attr( $bullet_color ) . ';'; }
             $icon_html = '<span class="et-pb-icon ph-feature-icon" aria-hidden="true" style="' . esc_attr( $icon_style ) . '">' . html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' ) . '</span>';
             $output = preg_replace( '/<li([^>]*)>/i', '<li$1 style="break-inside:avoid;margin-bottom:6px;">' . $icon_html, $output );

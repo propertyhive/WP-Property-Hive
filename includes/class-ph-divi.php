@@ -19,7 +19,98 @@ class PH_Divi {
 
         add_action( 'wp_enqueue_scripts', array( $this, 'propertyhive_enqueue_divi5_frontend_assets' ) );
 
+        add_action( 'admin_notices', array( $this, 'propertyhive_divi5_migration_notice' ) );
+
 	    add_action( 'et_builder_ready', array( $this, 'register_widgets' ) );
+	}
+
+	/**
+	 * Determine whether any current content still contains a Property Hive
+	 * Divi 4 module shortcode.
+	 *
+	 * @return bool
+	 */
+	private function has_legacy_divi_modules()
+	{
+		global $wpdb;
+
+		$shortcode_prefix = '%' . $wpdb->esc_like( '[et_pb_property_' ) . '%';
+		$post_types = array( 'page', 'post', 'project', 'et_pb_layout' );
+
+		foreach (
+			array(
+				'ET_THEME_BUILDER_HEADER_LAYOUT_POST_TYPE',
+				'ET_THEME_BUILDER_BODY_LAYOUT_POST_TYPE',
+				'ET_THEME_BUILDER_FOOTER_LAYOUT_POST_TYPE',
+			) as $post_type_constant
+		) {
+			if ( defined( $post_type_constant ) ) {
+				$post_types[] = constant( $post_type_constant );
+			}
+		}
+
+		if ( function_exists( 'et_builder_get_enabled_builder_post_types' ) ) {
+			$post_types = array_merge( $post_types, et_builder_get_enabled_builder_post_types() );
+		}
+
+		$post_types        = array_values( array_unique( array_filter( $post_types ) ) );
+		$post_placeholders = implode( ', ', array_fill( 0, count( $post_types ), '%s' ) );
+		$query_parameters  = array_merge( array( $shortcode_prefix ), $post_types );
+		$post_id = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT ID
+				FROM {$wpdb->posts}
+				WHERE post_content LIKE %s
+				AND post_status = 'publish'
+				AND post_type IN ( {$post_placeholders} )
+				LIMIT 1",
+				$query_parameters
+			)
+		);
+
+		$has_legacy_modules = ! empty( $post_id );
+
+		return $has_legacy_modules;
+	}
+
+	/**
+	 * Prompt administrators to migrate stored Property Hive Divi 4 modules.
+	 */
+	public function propertyhive_divi5_migration_notice()
+	{
+		$migration_complete = function_exists( 'et_get_option' )
+			&& et_get_option( 'et_d5_readiness_conversion_finished', false );
+
+		if (
+			! current_user_can( 'manage_options' )
+			|| ! function_exists( 'et_builder_d5_enabled' )
+			|| ! et_builder_d5_enabled()
+			|| $migration_complete
+			|| ! $this->has_legacy_divi_modules()
+		) {
+			return;
+		}
+
+		$migration_url = add_query_arg(
+			'page',
+			'et_d5_readiness',
+			admin_url( 'admin.php' )
+		);
+		?>
+		<div class="notice notice-warning">
+			<p>
+				<strong><?php esc_html_e( 'Property Hive: Divi 5 migration required', 'propertyhive' ); ?></strong>
+			</p>
+			<p>
+				<?php esc_html_e( 'Property Hive has detected legacy Divi 4 modules in your layouts. These modules must be migrated before they will display correctly with Divi 5.', 'propertyhive' ); ?>
+			</p>
+			<p>
+				<a class="button button-primary" href="<?php echo esc_url( $migration_url ); ?>">
+					<?php esc_html_e( 'Review Divi 5 Migration', 'propertyhive' ); ?>
+				</a>
+			</p>
+		</div>
+		<?php
 	}
 
 	public function propertyhive_enqueue_divi5_vb_assets() 
@@ -73,6 +164,7 @@ class PH_Divi {
 	{
 		if (
 	        function_exists( 'et_builder_d5_enabled' )
+	        && et_builder_d5_enabled()
 	    ) {
 	        return;
 	    }
