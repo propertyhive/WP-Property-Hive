@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-map-link",
+  "d4Shortcode": "et_pb_property_map_link_widget",
   "title": "Property Map Link",
   "titles": "Property Map Link",
   "category": "module",
@@ -151,6 +152,49 @@
         }
       }
     },
+    "mapLinkType": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": "_blank"
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyMapLink",
+            "priority": 10,
+            "render": true,
+            "attrName": "mapLinkType",
+            "label": "Link Type",
+            "component": {
+              "name": "divi/select",
+              "type": "field",
+              "props": {
+                "options": {
+                  "_blank": {
+                    "label": "Open map in new window"
+                  },
+                  "embedded": {
+                    "label": "Open embedded map in lightbox"
+                  },
+                  "iframe": {
+                    "label": "Open iframe map in lightbox"
+                  }
+                }
+              }
+            },
+            "features": {
+              "sticky": false,
+              "responsive": false,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
     "label": {
       "type": "object",
       "default": {
@@ -165,7 +209,7 @@
           "groupType": "group-item",
           "item": {
             "groupSlug": "propertyMapLink",
-            "priority": 10,
+            "priority": 20,
             "render": true,
             "attrName": "label.innerContent",
             "label": "Label",

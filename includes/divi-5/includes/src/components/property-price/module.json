@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-price",
+  "d4Shortcode": "et_pb_property_price_widget",
   "title": "Property Price",
   "titles": "Property Price",
   "category": "module",
@@ -37,9 +38,9 @@
     "icon": {
       "type": "object",
       "default": {
-        "desktop": {
-          "value": {
-            "icon": ""
+        "innerContent": {
+          "desktop": {
+            "value": null
           }
         }
       },
@@ -50,7 +51,7 @@
             "groupSlug": "propertyPrice",
             "priority": 10,
             "render": true,
-            "attrName": "icon",
+            "attrName": "icon.innerContent",
             "label": "Icon",
             "component": {
               "name": "divi/icon-picker",

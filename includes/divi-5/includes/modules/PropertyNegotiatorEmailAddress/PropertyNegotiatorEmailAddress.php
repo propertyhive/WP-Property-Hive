@@ -22,7 +22,9 @@ class PropertyNegotiatorEmailAddress extends PropertyContentModule implements De
         if ( ! $property ) { return ''; }
         $user = static::get_negotiator_user( $property );
         $v = $user ? $user->user_email : ( $property->negotiator_email_address ?? '' );
-        return $v ? '<a href="mailto:' . esc_attr( $v ) . '">' . esc_html( $v ) . '</a>' : '';
+        if ( ! $v ) { return ''; }
+        if ( 'no' === static::get_attr_value( $attrs, 'hyperlink', 'yes' ) ) { return esc_html( $v ); }
+        return '<a href="mailto:' . esc_attr( $v ) . '">' . esc_html( $v ) . '</a>';
     }
 }
 

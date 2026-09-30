@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-negotiator-telephone-number",
+  "d4Shortcode": "et_pb_property_negotiator_telephone_number_widget",
   "title": "Negotiator Telephone Number",
   "titles": "Negotiator Telephone Number",
   "category": "module",
@@ -116,6 +117,46 @@
                   }
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "hyperlink": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": "yes"
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyNegotiatorTelephoneNumber",
+            "priority": 10,
+            "render": true,
+            "attrName": "hyperlink",
+            "label": "Hyperlink",
+            "component": {
+              "name": "divi/select",
+              "type": "field",
+              "props": {
+                "options": {
+                  "yes": {
+                    "label": "Yes"
+                  },
+                  "no": {
+                    "label": "No"
+                  }
+                }
+              }
+            },
+            "features": {
+              "sticky": false,
+              "responsive": false,
+              "hover": false,
+              "dynamicContent": false
             }
           }
         }

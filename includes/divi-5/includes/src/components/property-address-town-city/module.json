@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-address-town-city",
+  "d4Shortcode": "et_pb_property_address_town_city_widget",
   "title": "Property Address Town/City",
   "titles": "Property Address Town/City",
   "category": "module",

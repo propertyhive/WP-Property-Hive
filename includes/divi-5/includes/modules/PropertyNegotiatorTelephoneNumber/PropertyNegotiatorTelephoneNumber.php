@@ -28,7 +28,9 @@ class PropertyNegotiatorTelephoneNumber extends PropertyContentModule implements
             if ( '' === $v ) { $v = get_user_meta( $user->ID, 'billing_phone', true ); }
         }
         if ( '' === $v ) { $v = $property->negotiator_telephone_number ?? ''; }
-        return $v ? '<a href="tel:' . esc_attr( $v ) . '">' . esc_html( $v ) . '</a>' : '';
+        if ( ! $v ) { return ''; }
+        if ( 'no' === static::get_attr_value( $attrs, 'hyperlink', 'yes' ) ) { return esc_html( $v ); }
+        return '<a href="tel:' . esc_attr( $v ) . '">' . esc_html( $v ) . '</a>';
     }
 }
 

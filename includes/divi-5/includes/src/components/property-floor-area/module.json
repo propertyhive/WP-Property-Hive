@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-floor-area",
+  "d4Shortcode": "et_pb_property_floor_area_widget",
   "title": "Property Floor Area",
   "titles": "Property Floor Area",
   "category": "module",
@@ -31,6 +32,103 @@
           "disabledOn": {},
           "position": {},
           "zIndex": {}
+        }
+      }
+    },
+    "icon": {
+      "type": "object",
+      "default": {
+        "innerContent": {
+          "desktop": {
+            "value": null
+          }
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyFloorArea",
+            "priority": 10,
+            "render": true,
+            "attrName": "icon.innerContent",
+            "label": "Icon",
+            "component": {
+              "name": "divi/icon-picker",
+              "type": "field"
+            },
+            "description": "Shown before the floor area.",
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "before": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": ""
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyFloorArea",
+            "priority": 20,
+            "render": true,
+            "attrName": "before",
+            "label": "Before",
+            "component": {
+              "name": "divi/text",
+              "type": "field"
+            },
+            "description": "Text shown before the floor area.",
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "after": {
+      "type": "object",
+      "default": {
+        "innerContent": {
+          "desktop": {
+            "value": ""
+          }
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyFloorArea",
+            "priority": 30,
+            "render": true,
+            "attrName": "after.innerContent",
+            "label": "After",
+            "component": {
+              "name": "divi/text",
+              "type": "field"
+            },
+            "description": "Text shown after the floor area.",
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
         }
       }
     },
@@ -140,6 +238,77 @@
             "component": {
               "name": "divi/color-picker",
               "type": "field"
+            },
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "iconColor": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": ""
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyFloorAreaStyle",
+            "priority": 60,
+            "render": true,
+            "attrName": "iconColor",
+            "label": "Icon Colour",
+            "component": {
+              "name": "divi/color-picker",
+              "type": "field"
+            },
+            "features": {
+              "sticky": false,
+              "responsive": true,
+              "hover": false,
+              "dynamicContent": false
+            }
+          }
+        }
+      }
+    },
+    "iconSize": {
+      "type": "object",
+      "default": {
+        "desktop": {
+          "value": "24px"
+        }
+      },
+      "settings": {
+        "innerContent": {
+          "groupType": "group-item",
+          "item": {
+            "groupSlug": "propertyFloorAreaStyle",
+            "priority": 70,
+            "render": true,
+            "attrName": "iconSize",
+            "label": "Icon Size",
+            "component": {
+              "name": "divi/range",
+              "type": "field",
+              "props": {
+                "allowedUnits": [
+                  "px",
+                  "em",
+                  "rem",
+                  "%",
+                  "vw",
+                  "vh"
+                ],
+                "defaultUnit": "px"
+              }
             },
             "features": {
               "sticky": false,

@@ -6,6 +6,8 @@ import ModulePreviewWrapper, {
   getCssSizeValue,
   usePreviewDevice,
   processDiviIconAttr,
+  getDiviIconFontFamily,
+  getDiviIconFontWeight,
 } from '../ModulePreviewWrapper';
 
 const imagePlaceholderStyle = {
@@ -154,12 +156,14 @@ const PreviewPlaceholder = ({ kind, attrs, device, sampleValue }) => {
     const columns = getResponsiveAttrValue(attrs?.columns, device, '1');
     const listStyleType = bulletType === 'square' ? 'square' : 'disc';
     const icon = processDiviIconAttr(attrs?.bulletIcon, device) || '✓';
+    const iconFontFamily = getDiviIconFontFamily(attrs?.bulletIcon, device);
+    const iconFontWeight = getDiviIconFontWeight(attrs?.bulletIcon, device);
 
     return (
       <ul style={{ columnCount: columns || 1, listStyleType: bulletType === 'icon' ? 'none' : listStyleType, paddingLeft: bulletType === 'icon' ? 0 : undefined }}>
         {['Feature one', 'Feature two', 'Feature three'].map((item) => (
           <li key={item} style={{ breakInside: 'avoid', color: bulletType === 'icon' ? undefined : (bulletColor || undefined), marginBottom: '6px' }}>
-            {bulletType === 'icon' && <span className="et-pb-icon" style={{ marginRight: '8px', color: bulletColor || undefined, fontSize: '1em', lineHeight: 1 }}>{icon}</span>}
+            {bulletType === 'icon' && <span className="et-pb-icon" style={{ marginRight: '8px', color: bulletColor || undefined, fontSize: '1em', lineHeight: 1, fontFamily: iconFontFamily, fontWeight: iconFontWeight }}>{icon}</span>}
             {item}
           </li>
         ))}

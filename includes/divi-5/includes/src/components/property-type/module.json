@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-type",
+  "d4Shortcode": "et_pb_property_type_widget",
   "title": "Property Type",
   "titles": "Property Type",
   "category": "module",
@@ -37,9 +38,9 @@
     "icon": {
       "type": "object",
       "default": {
-        "desktop": {
-          "value": {
-            "icon": ""
+        "innerContent": {
+          "desktop": {
+            "value": null
           }
         }
       },
@@ -50,7 +51,7 @@
             "groupSlug": "propertyType",
             "priority": 10,
             "render": true,
-            "attrName": "icon",
+            "attrName": "icon.innerContent",
             "label": "Icon",
             "component": {
               "name": "divi/icon-picker",

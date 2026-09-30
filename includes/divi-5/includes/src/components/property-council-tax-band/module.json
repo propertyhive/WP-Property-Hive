@@ -1,5 +1,6 @@
 {
   "name": "propertyhive/property-council-tax-band",
+  "d4Shortcode": "et_pb_property_council_tax_band_widget",
   "title": "Property Council Tax Band",
   "titles": "Property Council Tax Band",
   "category": "module",
@@ -37,9 +38,9 @@
     "icon": {
       "type": "object",
       "default": {
-        "desktop": {
-          "value": {
-            "icon": ""
+        "innerContent": {
+          "desktop": {
+            "value": null
           }
         }
       },
@@ -50,7 +51,7 @@
             "groupSlug": "propertyCouncilTaxBand",
             "priority": 10,
             "render": true,
-            "attrName": "icon",
+            "attrName": "icon.innerContent",
             "label": "Icon",
             "component": {
               "name": "divi/icon-picker",
