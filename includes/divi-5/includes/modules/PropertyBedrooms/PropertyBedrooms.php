@@ -17,7 +17,7 @@ class PropertyBedrooms extends PropertyMetaModule implements DependencyInterface
     const OUTPUT_CLASS = 'propertyhive-divi5-property-bedrooms';
     const TEXT_ATTR = 'bedroomsText';
     const HAS_ICON = true;
-    const DEFAULT_AFTER = 'bedrooms';
+    const DEFAULT_AFTER = '';
 
     public function load() {
         add_action( 'init', [ self::class, 'register_module' ] );

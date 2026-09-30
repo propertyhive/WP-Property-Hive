@@ -6,6 +6,6 @@ registerPropertyMetaModule(metadata, {
   outputClassName: 'propertyhive-divi5-property-bedrooms',
   textAttrName: 'bedroomsText',
   sampleValue: '3',
-  defaultAfter: 'bedrooms',
+  defaultAfter: '',
   hasIcon: true,
 });

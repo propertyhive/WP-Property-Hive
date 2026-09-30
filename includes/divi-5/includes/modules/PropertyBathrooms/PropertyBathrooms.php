@@ -17,7 +17,7 @@ class PropertyBathrooms extends PropertyMetaModule implements DependencyInterfac
     const OUTPUT_CLASS = 'propertyhive-divi5-property-bathrooms';
     const TEXT_ATTR = 'bathroomsText';
     const HAS_ICON = true;
-    const DEFAULT_AFTER = 'bathrooms';
+    const DEFAULT_AFTER = '';
 
     public function load() {
         add_action( 'init', [ self::class, 'register_module' ] );
