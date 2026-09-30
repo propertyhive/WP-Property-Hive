@@ -57,6 +57,7 @@ const createPropertyMetaPreview = ({
     return (
       <ModulePreviewWrapper
         attrs={attrs}
+        moduleProps={props}
         device={device}
         className={moduleClassName}
       >

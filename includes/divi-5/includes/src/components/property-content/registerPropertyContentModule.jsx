@@ -189,7 +189,7 @@ const createPropertyContentPreview = ({ moduleClassName, outputClassName, textAt
     const hideTitle = getResponsiveAttrValue(attrs?.hideTitle, device, 'no') === 'yes';
 
     return (
-      <ModulePreviewWrapper attrs={attrs} device={device} className={moduleClassName}>
+      <ModulePreviewWrapper attrs={attrs} moduleProps={props} device={device} className={moduleClassName}>
         <div className={outputClassName} style={textStyle}>
           {titleLabel && !hideTitle && <h4>{titleLabel}</h4>}
           <PreviewPlaceholder kind={previewKind} attrs={attrs} device={device} sampleValue={displayValue} />

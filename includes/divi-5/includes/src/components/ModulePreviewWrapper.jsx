@@ -383,23 +383,44 @@ export const getModuleStyle = (
 
 export default function ModulePreviewWrapper({
   attrs,
+  moduleProps = {},
   device = 'desktop',
   className = '',
   children,
 }) {
+  const ModuleContainer = window?.divi?.module?.ModuleContainer;
   const style = getModuleStyle(
     attrs,
     device
   );
+
+  const content = (
+    <div className="et_pb_module_inner">
+      {children}
+    </div>
+  );
+
+  if (ModuleContainer) {
+    return (
+      <ModuleContainer
+        attrs={attrs}
+        elements={moduleProps.elements}
+        id={moduleProps.id}
+        name={moduleProps.name}
+        moduleClassName={className}
+        htmlAttrs={{ style }}
+      >
+        {content}
+      </ModuleContainer>
+    );
+  }
 
   return (
     <div
       className={className}
       style={style}
     >
-      <div className="et_pb_module_inner">
-        {children}
-      </div>
+      {content}
     </div>
   );
 }
