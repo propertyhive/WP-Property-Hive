@@ -111,6 +111,7 @@ const Preview = (props) => {
   return (
     <ModulePreviewWrapper
       attrs={attrs}
+      moduleProps={props}
       device={device}
       className="propertyhive_divi5_property_actions"
     >
