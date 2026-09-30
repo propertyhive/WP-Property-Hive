@@ -17,7 +17,7 @@ class PropertyReceptionRooms extends PropertyMetaModule implements DependencyInt
     const OUTPUT_CLASS = 'propertyhive-divi5-property-reception-rooms';
     const TEXT_ATTR = 'receptionRoomsText';
     const HAS_ICON = true;
-    const DEFAULT_AFTER = 'reception rooms';
+    const DEFAULT_AFTER = '';
 
     public function load() {
         add_action( 'init', [ self::class, 'register_module' ] );

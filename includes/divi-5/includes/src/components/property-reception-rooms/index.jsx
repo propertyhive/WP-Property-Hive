@@ -6,6 +6,6 @@ registerPropertyMetaModule(metadata, {
   outputClassName: 'propertyhive-divi5-property-reception-rooms',
   textAttrName: 'receptionRoomsText',
   sampleValue: '1',
-  defaultAfter: 'reception rooms',
+  defaultAfter: '',
   hasIcon: true,
 });
