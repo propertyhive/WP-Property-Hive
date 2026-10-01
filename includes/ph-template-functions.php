@@ -1984,7 +1984,7 @@ function template_assistant_search_result_image_size_changes( $image_size )
     return $image_size;
 }
 
-add_action( 'wp', 'template_assistant_search_result_field_changes' );
+add_action( 'wp_loaded', 'template_assistant_search_result_field_changes' );
 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_search_result_field_changes; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_search_result_field_changes()
 {
