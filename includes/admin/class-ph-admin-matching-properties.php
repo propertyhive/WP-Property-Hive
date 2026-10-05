@@ -341,6 +341,7 @@ class PH_Admin_Matching_Properties {
 
             $args = array(
                 'post_type' => 'property',
+                'post_status' => 'publish',
                 'nopaging' => true,
                 'fields' => 'ids',
                 // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Exclude this contact's explicitly dismissed properties before applying existing matching and extension query conditions.
@@ -740,6 +741,8 @@ class PH_Admin_Matching_Properties {
 
             $args = apply_filters( 'propertyhive_matching_properties_args', $args, $contact_id, $applicant_profile );
 
+            // Preserve the ID-only return contract even if a query filter changes fields.
+            $args['fields'] = 'ids';
             $properties_query = new WP_Query( $args );
 
             if ( $properties_query->have_posts() )
