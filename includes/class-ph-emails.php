@@ -557,7 +557,7 @@ class PH_Emails {
 		$request_get = wp_unslash( $_GET );
 		$dry_run = null === $batch ? isset( $request_get['dry_run'] ) : !empty( $batch['dry_run'] );
 		// Evaluate once per batch so the query limit and completion check always agree.
-		$batch_size = null === $batch ? 50 : max( 1, (int) apply_filters( 'propertyhive_auto_email_match_batch_size', 50 ) );
+		$batch_size = null === $batch ? 100 : max( 1, (int) apply_filters( 'propertyhive_auto_email_match_batch_size', 100 ) );
 		if ( $dry_run && null !== $batch ) { echo esc_html( 'Batch preview: first ' . $batch_size . ' eligible contacts only. Live progress is unchanged.' ) . "<br>\n"; }
 
 		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
