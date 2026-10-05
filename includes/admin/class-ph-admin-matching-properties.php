@@ -320,8 +320,6 @@ class PH_Admin_Matching_Properties {
 
 	public function get_matching_properties( $contact_id, $applicant_profile_id, $date_added_from = '' )
 	{
-		global $post;
-
 		$properties = array();
 
         $contact = get_post($contact_id);
@@ -745,16 +743,8 @@ class PH_Admin_Matching_Properties {
             $args['fields'] = 'ids';
             $properties_query = new WP_Query( $args );
 
-            if ( $properties_query->have_posts() )
-            {
-                while ( $properties_query->have_posts() )
-                {
-                    $properties_query->the_post();
-
-                    $properties[] = $post->ID;
-                }
-            }
-            wp_reset_postdata();
+            // Read IDs directly; the_post() handles ID-only results differently across WP versions.
+            $properties = array_map( 'intval', $properties_query->posts );
         }
 
         return $properties;
