@@ -609,9 +609,9 @@ class PH_Emails {
 							$new_matching_properties = array();
 							foreach ($matching_properties as $matching_property)
 							{
-								if ( !isset($already_sent_properties[$matching_property->id]) && !in_array($matching_property->id, $dismissed_properties) )
+								if ( !isset($already_sent_properties[$matching_property]) && !in_array($matching_property, $dismissed_properties) )
 								{
-									$new_matching_properties[] = $matching_property->id;
+									$new_matching_properties[] = $matching_property;
 								}
 							}
 

@@ -341,8 +341,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <?php
 				// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
-				foreach ( $properties as $property )
+				foreach ( $properties as $property_id )
 				{
+                    $property = new PH_Property((int)$property_id);
+
 					// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
 					$previously_sent = array();
 					if ( isset($applicant_profile_match_history[$property->id]) && is_array($applicant_profile_match_history[$property->id]) && !empty($applicant_profile_match_history[$property->id]) )
