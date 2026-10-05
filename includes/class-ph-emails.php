@@ -567,8 +567,17 @@ class PH_Emails {
 							{
 								if ( $dry_run === true ) { echo 'Already sent properties before: ' . esc_html( wp_json_encode( $already_sent_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
+								$matching_property_lookup = array_fill_keys($matching_properties, true);
+
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
+									if ( !isset($matching_property_lookup[$already_sent_property_id]) )
+								    {
+								    	if ( $dry_run === true ) { echo 'Already sent property no longer in matched list. Skipping checks for on market and price changes.' . "<br>\n"; }
+
+								        continue;
+								    }
+
 									$highest_send = $sends[count($sends) - 1]['date'];
 
 									if ( $highest_send != '' )
