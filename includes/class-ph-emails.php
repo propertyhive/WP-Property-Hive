@@ -115,16 +115,16 @@ class PH_Emails {
         }
 	}
 
-		public function send_applicant_registration_alert( $contact_post_id, $user_id )
-		{
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
-			$request_post = wp_unslash( $_POST );
-			$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
-			$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
+	public function send_applicant_registration_alert( $contact_post_id, $user_id )
+	{
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
+		$request_post = wp_unslash( $_POST );
+		$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
+		$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
 
-			if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
-			{
-				$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
+		if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
+		{
+			$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
 
 			if ( $to == '' )
 			{
@@ -531,7 +531,6 @@ class PH_Emails {
 		}
 	}
 
-
 	private function schedule_auto_email_match_batch( $run )
 	{
 		$this->refresh_auto_email_match_lock();
@@ -557,7 +556,7 @@ class PH_Emails {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- dry_run only selects diagnostic output and never changes persisted data; the real email action is capability and nonce protected in run_custom_email_cron().
 		$request_get = wp_unslash( $_GET );
 		$dry_run = null === $batch ? isset( $request_get['dry_run'] ) : !empty( $batch['dry_run'] );
-		if ( $dry_run && null !== $batch ) { echo 'Batch preview: first 50 eligible contacts only. Live progress is unchanged.<br>\n'; }
+		if ( $dry_run && null !== $batch ) { echo 'Batch preview: first 50 eligible contacts only. Live progress is unchanged.' . "<br>\n"; }
 
 		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
 
