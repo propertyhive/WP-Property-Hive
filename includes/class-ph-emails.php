@@ -556,7 +556,9 @@ class PH_Emails {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- dry_run only selects diagnostic output and never changes persisted data; the real email action is capability and nonce protected in run_custom_email_cron().
 		$request_get = wp_unslash( $_GET );
 		$dry_run = null === $batch ? isset( $request_get['dry_run'] ) : !empty( $batch['dry_run'] );
-		if ( $dry_run && null !== $batch ) { echo 'Batch preview: first 50 eligible contacts only. Live progress is unchanged.' . "<br>\n"; }
+		// Evaluate once per batch so the query limit and completion check always agree.
+		$batch_size = null === $batch ? 50 : max( 1, (int) apply_filters( 'propertyhive_auto_email_match_batch_size', 50 ) );
+		if ( $dry_run && null !== $batch ) { echo esc_html( 'Batch preview: first ' . $batch_size . ' eligible contacts only. Live progress is unchanged.' ) . "<br>\n"; }
 
 		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
 
@@ -673,7 +675,7 @@ class PH_Emails {
 		if ( null !== $batch )
 		{
 			$args['nopaging'] = false;
-			$args['posts_per_page'] = 50;
+			$args['posts_per_page'] = $batch_size;
 			$args['orderby'] = 'ID';
 			$args['order'] = 'ASC';
 			$args['no_found_rows'] = true;
@@ -988,7 +990,7 @@ class PH_Emails {
 		{
 			return array(
 				'last_contact_id' => empty( $batch_contact_ids ) ? $batch['last_contact_id'] : (int) max( $batch_contact_ids ),
-				'finished' => count( $batch_contact_ids ) < 50,
+				'finished' => count( $batch_contact_ids ) < $batch_size,
 			);
 		}
 	}
