@@ -23,6 +23,9 @@ class PH_Emails {
 	/** @var PH_Emails The single instance of the class */
 	protected static $_instance = null;
 
+	/** @var string|null Expiry token for this worker's renewable 15-minute batch lease. */
+	private $auto_email_match_lock = null;
+
 	/**
 	 * Main PH_Emails Instance.
 	 *
@@ -364,17 +367,17 @@ class PH_Emails {
 	public function ph_auto_email_match_batch( $run_id = '', $cursor = 0 )
 	{
 		global $wpdb;
-		// Connection-owned lock: concurrent starters/workers cannot reserve the same batch.
-		// The database releases it if the PHP worker/connection dies; no expiring lease can
-		// accidentally allow a second worker while a slow first worker is still running.
-		$lock = 'ph_auto_match_' . md5( DB_NAME . ':' . $wpdb->prefix );
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- An advisory lock must be acquired atomically on this connection.
-		$locked = $wpdb->get_var( $wpdb->prepare( 'SELECT GET_LOCK(%s, 0)', $lock ) );
-		if ( '1' !== (string) $locked )
+		$lock = $this->acquire_auto_email_match_lock();
+		if ( null === $lock )
 		{
-			if ( null === $locked ) { error_log( 'Property Hive auto-match: unable to acquire database batch lock.' ); }
+			// A consumed continuation must not be lost just because another worker holds the lease.
+			if ( '' !== $run_id )
+			{
+				$this->schedule_auto_email_match_batch( array( 'run_id' => $run_id, 'last_contact_id' => (int) $cursor ) );
+			}
 			return false;
 		}
+		$this->auto_email_match_lock = $lock;
 		try
 		{
 			// Discard any pre-lock option lookup, including a cached missing option.
@@ -413,6 +416,7 @@ class PH_Emails {
 					'run_id' => wp_generate_uuid4(), 'last_contact_id' => 0,
 					'max_contact_id' => (int) $last_contact->posts[0], 'enabled_date' => $enabled_date,
 				);
+				$this->refresh_auto_email_match_lock();
 				if ( !add_option( 'propertyhive_auto_email_match_run', $run, '', false ) )
 				{
 					throw new RuntimeException( 'Unable to save auto-match run.' );
@@ -425,6 +429,7 @@ class PH_Emails {
 			}
 			$result = $this->run_auto_email_match( $run );
 			if ( !is_array( $result ) ) { return false; }
+			$this->refresh_auto_email_match_lock();
 			if ( $result['finished'] )
 			{
 				$this->clear_auto_email_match_run();
@@ -445,13 +450,91 @@ class PH_Emails {
 		}
 		finally
 		{
-			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Release only the advisory lock owned by this database connection.
-			$wpdb->get_var( $wpdb->prepare( 'SELECT RELEASE_LOCK(%s)', $lock ) );
+			$this->release_auto_email_match_lock();
 		}
 	}
 
+	/**
+	 * Claim a non-autoloaded options row, or atomically take over an expired lease.
+	 * Pattern adapted from WooCommerce BatchProcessingController's enqueued-processors lock.
+	 * Unlike its short, best-effort list mutation, email batches must never run unlocked.
+	 */
+	private function acquire_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null !== $this->auto_email_match_lock ) { return null; }
+		$time = microtime( true );
+		$now = number_format( $time, 6, '.', '' );
+		$expiry = number_format( $time + 900, 6, '.', '' );
+		$suppress = $wpdb->suppress_errors( true );
+		try
+		{
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The unique option_name index is the atomic mutex; duplicate-key contention is expected.
+			$acquired = $wpdb->insert( $wpdb->options, array(
+				'option_name' => 'propertyhive_auto_email_match_lock',
+				'option_value' => $expiry, 'autoload' => 'no',
+			), array( '%s', '%s', '%s' ) );
+			if ( !$acquired )
+			{
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Conditional write makes stale-lock takeover atomic and routes it as a database write.
+				$acquired = $wpdb->query( $wpdb->prepare(
+					"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %s",
+					$expiry, 'propertyhive_auto_email_match_lock', $now
+				) );
+			}
+			if ( false === $acquired ) { error_log( 'Property Hive auto-match: unable to acquire options-table lock.' ); }
+			return $acquired ? $expiry : null;
+		}
+		finally
+		{
+			$wpdb->suppress_errors( $suppress );
+		}
+	}
+
+	/** Renew only a still-valid lease owned by this worker; never resurrect an expired lock. */
+	private function refresh_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null === $this->auto_email_match_lock ) { return; }
+		$time = microtime( true );
+		$now = number_format( $time, 6, '.', '' );
+		$expiry = number_format( max( $time + 900, (float) $this->auto_email_match_lock + 0.00001 ), 6, '.', '' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Ownership and expiry are checked atomically with the renewal write, without relying on an option cache or replica read.
+		$renewed = $wpdb->query( $wpdb->prepare(
+			"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s AND option_value > %s",
+			$expiry, 'propertyhive_auto_email_match_lock', $this->auto_email_match_lock, $now
+		) );
+		if ( 1 !== $renewed )
+		{
+			throw new RuntimeException( 'Auto-match batch lock expired or was lost; progress retained.' );
+		}
+		$this->auto_email_match_lock = $expiry;
+	}
+
+	/** A delayed worker must never delete a lock subsequently acquired by another worker. */
+	private function release_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null === $this->auto_email_match_lock ) { return; }
+		try
+		{
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Compare-and-delete releases only our exact lease; all lock access bypasses the options cache.
+			$released = $wpdb->delete( $wpdb->options, array(
+				'option_name' => 'propertyhive_auto_email_match_lock',
+				'option_value' => $this->auto_email_match_lock,
+			), array( '%s', '%s' ) );
+			if ( false === $released ) { error_log( 'Property Hive auto-match: unable to release options-table lock; it will expire.' ); }
+		}
+		finally
+		{
+			$this->auto_email_match_lock = null;
+		}
+	}
+
+
 	private function schedule_auto_email_match_batch( $run )
 	{
+		$this->refresh_auto_email_match_lock();
 		$args = array( $run['run_id'], (int) $run['last_contact_id'] );
 		if ( wp_next_scheduled( 'propertyhive_auto_email_match_batch', $args ) ) { return true; }
 		$scheduled = wp_schedule_single_event( time() + 60, 'propertyhive_auto_email_match_batch', $args );
@@ -461,6 +544,7 @@ class PH_Emails {
 
 	private function clear_auto_email_match_run()
 	{
+		$this->refresh_auto_email_match_lock();
 		wp_unschedule_hook( 'propertyhive_auto_email_match_batch' );
 		delete_option( 'propertyhive_auto_email_match_run' );
 	}
@@ -656,6 +740,7 @@ class PH_Emails {
 			{
 				$contact_query->the_post();
 
+				$this->refresh_auto_email_match_lock();
 				$contact_id = get_the_ID();
 
 				if ( $dry_run === true ) { echo 'Doing contact: ' . esc_html( get_the_title() ) . "<br>\n"; }
@@ -871,6 +956,7 @@ class PH_Emails {
 
 								if ( !$dry_run )
 								{
+									$this->refresh_auto_email_match_lock();
 									$ph_admin_matching_properties->send_emails(
 										$contact_id,
 										$i,
