@@ -23,6 +23,9 @@ class PH_Emails {
 	/** @var PH_Emails The single instance of the class */
 	protected static $_instance = null;
 
+	/** @var string|null Expiry token for this worker's renewable 15-minute batch lease. */
+	private $auto_email_match_lock = null;
+
 	/**
 	 * Main PH_Emails Instance.
 	 *
@@ -70,6 +73,7 @@ class PH_Emails {
 
 		add_action( 'propertyhive_process_email_log', array( $this, 'ph_process_email_log' ) );
 		add_action( 'propertyhive_auto_email_match', array( $this, 'ph_auto_email_match' ) );
+		add_action( 'propertyhive_auto_email_match_batch', array( $this, 'ph_auto_email_match_batch' ), 10, 2 );
 
 		// Send applicant registration email 
 		add_action( 'propertyhive_applicant_registered', array( $this, 'send_applicant_registration_alert' ), 10, 2 );
@@ -111,16 +115,16 @@ class PH_Emails {
         }
 	}
 
-		public function send_applicant_registration_alert( $contact_post_id, $user_id )
-		{
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
-			$request_post = wp_unslash( $_POST );
-			$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
-			$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
+	public function send_applicant_registration_alert( $contact_post_id, $user_id )
+	{
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
+		$request_post = wp_unslash( $_POST );
+		$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
+		$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
 
-			if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
-			{
-				$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
+		if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
+		{
+			$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
 
 			if ( $to == '' )
 			{
@@ -342,11 +346,219 @@ class PH_Emails {
 	 */
 	public function ph_auto_email_match()
 	{
-		global $post;
+		// Opt in site-wide (including cron): add_filter( 'propertyhive_auto_email_match_batch_mode', '__return_true' );
+		$batch_mode = (bool) apply_filters( 'propertyhive_auto_email_match_batch_mode', false );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Diagnostic mode performs no queue or progress writes.
+		if ( isset( $_GET['dry_run'] ) )
+		{
+			return $this->run_auto_email_match( $batch_mode ? array(
+				'last_contact_id' => 0, 'max_contact_id' => PHP_INT_MAX, 'dry_run' => true,
+			) : null );
+		}
+		if ( !$batch_mode && !get_option( 'propertyhive_auto_email_match_run', false ) )
+		{
+			// Unchanged synchronous behaviour for sites that have not opted in.
+			return $this->run_auto_email_match();
+		}
+		return $this->ph_auto_email_match_batch();
+	}
+
+	/** Start/resume a run, or process one scheduled batch. Never recurse into the next batch. */
+	public function ph_auto_email_match_batch( $run_id = '', $cursor = 0 )
+	{
+		global $wpdb;
+		$lock = $this->acquire_auto_email_match_lock();
+		if ( null === $lock )
+		{
+			// A consumed continuation must not be lost just because another worker holds the lease.
+			if ( '' !== $run_id )
+			{
+				$this->schedule_auto_email_match_batch( array( 'run_id' => $run_id, 'last_contact_id' => (int) $cursor ) );
+			}
+			return false;
+		}
+		$this->auto_email_match_lock = $lock;
+		try
+		{
+			// Discard any pre-lock option lookup, including a cached missing option.
+			wp_cache_delete( 'propertyhive_auto_email_match_run', 'options' );
+			wp_cache_delete( 'notoptions', 'options' );
+			$run = get_option( 'propertyhive_auto_email_match_run', false );
+			$batch_mode = (bool) apply_filters( 'propertyhive_auto_email_match_batch_mode', false );
+			$enabled = get_option( 'propertyhive_auto_property_match', '' );
+			$enabled_date = get_option( 'propertyhive_auto_property_match_enabled_date', '' );
+			if ( !$batch_mode || '' === $enabled || '' === $enabled_date )
+			{
+				$this->clear_auto_email_match_run();
+				// A stale continuation must never fall back to an unlimited run.
+				if ( !$batch_mode && '' === $run_id ) { return $this->run_auto_email_match(); }
+				return false;
+			}
+			if ( is_array( $run ) && $run['enabled_date'] !== $enabled_date )
+			{
+				$this->clear_auto_email_match_run();
+				$run = false;
+			}
+			if ( '' !== $run_id && ( !is_array( $run ) || $run['run_id'] !== $run_id || (int) $run['last_contact_id'] !== (int) $cursor ) )
+			{
+				return false; // Stale or duplicate event.
+			}
+			if ( !is_array( $run ) )
+			{
+				$wpdb->last_error = '';
+				$last_contact = new WP_Query( array(
+					'post_type' => 'contact', 'post_status' => 'publish', 'fields' => 'ids',
+					'posts_per_page' => 1, 'orderby' => 'ID', 'order' => 'DESC', 'no_found_rows' => true,
+				) );
+				if ( '' !== $wpdb->last_error ) { throw new RuntimeException( 'Unable to determine auto-match contact boundary.' ); }
+				if ( empty( $last_contact->posts ) ) { return true; }
+				$run = array(
+					'run_id' => wp_generate_uuid4(), 'last_contact_id' => 0,
+					'max_contact_id' => (int) $last_contact->posts[0], 'enabled_date' => $enabled_date,
+				);
+				$this->refresh_auto_email_match_lock();
+				if ( !add_option( 'propertyhive_auto_email_match_run', $run, '', false ) )
+				{
+					throw new RuntimeException( 'Unable to save auto-match run.' );
+				}
+			}
+			if ( '' === $run_id )
+			{
+				// Daily/hourly and manual triggers start or resume, never reset the cursor.
+				return $this->schedule_auto_email_match_batch( $run );
+			}
+			$result = $this->run_auto_email_match( $run );
+			if ( !is_array( $result ) ) { return false; }
+			$this->refresh_auto_email_match_lock();
+			if ( $result['finished'] )
+			{
+				$this->clear_auto_email_match_run();
+				return true;
+			}
+			$run['last_contact_id'] = $result['last_contact_id'];
+			if ( !update_option( 'propertyhive_auto_email_match_run', $run, false ) )
+			{
+				throw new RuntimeException( 'Unable to save auto-match batch progress.' );
+			}
+			return $this->schedule_auto_email_match_batch( $run );
+		}
+		catch ( Throwable $error )
+		{
+			// Keep the last completed cursor. The next normal/manual trigger can resume it.
+			error_log( 'Property Hive auto-match batch stopped: ' . $error->getMessage() );
+			return false;
+		}
+		finally
+		{
+			$this->release_auto_email_match_lock();
+		}
+	}
+
+	/**
+	 * Claim a non-autoloaded options row, or atomically take over an expired lease.
+	 * Pattern adapted from WooCommerce BatchProcessingController's enqueued-processors lock.
+	 * Unlike its short, best-effort list mutation, email batches must never run unlocked.
+	 */
+	private function acquire_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null !== $this->auto_email_match_lock ) { return null; }
+		$time = microtime( true );
+		$now = number_format( $time, 6, '.', '' );
+		$expiry = number_format( $time + 900, 6, '.', '' );
+		$suppress = $wpdb->suppress_errors( true );
+		try
+		{
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- The unique option_name index is the atomic mutex; duplicate-key contention is expected.
+			$acquired = $wpdb->insert( $wpdb->options, array(
+				'option_name' => 'propertyhive_auto_email_match_lock',
+				'option_value' => $expiry, 'autoload' => 'no',
+			), array( '%s', '%s', '%s' ) );
+			if ( !$acquired )
+			{
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Conditional write makes stale-lock takeover atomic and routes it as a database write.
+				$acquired = $wpdb->query( $wpdb->prepare(
+					"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value < %s",
+					$expiry, 'propertyhive_auto_email_match_lock', $now
+				) );
+			}
+			if ( false === $acquired ) { error_log( 'Property Hive auto-match: unable to acquire options-table lock.' ); }
+			return $acquired ? $expiry : null;
+		}
+		finally
+		{
+			$wpdb->suppress_errors( $suppress );
+		}
+	}
+
+	/** Renew only a still-valid lease owned by this worker; never resurrect an expired lock. */
+	private function refresh_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null === $this->auto_email_match_lock ) { return; }
+		$time = microtime( true );
+		$now = number_format( $time, 6, '.', '' );
+		$expiry = number_format( max( $time + 900, (float) $this->auto_email_match_lock + 0.00001 ), 6, '.', '' );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Ownership and expiry are checked atomically with the renewal write, without relying on an option cache or replica read.
+		$renewed = $wpdb->query( $wpdb->prepare(
+			"UPDATE {$wpdb->options} SET option_value = %s WHERE option_name = %s AND option_value = %s AND option_value > %s",
+			$expiry, 'propertyhive_auto_email_match_lock', $this->auto_email_match_lock, $now
+		) );
+		if ( 1 !== $renewed )
+		{
+			throw new RuntimeException( 'Auto-match batch lock expired or was lost; progress retained.' );
+		}
+		$this->auto_email_match_lock = $expiry;
+	}
+
+	/** A delayed worker must never delete a lock subsequently acquired by another worker. */
+	private function release_auto_email_match_lock()
+	{
+		global $wpdb;
+		if ( null === $this->auto_email_match_lock ) { return; }
+		try
+		{
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Compare-and-delete releases only our exact lease; all lock access bypasses the options cache.
+			$released = $wpdb->delete( $wpdb->options, array(
+				'option_name' => 'propertyhive_auto_email_match_lock',
+				'option_value' => $this->auto_email_match_lock,
+			), array( '%s', '%s' ) );
+			if ( false === $released ) { error_log( 'Property Hive auto-match: unable to release options-table lock; it will expire.' ); }
+		}
+		finally
+		{
+			$this->auto_email_match_lock = null;
+		}
+	}
+
+	private function schedule_auto_email_match_batch( $run )
+	{
+		$this->refresh_auto_email_match_lock();
+		$args = array( $run['run_id'], (int) $run['last_contact_id'] );
+		if ( wp_next_scheduled( 'propertyhive_auto_email_match_batch', $args ) ) { return true; }
+		$scheduled = wp_schedule_single_event( time() + 60, 'propertyhive_auto_email_match_batch', $args );
+		if ( !$scheduled ) { error_log( 'Property Hive auto-match: unable to schedule next batch; progress retained.' ); }
+		return $scheduled;
+	}
+
+	private function clear_auto_email_match_run()
+	{
+		$this->refresh_auto_email_match_lock();
+		wp_unschedule_hook( 'propertyhive_auto_email_match_batch' );
+		delete_option( 'propertyhive_auto_email_match_run' );
+	}
+
+	/** Run the existing matching logic, optionally restricted to one contact batch. */
+	protected function run_auto_email_match( $batch = null )
+	{
+		global $post, $wpdb;
 
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- dry_run only selects diagnostic output and never changes persisted data; the real email action is capability and nonce protected in run_custom_email_cron().
 		$request_get = wp_unslash( $_GET );
-		$dry_run = isset( $request_get['dry_run'] );
+		$dry_run = null === $batch ? isset( $request_get['dry_run'] ) : !empty( $batch['dry_run'] );
+		// Evaluate once per batch so the query limit and completion check always agree.
+		$batch_size = null === $batch ? 100 : max( 1, (int) apply_filters( 'propertyhive_auto_email_match_batch_size', 100 ) );
+		if ( $dry_run && null !== $batch ) { echo esc_html( 'Batch preview: first ' . $batch_size . ' eligible contacts only. Live progress is unchanged.' ) . "<br>\n"; }
 
 		if ( $dry_run === true ) { echo 'Running auto-match in dry run mode. Logging will be output and no emails will be sent.' . "<br>\n"; }
 
@@ -460,11 +672,43 @@ class PH_Emails {
 			'fields' => 'ids'
 		);
 
+		if ( null !== $batch )
+		{
+			$args['nopaging'] = false;
+			$args['posts_per_page'] = $batch_size;
+			$args['orderby'] = 'ID';
+			$args['order'] = 'ASC';
+			$args['no_found_rows'] = true;
+		}
+
 		if ( $dry_run === true ) { echo 'Running query to get contacts with args: ' . esc_html( wp_json_encode( $args, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
-		$contact_query = new WP_Query( $args );
+		$contact_query = new WP_Query();
+		$batch_where = static function ( $where, $query ) use ( $batch, $contact_query ) {
+			global $wpdb;
+			if ( null === $batch || $query !== $contact_query ) { return $where; }
+			return $where . $wpdb->prepare(
+				" AND {$wpdb->posts}.ID > %d AND {$wpdb->posts}.ID <= %d",
+				$batch['last_contact_id'], $batch['max_contact_id']
+			);
+		};
+		if ( null !== $batch ) { add_filter( 'posts_where', $batch_where, 10, 2 ); }
+		try
+		{
+			if ( null !== $batch ) { $wpdb->last_error = ''; }
+			$contact_query->query( $args );
+			if ( null !== $batch && '' !== $wpdb->last_error )
+			{
+				throw new RuntimeException( 'Auto-match contact query failed; batch progress retained.' );
+			}
+		}
+		finally
+		{
+			if ( null !== $batch ) { remove_filter( 'posts_where', $batch_where, 10 ); }
+		}
+		$batch_contact_ids = null !== $batch ? $contact_query->posts : array();
 
-		if ( $dry_run === true ) { echo 'Found ' . esc_html( $contact_query->found_posts ) . ' contacts' . "<br>\n"; }
+		if ( $dry_run === true ) { echo 'Found ' . esc_html( null === $batch ? $contact_query->found_posts : count( $batch_contact_ids ) ) . ' contacts' . "<br>\n"; }
 
 		if ( $contact_query->have_posts() )
 		{
@@ -497,6 +741,7 @@ class PH_Emails {
 			{
 				$contact_query->the_post();
 
+				$this->refresh_auto_email_match_lock();
 				$contact_id = get_the_ID();
 
 				if ( $dry_run === true ) { echo 'Doing contact: ' . esc_html( get_the_title() ) . "<br>\n"; }
@@ -567,8 +812,17 @@ class PH_Emails {
 							{
 								if ( $dry_run === true ) { echo 'Already sent properties before: ' . esc_html( wp_json_encode( $already_sent_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
+								$matching_property_lookup = array_fill_keys($matching_properties, true);
+
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
+									if ( !isset($matching_property_lookup[$already_sent_property_id]) )
+								    {
+								    	if ( $dry_run === true ) { echo 'Already sent property no longer in matched list. Skipping checks for on market and price changes.' . "<br>\n"; }
+
+								        continue;
+								    }
+
 									$highest_send = $sends[count($sends) - 1]['date'];
 
 									if ( $highest_send != '' )
@@ -609,9 +863,9 @@ class PH_Emails {
 							$new_matching_properties = array();
 							foreach ($matching_properties as $matching_property)
 							{
-								if ( !isset($already_sent_properties[$matching_property->id]) && !in_array($matching_property->id, $dismissed_properties) )
+								if ( !isset($already_sent_properties[$matching_property]) && !in_array($matching_property, $dismissed_properties) )
 								{
-									$new_matching_properties[] = $matching_property->id;
+									$new_matching_properties[] = $matching_property;
 								}
 							}
 
@@ -703,6 +957,7 @@ class PH_Emails {
 
 								if ( !$dry_run )
 								{
+									$this->refresh_auto_email_match_lock();
 									$ph_admin_matching_properties->send_emails(
 										$contact_id,
 										$i,
@@ -731,6 +986,13 @@ class PH_Emails {
 		if ( $dry_run === true ) { echo esc_html('Finished auto-match process') . "<br>\n"; die(); }
 
 		wp_reset_postdata();
+		if ( null !== $batch )
+		{
+			return array(
+				'last_contact_id' => empty( $batch_contact_ids ) ? $batch['last_contact_id'] : (int) max( $batch_contact_ids ),
+				'finished' => count( $batch_contact_ids ) < $batch_size,
+			);
+		}
 	}
 
 	/**
