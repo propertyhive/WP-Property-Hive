@@ -874,7 +874,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $field['id'] ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
@@ -930,7 +930,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
@@ -1091,7 +1091,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
