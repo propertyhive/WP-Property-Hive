@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) ) ) {
 ?>
 
-<form name="ph_lost_password_form" class="propertyhive-form lost-password-form" action="" method="post" style="display:none">
+<form name="ph_lost_password_form" class="propertyhive-form lost-password-form" action="" method="post" style="display:none" aria-label="<?php esc_attr_e( 'Request password reset', 'propertyhive' ); ?>">
 
     <p><?php echo esc_html(__( 'Lost your password? Please enter your email address and we\'ll send you a link to create a new password via email.', 'propertyhive' )); ?></p>
  	

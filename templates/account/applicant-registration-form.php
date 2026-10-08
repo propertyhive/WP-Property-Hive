@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_applicant_registration_form" class="propertyhive-form applicant-registration-form" action="" method="post">
+<form name="ph_applicant_registration_form" class="propertyhive-form applicant-registration-form" action="" method="post" aria-label="<?php esc_attr_e( 'Register', 'propertyhive' ); ?>">
  	
 	<div id="registrationSuccess" role="status" style="display:none;" class="alert alert-success alert-box success">
         <?php echo esc_html(__( 'Thank you. You have registered successfully.', 'propertyhive' )); ?>

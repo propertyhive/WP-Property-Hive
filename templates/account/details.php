@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_account_details_form" class="propertyhive-form account-details-form" action="" method="post">
+<form name="ph_account_details_form" class="propertyhive-form account-details-form" action="" method="post" aria-label="<?php esc_attr_e( 'Account details', 'propertyhive' ); ?>">
  	
 	<div id="detailsSuccess" role="status" style="display:none;" class="alert alert-success alert-box success">
         <?php echo esc_html(__( 'Thank you. Your details have been updated successfully.', 'propertyhive' )); ?>

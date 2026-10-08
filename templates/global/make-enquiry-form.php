@@ -10,7 +10,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_property_enquiry" class="property-enquiry-form" action="" method="post">
+<form name="ph_property_enquiry" class="property-enquiry-form" action="" method="post" aria-label="<?php esc_attr_e( 'Property enquiry', 'propertyhive' ); ?>">
     
     <div id="enquirySuccess" role="status" style="display:none;" class="alert alert-success alert-box success">
         <?php echo esc_html(__( 'Thank you. Your enquiry has been sent successfully.', 'propertyhive' )); ?>

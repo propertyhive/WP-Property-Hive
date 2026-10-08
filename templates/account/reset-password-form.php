@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_reset_password_form" class="propertyhive-form reset-password-form" action="" method="post">
+<form name="ph_reset_password_form" class="propertyhive-form reset-password-form" action="" method="post" aria-label="<?php esc_attr_e( 'Reset password', 'propertyhive' ); ?>">
 
     <p><?php echo esc_html__( 'Enter a new password below.', 'propertyhive' ); ?></p>
  	
