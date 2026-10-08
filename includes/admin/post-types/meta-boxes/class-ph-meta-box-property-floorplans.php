@@ -108,7 +108,7 @@ class PH_Meta_Box_Property_Floorplans {
                     foreach ($floorplans as $floorplan_attachment_id)
                     {
                         echo '<li id="floorplan_' . (int)$floorplan_attachment_id . '">';
-                            echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
+                            echo '<div class="hover"><div class="attachment-delete"><a href="" aria-label="' . esc_attr__( 'Delete floorplan', 'propertyhive' ) . '"></a></div><div class="attachment-edit"><a href="" aria-label="' . esc_attr__( 'Edit floorplan', 'propertyhive' ) . '"></a></div></div>';
                             if ( wp_attachment_is_image( $floorplan_attachment_id ) )
                             {
                                 echo wp_get_attachment_image( $floorplan_attachment_id, 'thumbnail' );
@@ -272,7 +272,7 @@ class PH_Meta_Box_Property_Floorplans {
                                     // Add floorplan to media grid
                                     var mediaHTML = \'\';
                                     mediaHTML += \'<li id="floorplan_\' + attachment.id + \'">\';
-                                    mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
+                                    mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href="" aria-label="' . esc_js( esc_attr__( 'Delete floorplan', 'propertyhive' ) ) . '"></a></div><div class="attachment-edit"><a href="" aria-label="' . esc_js( esc_attr__( 'Edit floorplan', 'propertyhive' ) ) . '"></a></div></div>\';
                                     mediaHTML += \'<img src="\' + attachment.url + \'" alt=""></li>\';
                                     
                                     jQuery(\'#property_floorplans_grid ul li#floorplan_\' + floorplan_id).after(mediaHTML);
@@ -355,7 +355,7 @@ class PH_Meta_Box_Property_Floorplans {
                             // Add floorplan to media grid
                             var mediaHTML = \'\';
                             mediaHTML += \'<li id="floorplan_\' + attachment.id + \'">\';
-                            mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
+                            mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href="" aria-label="' . esc_js( esc_attr__( 'Delete floorplan', 'propertyhive' ) ) . '"></a></div><div class="attachment-edit"><a href="" aria-label="' . esc_js( esc_attr__( 'Edit floorplan', 'propertyhive' ) ) . '"></a></div></div>\';
                             mediaHTML += \'<img src="\' + attachment.url + \'" alt=""></li>\';
                             
                             jQuery(\'#property_floorplans_grid ul\').append(mediaHTML);
