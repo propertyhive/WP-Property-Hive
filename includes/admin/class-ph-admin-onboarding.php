@@ -1433,12 +1433,12 @@ class PH_Admin_Onboarding {
 
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $this->get_url( '/import-properties', 'exit' ) ); ?>" target="_blank" rel="noopener noreferrer" data-onboarding-exit data-exit="import" data-recommendation="import" <?php echo ! $license_activated && in_array( 'import_properties', $usage, true ) ? '' : 'hidden'; ?>>
 								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Learn about property imports', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and check if your CRM is supported.', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and check if your CRM is supported', 'propertyhive' ); ?></span>
 							</a>
 
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( $this->get_url( '/export-properties', 'exit' ) ); ?>" target="_blank" rel="noopener noreferrer" data-onboarding-exit data-exit="import" data-recommendation="portal" <?php echo ! $license_activated && in_array( 'portal_uploads', $usage, true ) ? '' : 'hidden'; ?>>
 								<span class="ph-onboarding__exit-label"><?php esc_html_e( 'Learn about portal exports', 'propertyhive' ); ?></span>
-								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and where you can send your properties.', 'propertyhive' ); ?></span>
+								<span class="ph-onboarding__exit-sub-label"><?php esc_html_e( 'See how it works and where you can send your properties', 'propertyhive' ); ?></span>
 							</a>
 
 							<a class="button button-primary ph-onboarding__exit" href="<?php echo esc_url( admin_url( 'admin.php?page=propertyhive_import_properties' ) ); ?>" data-onboarding-exit data-exit="import" data-import-setup <?php echo $import_feature_active ? '' : 'hidden'; ?>>
