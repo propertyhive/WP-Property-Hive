@@ -996,7 +996,18 @@ function ph_form_field( $key, $field )
         case "radio":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
-            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . esc_attr( $key ) . '">';
+            // Name the default group without changing extension-provided wrappers.
+            if ( ! isset( $field['before'] ) ) {
+                $group_label = isset( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : '';
+                if ( '' === $group_label && isset( $field['aria_label'] ) ) {
+                    $group_label = trim( wp_strip_all_tags( $field['aria_label'] ) );
+                }
+                if ( '' === $group_label ) {
+                    $group_label = ucwords( str_replace( array( '_', '-' ), ' ', $key ) );
+                }
+                $field['before'] = '<div class="control control-' . esc_attr( $key ) . '"'
+                    . ( '' !== $group_label ? ' role="group" aria-label="' . esc_attr( $group_label ) . '"' : '' ) . '>';
+            }
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['before_option'] = isset( $field['before_option'] ) ? $field['before_option'] : '<label>';
             $field['after_option'] = isset( $field['after_option'] ) ? $field['after_option'] : '</label>';
