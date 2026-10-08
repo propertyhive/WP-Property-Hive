@@ -5,6 +5,7 @@ import ModulePreviewWrapper, {
   getTextStyle,
   getCssSizeValue,
   usePreviewDevice,
+  getRawIconAttrValue,
   processDiviIconAttr,
   getDiviIconFontFamily,
   getDiviIconFontWeight,
@@ -155,7 +156,9 @@ const PreviewPlaceholder = ({ kind, attrs, device, sampleValue }) => {
     const bulletColor = getResponsiveAttrValue(attrs?.bulletColor, device, '');
     const columns = getResponsiveAttrValue(attrs?.columns, device, '1');
     const listStyleType = bulletType === 'square' ? 'square' : 'disc';
+    const rawIcon = getRawIconAttrValue(attrs?.bulletIcon, device, '');
     const icon = processDiviIconAttr(attrs?.bulletIcon, device) || '✓';
+    const iconClassName = rawIcon?.type === 'fa' ? 'et-pb-icon et-pb-fa-icon' : 'et-pb-icon';
     const iconFontFamily = getDiviIconFontFamily(attrs?.bulletIcon, device);
     const iconFontWeight = getDiviIconFontWeight(attrs?.bulletIcon, device);
 
@@ -163,7 +166,7 @@ const PreviewPlaceholder = ({ kind, attrs, device, sampleValue }) => {
       <ul style={{ columnCount: columns || 1, listStyleType: bulletType === 'icon' ? 'none' : listStyleType, paddingLeft: bulletType === 'icon' ? 0 : undefined }}>
         {['Feature one', 'Feature two', 'Feature three'].map((item) => (
           <li key={item} style={{ breakInside: 'avoid', color: bulletType === 'icon' ? undefined : (bulletColor || undefined), marginBottom: '6px' }}>
-            {bulletType === 'icon' && <span className="et-pb-icon" style={{ marginRight: '8px', color: bulletColor || undefined, fontSize: '1em', lineHeight: 1, fontFamily: iconFontFamily, fontWeight: iconFontWeight }}>{icon}</span>}
+            {bulletType === 'icon' && <span className={iconClassName} style={{ marginRight: '8px', color: bulletColor || undefined, fontSize: '1em', lineHeight: 1, fontFamily: iconFontFamily, fontWeight: iconFontWeight }}>{icon}</span>}
             {item}
           </li>
         ))}

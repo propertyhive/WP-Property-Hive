@@ -236,7 +236,13 @@ abstract class PropertyMetaModule {
 
     protected static function get_icon_font_family( $icon ) {
         if ( is_array( $icon ) ) {
-            return ! empty( $icon['type'] ) && 'divi' !== $icon['type'] ? 'FontAwesome' : 'ETmodules';
+            $type = $icon['type'] ?? 'divi';
+
+            if ( class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' ) ) {
+                return \ET\Builder\Packages\IconLibrary\IconFont\Utils::get_icon_font_family( $type );
+            }
+
+            return 'fa' === $type ? 'FontAwesome' : 'ETmodules';
         }
 
         if ( ! is_string( $icon ) || '' === $icon || ! function_exists( 'et_pb_get_icon_font_family' ) ) {
@@ -244,6 +250,18 @@ abstract class PropertyMetaModule {
         }
 
         return et_pb_get_icon_font_family( $icon );
+    }
+
+    protected static function is_fa_icon( $icon ) {
+        if ( ! is_array( $icon ) ) {
+            return false;
+        }
+
+        if ( class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' ) ) {
+            return \ET\Builder\Packages\IconLibrary\IconFont\Utils::is_fa_icon( $icon );
+        }
+
+        return 'fa' === ( $icon['type'] ?? '' );
     }
 
     protected static function process_icon( $icon ) {
@@ -347,7 +365,16 @@ abstract class PropertyMetaModule {
         if ( '' !== $icon ) {
             $processed_icon = static::process_icon( $icon );
             if ( '' !== $processed_icon ) {
-                $children .= '<span class="et-pb-icon ' . esc_attr( static::OUTPUT_CLASS . '__icon' ) . '" style="' . esc_attr( static::get_icon_style( $attrs, $icon ) ) . '">' . $processed_icon . '</span>';
+                $icon_classes = array(
+                    'et-pb-icon',
+                    static::OUTPUT_CLASS . '__icon',
+                );
+
+                if ( static::is_fa_icon( $icon ) ) {
+                    $icon_classes[] = 'et-pb-fa-icon';
+                }
+
+                $children .= '<span class="' . esc_attr( implode( ' ', $icon_classes ) ) . '" style="' . esc_attr( static::get_icon_style( $attrs, $icon ) ) . '">' . esc_html( $processed_icon ) . '</span>';
             }
         }
 
