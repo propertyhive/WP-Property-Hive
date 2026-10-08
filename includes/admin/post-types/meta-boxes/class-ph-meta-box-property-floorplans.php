@@ -141,7 +141,7 @@ class PH_Meta_Box_Property_Floorplans {
                                     }
                                 }
 
-                                echo '<a href="' . esc_url(wp_get_attachment_url( $floorplan_attachment_id )) . '" target="_blank"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/filetypes/' . $icon) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
+                                echo '<a href="' . esc_url(wp_get_attachment_url( $floorplan_attachment_id )) . '" target="_blank" aria-label="' . esc_attr__( 'View floorplan', 'propertyhive' ) . '"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/filetypes/' . $icon) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
                             }
                         echo '</li>';
                     }

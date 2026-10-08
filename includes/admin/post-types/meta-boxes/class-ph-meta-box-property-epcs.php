@@ -145,7 +145,7 @@ class PH_Meta_Box_Property_Epcs {
                         
                         echo '<li id="epc_' . (int)$epcs_attachment_id . '">';
                             echo '<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>';
-                            echo '<a href="' . esc_url(wp_get_attachment_url( $epcs_attachment_id )) . '" target="_blank"><img src="' . esc_url($image) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
+                            echo '<a href="' . esc_url(wp_get_attachment_url( $epcs_attachment_id )) . '" target="_blank" aria-label="' . esc_attr__( 'View EPC', 'propertyhive' ) . '"><img src="' . esc_url($image) . '" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a>';
                         echo '</li>';
                     }
                 }
@@ -394,7 +394,7 @@ class PH_Meta_Box_Property_Epcs {
                             
                             mediaHTML += \'<li id="epc_\' + attachment.id + \'">\';
                             mediaHTML += \'<div class="hover"><div class="attachment-delete"><a href=""></a></div><div class="attachment-edit"><a href=""></a></div></div>\';
-                            mediaHTML += \'<a href="\' + image + \'" target="_blank"><img src="\' + image + \'" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a></li>\';
+                            mediaHTML += \'<a href="\' + image + \'" target="_blank" aria-label="' . esc_js( esc_attr__( 'View EPC', 'propertyhive' ) ) . '"><img src="\' + image + \'" alt="" width="' . (int)$thumbnail_width . '" height="' . (int)$thumbnail_height . '"></a></li>\';
                             
                             jQuery(\'#property_epcs_grid ul\').append(mediaHTML);
                         }
