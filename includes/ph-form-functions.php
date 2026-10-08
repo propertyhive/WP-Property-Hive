@@ -1771,7 +1771,13 @@ function ph_form_field( $key, $field )
                         $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
                     }
 
-                    $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
+                    $level_aria_label = $control_aria_label;
+                    if ( $field['dynamic_population'] && $levels_of_taxonomy > 1 && '' !== $level_aria_label ) {
+                        /* translators: 1: dropdown label, 2: location hierarchy level number. */
+                        $level_aria_label = sprintf( __( '%1$s level %2$s', 'propertyhive' ), $control_aria_label, number_format_i18n( $level_i ) );
+                    }
+
+                    $output .= '<select' . ( '' !== $level_aria_label ? ' aria-label="' . esc_attr( $level_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                         name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                         id="' . esc_attr( $key ) . '"
                         class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
