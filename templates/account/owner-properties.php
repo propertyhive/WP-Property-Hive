@@ -22,10 +22,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 			echo '
 			<table class="viewings-table upcoming-viewings-table" width="100%">
 				<tr>
-					<th>&nbsp;</th>
-					<th>' . esc_html(__( 'Address', 'propertyhive' )) . '</th>
-					<th>' . esc_html(__( 'Price', 'propertyhive' )) . '</th>
-					<th>' . esc_html(__( 'Status', 'propertyhive' )) . '</th>
+					<th scope="col">&nbsp;</th>
+					<th scope="col">' . esc_html(__( 'Address', 'propertyhive' )) . '</th>
+					<th scope="col">' . esc_html(__( 'Price', 'propertyhive' )) . '</th>
+					<th scope="col">' . esc_html(__( 'Status', 'propertyhive' )) . '</th>
 				</tr>
 			';
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable included through the account rendering helper scope.
