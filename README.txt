@@ -40,6 +40,8 @@ The free Property Hive plugin gives you the tools to create and manage a working
 
 Use Property Hive with your existing WordPress theme, page builders, our free Honeycomb theme or build something completely bespoke.
 
+To make getting started even easier, Property Hive includes an optional onboarding wizard that guides you through the initial setup when you first activate the plugin.
+
 = Connect your CRM and keep your website in sync =
 
 Already manage your properties in an estate agency CRM?
