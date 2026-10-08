@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 <form name="ph_login_form" class="propertyhive-form login-form" action="" method="post">
  	
-    <div id="loginError" style="display:none;" class="alert alert-danger alert-box">
+    <div id="loginError" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'Invalid details provided. Please try again', 'propertyhive' )); ?>
     </div>
 

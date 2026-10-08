@@ -14,13 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 <form name="ph_applicant_registration_form" class="propertyhive-form applicant-registration-form" action="" method="post">
  	
-	<div id="registrationSuccess" style="display:none;" class="alert alert-success alert-box success">
+	<div id="registrationSuccess" role="status" style="display:none;" class="alert alert-success alert-box success">
         <?php echo esc_html(__( 'Thank you. You have registered successfully.', 'propertyhive' )); ?>
     </div>
-    <div id="registrationError" style="display:none;" class="alert alert-danger alert-box">
+    <div id="registrationError" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'An error occurred whilst trying to register. Please try again.', 'propertyhive' )); ?>
     </div>
-    <div id="registrationValidation" style="display:none;" class="alert alert-danger alert-box">
+    <div id="registrationValidation" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
 

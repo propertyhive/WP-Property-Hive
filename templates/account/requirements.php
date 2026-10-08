@@ -14,13 +14,13 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 <form name="ph_account_requirements_form" class="propertyhive-form account-requirements-form" action="" method="post">
  	
-	<div id="requirementsSuccess" style="display:none;" class="alert alert-success alert-box success">
+	<div id="requirementsSuccess" role="status" style="display:none;" class="alert alert-success alert-box success">
         <?php echo esc_html(__( 'Thank you. Your requirements have been updated successfully.', 'propertyhive' )); ?>
     </div>
-    <div id="requirementsError" style="display:none;" class="alert alert-danger alert-box">
+    <div id="requirementsError" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'An error occurred whilst trying to update your requirements. Please try again.', 'propertyhive' )); ?>
     </div>
-    <div id="requirementsValidation" style="display:none;" class="alert alert-danger alert-box">
+    <div id="requirementsValidation" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'Please ensure all required fields have been completed', 'propertyhive' )); ?>
     </div>
 

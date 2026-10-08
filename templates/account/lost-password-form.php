@@ -18,11 +18,11 @@ if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) )
 
     <p><?php echo esc_html(__( 'Lost your password? Please enter your email address and we\'ll send you a link to create a new password via email.', 'propertyhive' )); ?></p>
  	
-    <div id="lostPasswordError" style="display:none;" class="alert alert-danger alert-box">
+    <div id="lostPasswordError" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'Email address not found. Please try again', 'propertyhive' )); ?>
     </div>
 
-    <div id="lostPasswordSuccess" style="display:none;" class="alert alert-success">
+    <div id="lostPasswordSuccess" role="status" style="display:none;" class="alert alert-success">
         <?php echo esc_html(__( 'Success. A link to reset your password has been emailed to you', 'propertyhive' )); ?>
     </div>
 
