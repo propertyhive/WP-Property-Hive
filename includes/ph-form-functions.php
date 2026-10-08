@@ -1764,11 +1764,13 @@ function ph_form_field( $key, $field )
 
                 for ( $level_i = 1; $level_i <= $levels_of_taxonomy; ++$level_i )
                 {
+                    $level_id = ( $field['dynamic_population'] && $level_i > 1 ) ? $key . '_level_' . $level_i : $key;
+
                     $output .= $field['before'];
 
                     if ($field['show_label'])
                     {
-                        $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+                        $output .= '<label for="' . esc_attr( $level_id ) . '">' . $field['label'] . '</label>';
                     }
 
                     $level_aria_label = $control_aria_label;
@@ -1779,7 +1781,7 @@ function ph_form_field( $key, $field )
 
                     $output .= '<select' . ( '' !== $level_aria_label ? ' aria-label="' . esc_attr( $level_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                         name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
-                        id="' . esc_attr( $key ) . '"
+                        id="' . esc_attr( $level_id ) . '"
                         class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
                         ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . 
                         ( $field['dynamic_population'] ? ' data-dynamic-population-level="' . $level_i . '"' : '' ) .
