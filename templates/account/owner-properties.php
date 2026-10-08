@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		if ( !empty($properties) )
 		{
 			echo '
-			<table class="viewings-table upcoming-viewings-table" width="100%">
+			<table class="viewings-table upcoming-viewings-table" width="100%" aria-label="' . esc_attr__( 'Your properties', 'propertyhive' ) . '">
 				<tr>
 					<th scope="col">&nbsp;</th>
 					<th scope="col">' . esc_html(__( 'Address', 'propertyhive' )) . '</th>
