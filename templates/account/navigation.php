@@ -12,7 +12,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<nav class="my-account-navigation">
+<nav class="my-account-navigation" aria-label="<?php esc_attr_e( 'My account', 'propertyhive' ); ?>">
 
 	<ul>
 	<?php
