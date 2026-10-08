@@ -2181,10 +2181,14 @@ function propertyhive_add_aria_label_to_pagination_numbers( $html, $args )
     $page_text = __( 'Page', 'propertyhive' );
 
     while ( $p->next_tag( array( 'class_name' => 'page-numbers' ) ) ) {
-        if (
-            $p->has_class( 'prev' ) ||
-            $p->has_class( 'next' ) ||
-            ( 'SPAN' !== $p->get_tag() && 'A' !== $p->get_tag() ) ) {
+        if ( 'SPAN' !== $p->get_tag() && 'A' !== $p->get_tag() ) {
+            continue;
+        }
+
+        if ( $p->has_class( 'prev' ) || $p->has_class( 'next' ) ) {
+            if ( null === $p->get_attribute( 'aria-label' ) && null === $p->get_attribute( 'aria-labelledby' ) ) {
+                $p->set_attribute( 'aria-label', $p->has_class( 'prev' ) ? __( 'Previous page', 'propertyhive' ) : __( 'Next page', 'propertyhive' ) );
+            }
             continue;
         }
 
