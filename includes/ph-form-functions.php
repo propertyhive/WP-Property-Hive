@@ -816,6 +816,20 @@ function ph_form_field( $key, $field )
 
     $output = '';
 
+    // Name unlabelled controls without changing their structure or label visibility.
+    $control_aria_label = '';
+    $field_label = isset( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : '';
+    if ( ( isset( $field['show_label'] ) && ! $field['show_label'] ) || '' === $field_label ) {
+        $control_aria_label = isset( $field['aria_label'] ) ? trim( wp_strip_all_tags( $field['aria_label'] ) ) : '';
+        if ( '' === $control_aria_label ) {
+            $control_aria_label = $field_label;
+        }
+        if ( '' === $control_aria_label ) {
+            // Custom fields can supply aria_label when the field key is not descriptive.
+            $control_aria_label = ucwords( str_replace( array( '_', '-' ), ' ', $key ) );
+        }
+    }
+
     switch ($field['type'])
     {
         case "text":
@@ -857,7 +871,7 @@ function ph_form_field( $key, $field )
 
             if ($field['show_label'])
             {
-                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
+                $output .= '<label for="' . esc_attr( $field['id'] ) . '">' . $field['label'];
                 if ($field['required'])
                 {
                     $output .= '<span class="required"> *</span>';
@@ -865,7 +879,7 @@ function ph_form_field( $key, $field )
                 $output .= '</label>';
             }
 
-            $output .= '<input
+            $output .= '<input' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                     type="' . esc_attr( $field['type'] ) . '"
                     name="' . esc_attr( $key ) . '"
                     id="' . esc_attr( $field['id'] ) . '"
@@ -921,7 +935,7 @@ function ph_form_field( $key, $field )
                 $output .= '</label>';
             }
 
-            $output .= '<textarea
+            $output .= '<textarea' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                     name="' . esc_attr( $key ) . '"
                     id="' . esc_attr( $key ) . '"
                     placeholder="' . esc_attr(  $field['placeholder'] ) . '"
@@ -962,7 +976,7 @@ function ph_form_field( $key, $field )
 
             $output .= $field['before'];
 
-            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input
+            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                 type="' . esc_attr( $field['type'] ) . '"
                 name="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
@@ -1092,7 +1106,7 @@ function ph_form_field( $key, $field )
                 }
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
@@ -1168,7 +1182,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
@@ -1247,7 +1261,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . '"
@@ -1499,7 +1513,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<input type="text" autocomplete="off"
+            $output .= '<input type="text" autocomplete="off"' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                 name="' . esc_attr( $key ) . '"
                 id="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
@@ -1746,7 +1760,7 @@ function ph_form_field( $key, $field )
                         $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
                     }
 
-                    $output .= '<select
+                    $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                         name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                         id="' . esc_attr( $key ) . '"
                         class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"

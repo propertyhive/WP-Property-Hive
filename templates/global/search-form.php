@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 <?php do_action( 'propertyhive_before_search_form', $id ); ?>
 
-<form name="ph_property_search" class="property-search-form property-search-form-<?php echo esc_attr($id); ?> clear" action="<?php echo esc_url( apply_filters( 'propertyhive_search_form_action', get_post_type_archive_link( 'property' ) ) ); ?>" method="get" role="form">
+<form name="ph_property_search" class="property-search-form property-search-form-<?php echo esc_attr($id); ?> clear" action="<?php echo esc_url( apply_filters( 'propertyhive_search_form_action', get_post_type_archive_link( 'property' ) ) ); ?>" method="get" role="search" aria-label="<?php echo esc_attr__( 'Property search', 'propertyhive' ); ?>">
 
     <?php do_action( 'propertyhive_before_search_form_controls', $id, $form_controls ); ?>
 
