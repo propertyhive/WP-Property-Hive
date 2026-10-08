@@ -206,9 +206,9 @@ jQuery(document).ready(function($)
 		// Remove/add active class on nav/tabs
 		$('.my-account-navigation a').each(function()
 		{
-			$(this).parent().removeClass('active');
+			$(this).removeAttr('aria-current').parent().removeClass('active');
 		});
-		$(this).parent().addClass('active');
+		$(this).attr('aria-current', 'true').parent().addClass('active');
 	});
 
     $('a.ph-forgot-password').on('click', function(e)
@@ -381,9 +381,9 @@ jQuery(window).on('load', function() {
             // Remove/add active class on nav/tabs
             jQuery('.my-account-navigation a').each(function()
             {
-                jQuery(this).parent().removeClass('active');
+                jQuery(this).removeAttr('aria-current').parent().removeClass('active');
             });
-            jQuery('.my-account-navigation a[href=\'' + window.location.hash + '\']').parent().addClass('active');
+            jQuery('.my-account-navigation a[href=\'' + window.location.hash + '\']').attr('aria-current', 'true').parent().addClass('active');
         }
     }
 
