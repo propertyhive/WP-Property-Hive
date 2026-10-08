@@ -152,12 +152,14 @@ class Elementor_Property_Images_Widget extends \Elementor\Widget_Base {
 	public function customise_property_images_html_blank( $html, $post_id )
 	{
 		$html = str_replace("data-fancybox=\"gallery-" . (int)$post_id . "\"", "target=\"_blank\"", $html);
+		$html = str_replace( ' aria-haspopup="dialog"', '', $html );
 		return $html;
 	}
 
 	public function customise_property_images_html_property( $html, $post_id )
 	{
 		$html = str_replace("data-fancybox=\"gallery-" . (int)$post_id . "\"", "", $html);
+		$html = str_replace( ' aria-haspopup="dialog"', '', $html );
 
 		$html = preg_replace('/(href=")([^"]*)(")/', 'href="' . esc_url(get_permalink($post_id)) . '"', $html);
 
