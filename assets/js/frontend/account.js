@@ -217,7 +217,10 @@ jQuery(document).ready(function($)
 
         $('form[name=\'ph_login_form\']').fadeOut(100, function()
         {
-            $('form[name=\'ph_lost_password_form\']').fadeIn(250);
+            $('form[name=\'ph_lost_password_form\']').fadeIn(250, function()
+            {
+                $(this).find('input[name="email_address"]:visible:enabled').first().trigger('focus');
+            });
         });
     });
 

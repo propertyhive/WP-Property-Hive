@@ -32,6 +32,7 @@ if ( !empty( get_option( 'propertyhive_applicant_reset_password_page_id', '' ) )
         ph_form_field( 'email_address', 
             array( 
                 'type' => 'email',
+                'id' => 'lost_password_email_address',
                 'label' => __( 'Email Address', 'propertyhive' ),
                 'required' => true
             )
