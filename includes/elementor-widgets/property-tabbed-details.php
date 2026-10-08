@@ -623,7 +623,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $photo_urls as $photo )
 												{
-													echo '<a href="' . esc_url($photo['url']) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($photo['url']) . '" alt=""></a>';
+													echo '<a href="' . esc_url($photo['url']) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($photo['url']) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( ( isset( $photo['title'] ) ? $photo['title'] : '' ) ) ) !== '' ) ? wp_strip_all_tags( ( isset( $photo['title'] ) ? $photo['title'] : '' ) ) : __( 'View property photo', 'propertyhive' ) ) . '"></a>';
 												}
 
 												echo '</div>';
@@ -645,7 +645,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														$image_medium_url = $image[0];
 													}
-													echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($image_medium_url) . '" alt=""></a>';
+													echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="tabbed_photos" rel="nofollow"><img src="' . esc_url($image_medium_url) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View property photo', 'propertyhive' ) ) . '"></a>';
 												}
 
 												echo '</div>';
@@ -666,7 +666,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $floorplan_urls as $floorplan )
 												{
-													echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
+													echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( ( isset( $floorplan['title'] ) ? $floorplan['title'] : '' ) ) ) !== '' ) ? wp_strip_all_tags( ( isset( $floorplan['title'] ) ? $floorplan['title'] : '' ) ) : __( 'View floorplan', 'propertyhive' ) ) . '"></a>';
 												}
 
 												echo '</div>';
@@ -684,7 +684,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View floorplan', 'propertyhive' ) ) . '"></a>';
 														}
 														else
 														{
@@ -728,7 +728,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="brochures" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="brochures" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View brochure', 'propertyhive' ) ) . '"></a>';
 														}
 														else
 														{
@@ -754,7 +754,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 
 												foreach ( $epc_urls as $epc )
 												{
-													echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
+													echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( ( isset( $epc['title'] ) ? $epc['title'] : '' ) ) ) !== '' ) ? wp_strip_all_tags( ( isset( $epc['title'] ) ? $epc['title'] : '' ) ) : __( 'View EPC', 'propertyhive' ) ) . '"></a>';
 												}
 
 												echo '</div>';
@@ -772,7 +772,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													{
 														if ( wp_attachment_is_image($attachment_id) )
 									                    {
-															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
+															echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View EPC', 'propertyhive' ) ) . '"></a>';
 														}
 														else
 														{
@@ -854,7 +854,7 @@ class Elementor_Property_Tabbed_Details_Widget extends \Elementor\Widget_Base {
 													continue;
 												}
 												
-												echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+												echo '<iframe title="' . esc_attr( ! empty( $virtual_tour['label'] ) ? wp_strip_all_tags( $virtual_tour['label'] ) : __( 'Property virtual tour', 'propertyhive' ) ) . '" src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 											}
 
 											echo '</div>';

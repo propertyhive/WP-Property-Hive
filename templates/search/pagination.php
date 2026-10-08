@@ -10,7 +10,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 ?>
-<div class="propertyhive-pagination">
+<div class="propertyhive-pagination" role="navigation" aria-label="<?php esc_attr_e( 'Property search pagination', 'propertyhive' ); ?>">
 	<?php
 		if ( $max_num_pages  > 1 )
 		{

@@ -96,7 +96,7 @@ class Bricks_Builder_Property_Embedded_Virtual_Tours_Widget extends \Bricks\Elem
 			        	$virtual_tour['url']
 			    	);
 
-					echo '<iframe src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
+					echo '<iframe title="' . esc_attr( ! empty( $virtual_tour['label'] ) ? wp_strip_all_tags( $virtual_tour['label'] ) : __( 'Property virtual tour', 'propertyhive' ) ) . '" src="' . esc_url($virtual_tour['url']) . '" height="500" width="100%" allowfullscreen frameborder="0" allow="fullscreen"></iframe>';
 				}
 			}
 

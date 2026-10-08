@@ -368,7 +368,7 @@ function get_property_map( $args = array() )
 			$api_key = get_option('propertyhive_google_maps_api_key');
 			if ( isset($args['embed']) && ($args['embed'] === 'true' || $args['embed'] === TRUE) ) 
 			{
-				echo '<iframe
+				echo '<iframe title="' . esc_attr__( 'Property location map', 'propertyhive' ) . '"
 				  width="100%"
 				  height="' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . '"
 				  style="border:0"
@@ -543,7 +543,7 @@ function get_property_street_view( $args = array() )
 			$api_key = get_option('propertyhive_google_maps_api_key');
 			if ( isset($args['embed']) && ($args['embed'] === 'true' || $args['embed'] === TRUE) ) 
 			{
-				echo '<iframe
+				echo '<iframe title="' . esc_attr__( 'Property street view', 'propertyhive' ) . '"
 				  width="100%"
 				  height="' . ( ( isset($args['height']) && !empty($args['height']) && is_numeric($args['height']) ) ? (int)$args['height'] : 400 ) . '"
 				  style="border:0"
