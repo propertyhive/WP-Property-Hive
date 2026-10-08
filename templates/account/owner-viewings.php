@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		if ( !empty($upcoming_viewings) )
 		{
 			echo '
-			<table class="viewings-table upcoming-viewings-table" width="100%">
+			<table class="viewings-table upcoming-viewings-table" width="100%" aria-label="' . esc_attr__( 'Upcoming viewings', 'propertyhive' ) . '">
 				<tr>
 					<th scope="col">&nbsp;</th>
 					<th scope="col">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
@@ -75,7 +75,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		if ( !empty($past_viewings) )
 		{
 			echo '
-			<table class="viewings-table upcoming-viewings-table" width="100%">
+			<table class="viewings-table upcoming-viewings-table" width="100%" aria-label="' . esc_attr__( 'Past viewings', 'propertyhive' ) . '">
 				<tr>
 					<th scope="col">&nbsp;</th>
 					<th scope="col">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
