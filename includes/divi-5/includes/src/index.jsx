@@ -1,3 +1,5 @@
+import './shared/ensure-font-awesome';
+
 import './components/back-to-search';
 import './components/property-actions';
 import './components/property-additional-field';

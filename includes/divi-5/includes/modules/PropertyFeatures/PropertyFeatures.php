@@ -58,12 +58,15 @@ class PropertyFeatures extends PropertyContentModule implements DependencyInterf
         if ( 'icon' === $bullet_type ) {
             $icon_attr = static::get_icon_value( $attrs, 'bulletIcon', '' );
             $processed_icon = '';
+            $is_fa_icon = false;
             if ( ! empty( $icon_attr ) ) {
                 if ( class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' ) ) {
                     $processed_icon = \ET\Builder\Packages\IconLibrary\IconFont\Utils::process_font_icon( $icon_attr );
+                    $is_fa_icon = \ET\Builder\Packages\IconLibrary\IconFont\Utils::is_fa_icon( $icon_attr );
                 } else {
                     $legacy_icon    = is_array( $icon_attr ) ? ( $icon_attr['unicode'] ?? '' ) : $icon_attr;
                     $processed_icon = function_exists( 'et_pb_process_font_icon' ) ? et_pb_process_font_icon( $legacy_icon ) : $legacy_icon;
+                    $is_fa_icon = is_array( $icon_attr ) && 'fa' === ( $icon_attr['type'] ?? '' );
                 }
             }
             if ( '' === $processed_icon ) { $processed_icon = '✓'; }
@@ -71,11 +74,17 @@ class PropertyFeatures extends PropertyContentModule implements DependencyInterf
             $ul_style .= 'list-style:none;padding-left:0;';
             $icon_style = 'display:inline-block;margin-right:8px;line-height:1;font-size:1em;';
             if ( is_array( $icon_attr ) ) {
-                $icon_style .= 'font-family:' . ( ! empty( $icon_attr['type'] ) && 'divi' !== $icon_attr['type'] ? 'FontAwesome' : 'ETmodules' ) . ';';
+                $icon_type = $icon_attr['type'] ?? 'divi';
+                $icon_font_family = class_exists( '\\ET\\Builder\\Packages\\IconLibrary\\IconFont\\Utils' )
+                    ? \ET\Builder\Packages\IconLibrary\IconFont\Utils::get_icon_font_family( $icon_type )
+                    : ( 'fa' === $icon_type ? 'FontAwesome' : 'ETmodules' );
+                $icon_style .= 'font-family:' . esc_attr( $icon_font_family ) . ';';
                 if ( ! empty( $icon_attr['weight'] ) ) { $icon_style .= 'font-weight:' . absint( $icon_attr['weight'] ) . ';'; }
             }
             if ( '' !== $bullet_color ) { $icon_style .= 'color:' . esc_attr( $bullet_color ) . ';'; }
-            $icon_html = '<span class="et-pb-icon ph-feature-icon" aria-hidden="true" style="' . esc_attr( $icon_style ) . '">' . html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' ) . '</span>';
+            $icon_classes = array( 'et-pb-icon', 'ph-feature-icon' );
+            if ( $is_fa_icon ) { $icon_classes[] = 'et-pb-fa-icon'; }
+            $icon_html = '<span class="' . esc_attr( implode( ' ', $icon_classes ) ) . '" aria-hidden="true" style="' . esc_attr( $icon_style ) . '">' . esc_html( html_entity_decode( $processed_icon, ENT_QUOTES, 'UTF-8' ) ) . '</span>';
             $output = preg_replace( '/<li([^>]*)>/i', '<li$1 style="break-inside:avoid;margin-bottom:6px;">' . $icon_html, $output );
         } else {
             $ul_style .= 'list-style-type:' . ( 'square' === $bullet_type ? 'square' : 'disc' ) . ';';

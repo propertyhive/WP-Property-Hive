@@ -19,6 +19,9 @@ class PH_Divi {
 
         add_action( 'wp_enqueue_scripts', array( $this, 'propertyhive_enqueue_divi5_frontend_assets' ) );
 
+        add_filter( 'divi_frontend_assets_dynamic_assets_global_assets_list', array( $this, 'propertyhive_add_divi5_icon_assets' ), 10, 3 );
+        add_filter( 'divi_frontend_assets_dynamic_assets_late_global_assets_list', array( $this, 'propertyhive_add_divi5_icon_assets' ), 10, 3 );
+
         add_action( 'admin_notices', array( $this, 'propertyhive_divi5_migration_notice' ) );
 
 	    add_action( 'et_builder_ready', array( $this, 'register_widgets' ) );
@@ -124,12 +127,24 @@ class PH_Divi {
 	        return;
 	    }
 
+		$builder_script_url = add_query_arg(
+			'propertyhive_divi5_fa_base',
+			$this->propertyhive_divi5_fontawesome_base_url(),
+			PH()->plugin_url() . '/includes/divi-5/includes/scripts/bundle.js'
+		);
+		$builder_script_path = dirname( __FILE__ ) . '/divi-5/includes/scripts/bundle.js';
+		$builder_script_version = defined( 'PH_VERSION' ) ? PH_VERSION : '1.0.0';
+
+		if ( file_exists( $builder_script_path ) ) {
+			$builder_script_version .= '.' . filemtime( $builder_script_path );
+		}
+
 	    \ET\Builder\VisualBuilder\Assets\PackageBuildManager::register_package_build(
 	        [
 	            'name'    => 'propertyhive-divi5-builder-script',
-	            'version' => defined( 'PH_VERSION' ) ? PH_VERSION : '1.0.0',
+	            'version' => $builder_script_version,
 	            'script'  => [
-	                'src'                => PH()->plugin_url() . '/includes/divi-5/includes/scripts/bundle.js',
+	                'src'                => $builder_script_url,
 	                'deps'               => [
 	                    'react',
 	                    'jquery',
@@ -158,6 +173,129 @@ class PH_Divi {
 	        [],
 	        defined( 'PH_VERSION' ) ? PH_VERSION : '1.0.0'
 	    );
+
+		// Divi's dynamic-assets detector does not reliably enqueue its Font
+		// Awesome stylesheet for third-party modules. Add the font faces to the
+		// Property Hive stylesheet so icon glyphs always have a matching font.
+		wp_add_inline_style(
+			'propertyhive-divi5-frontend',
+			$this->propertyhive_divi5_fontawesome_css()
+		);
+	}
+
+	/**
+	 * Get the URL of the Font Awesome files supplied by Divi.
+	 *
+	 * @return string
+	 */
+	private function propertyhive_divi5_fontawesome_base_url()
+	{
+		if ( defined( 'ET_BUILDER_PLUGIN_URI' ) ) {
+			$divi_base_url = ET_BUILDER_PLUGIN_URI;
+		} else {
+			$divi_base_url = get_template_directory_uri();
+		}
+
+		return trailingslashit( $divi_base_url ) . 'core/admin/fonts/fontawesome';
+	}
+
+	/**
+	 * Build the Font Awesome font-face declarations required by Divi icons.
+	 *
+	 * @return string
+	 */
+	private function propertyhive_divi5_fontawesome_css()
+	{
+		$font_base_url = trailingslashit( $this->propertyhive_divi5_fontawesome_base_url() );
+
+		return sprintf(
+			'@font-face{font-family:"FontAwesome";font-style:normal;font-weight:400;font-display:block;src:url("%1$sfa-regular-400.woff2") format("woff2"),url("%1$sfa-regular-400.woff") format("woff")}@font-face{font-family:"FontAwesome";font-style:normal;font-weight:900;font-display:block;src:url("%1$sfa-solid-900.woff2") format("woff2"),url("%1$sfa-solid-900.woff") format("woff")}@font-face{font-family:"FontAwesome";font-style:normal;font-weight:400;font-display:block;src:url("%1$sfa-brands-400.woff2") format("woff2"),url("%1$sfa-brands-400.woff") format("woff")}',
+			esc_url_raw( $font_base_url )
+		);
+	}
+
+	/**
+	 * Determine whether the current Divi 5 layout contains a Property Hive
+	 * module that can render a font icon.
+	 *
+	 * @param mixed $dynamic_assets_instance Divi dynamic assets instance.
+	 * @return bool
+	 */
+	private function has_propertyhive_divi5_icon_module( $dynamic_assets_instance )
+	{
+		if ( function_exists( 'et_core_is_fb_enabled' ) && et_core_is_fb_enabled() ) {
+			return true;
+		}
+
+		$icon_modules = array(
+			'propertyhive/property-availability',
+			'propertyhive/property-bathrooms',
+			'propertyhive/property-bedrooms',
+			'propertyhive/property-council-tax-band',
+			'propertyhive/property-features',
+			'propertyhive/property-floor-area',
+			'propertyhive/property-let-available-date',
+			'propertyhive/property-price',
+			'propertyhive/property-reception-rooms',
+			'propertyhive/property-reference-number',
+			'propertyhive/property-tenure',
+			'propertyhive/property-type',
+		);
+
+		if ( ! is_object( $dynamic_assets_instance ) ) {
+			return false;
+		}
+
+		if ( method_exists( $dynamic_assets_instance, 'get_saved_page_blocks' ) ) {
+			$used_blocks = $dynamic_assets_instance->get_saved_page_blocks();
+			if ( array_intersect( $icon_modules, is_array( $used_blocks ) ? $used_blocks : array() ) ) {
+				return true;
+			}
+		}
+
+		if ( method_exists( $dynamic_assets_instance, 'get_block_assets_list' ) ) {
+			$block_assets = $dynamic_assets_instance->get_block_assets_list();
+			if ( array_intersect( $icon_modules, array_keys( is_array( $block_assets ) ? $block_assets : array() ) ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Ensure Divi loads its Font Awesome files for Property Hive modules.
+	 * Divi's core detector does not automatically inspect third-party modules.
+	 *
+	 * @param array $global_asset_list Current Divi dynamic asset list.
+	 * @param array $assets_args Divi dynamic asset context.
+	 * @param mixed $dynamic_assets_instance Divi dynamic assets instance.
+	 * @return array
+	 */
+	public function propertyhive_add_divi5_icon_assets( $global_asset_list, $assets_args = array(), $dynamic_assets_instance = null )
+	{
+		if (
+			! function_exists( 'et_builder_d5_enabled' )
+			|| ! et_builder_d5_enabled()
+		) {
+			return $global_asset_list;
+		}
+
+		$assets_prefix = $assets_args['assets_prefix'] ?? '';
+		if (
+			'' === $assets_prefix
+			&& class_exists( '\\ET\\Builder\\FrontEnd\\Assets\\DynamicAssetsUtils' )
+		) {
+			$assets_prefix = \ET\Builder\FrontEnd\Assets\DynamicAssetsUtils::get_dynamic_assets_path();
+		}
+
+		if ( '' !== $assets_prefix ) {
+			$global_asset_list['et_icons_fa'] = array(
+				'css' => $assets_prefix . '/css/icons_fa_all.css',
+			);
+		}
+
+		return $global_asset_list;
 	}
 
 	public function register_widgets()

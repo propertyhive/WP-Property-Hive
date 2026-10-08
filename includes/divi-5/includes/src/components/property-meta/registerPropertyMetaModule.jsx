@@ -26,6 +26,9 @@ const createPropertyMetaPreview = ({
 
     const rawIcon = hasIcon ? getRawIconAttrValue(attrs?.icon, device, '') : '';
     const icon = hasIcon ? processDiviIconAttr(attrs?.icon, device, '') : '';
+    const iconClassName = rawIcon?.type === 'fa'
+      ? `et-pb-icon et-pb-fa-icon ${outputClassName}__icon`
+      : `et-pb-icon ${outputClassName}__icon`;
     const iconFontFamily = hasIcon ? getDiviIconFontFamily(attrs?.icon, device) : undefined;
     const iconFontWeight = hasIcon ? getDiviIconFontWeight(attrs?.icon, device) : undefined;
     const before = getResponsiveAttrValue(attrs?.before, device, '');
@@ -66,7 +69,7 @@ const createPropertyMetaPreview = ({
       >
         <div className={outputClassName} style={textStyle}>
           {hasIcon && icon !== '' && (
-            <span className={`et-pb-icon ${outputClassName}__icon`} style={iconStyle}>{icon}</span>
+            <span className={iconClassName} style={iconStyle}>{icon}</span>
           )}
 
           {before !== '' && (
