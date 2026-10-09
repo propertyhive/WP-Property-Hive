@@ -2412,6 +2412,14 @@ class PH_AJAX {
      */
     public function make_property_enquiry() {
         
+        if ( !apply_filters( 'propertyhive_property_enquiries_enabled', true ) ) 
+        {
+            wp_send_json_error(
+                __( 'Property enquiries are disabled.', 'propertyhive' ),
+                403
+            );
+        }
+
         global $post;
         
         $return = array();
