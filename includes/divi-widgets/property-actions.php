@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 class Divi_Property_Actions_Widget extends ET_Builder_Module
 {
     public $slug       = 'et_pb_property_actions_widget';
-    public $vb_support = 'partial';
+    public $vb_support = 'on';
     public $icon = '';
 
     public function init() {
@@ -34,6 +34,18 @@ class Divi_Property_Actions_Widget extends ET_Builder_Module
 
     public function render( $attrs, $content, $render_slug )
     {
+        if ( function_exists( 'ph_divi_property_actions_render_actions_html' ) )
+        {
+            $actions_html = ph_divi_property_actions_render_actions_html( $this->props, get_the_ID() );
+
+            if ( '' === trim( $actions_html ) )
+            {
+                return '';
+            }
+
+            return $this->_render_module_wrapper( $actions_html, $render_slug );
+        }
+
         $post_id = get_the_ID();
 
         $property = new PH_Property($post_id);
