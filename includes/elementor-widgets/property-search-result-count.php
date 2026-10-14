@@ -95,18 +95,6 @@ class Elementor_Property_Search_Result_Count_Widget extends \Elementor\Widget_Ba
 	}
 
 	protected function render() {
-
-		global $wp_query;
-
-		$settings = $this->get_settings_for_display();
-
-		if ( is_post_type_archive('property') )
-		{
-			propertyhive_result_count();
-		}
-		else
-		{
-			echo '<p class="propertyhive-result-count">Result count to appear here</p>';
-		}
+	    echo '<!-- propertyhive-elementor-result-count -->';
 	}
 }

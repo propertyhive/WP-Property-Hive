@@ -6,6 +6,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class PH_Elementor {
 
+	private static $query_results = array();
+
 	public function __construct()
 	{
 		add_action( 'plugins_loaded', array( $this, 'setup_propertyhive_elementor_functionality' ) );
@@ -16,8 +18,96 @@ class PH_Elementor {
 		add_action( 'elementor/query/featuredpropertyquery', array( $this, 'elementor_query_featured_only' ) );
 		add_filter( 'elementor/query/query_args', array( $this, 'elementor_query_args' ), 10, 2 );
 
+		add_action( 'elementor/query/query_results', array( $this, 'capture_elementor_query_results' ), 10, 2 );
+		add_filter( 'elementor/frontend/the_content', array( $this, 'replace_result_count_placeholder' ), 20 );
+
 		add_action( 'propertyhive_elementor_widget_property_image_controls', array( $this, 'elementor_widget_property_image_controls' ), 10 );
         add_action( 'propertyhive_elementor_widget_property_image_render_after', array( $this, 'elementor_widget_property_image_render_after' ), 10, 2 );
+	}
+
+	/**
+	 * Store completed Elementor queries by their Query ID.
+	 *
+	 * @param WP_Query               $query  Completed Elementor query.
+	 * @param \Elementor\Widget_Base $widget Elementor widget.
+	 */
+	public function capture_elementor_query_results( $query, $widget ) {
+	    if ( ! $query instanceof \WP_Query ) {
+	        return;
+	    }
+
+	    $settings = $widget->get_data( 'settings' );
+
+	    if (
+	        ! isset( $settings['post_query_query_id'] ) ||
+	        ! is_string( $settings['post_query_query_id'] )
+	    ) {
+	        return;
+	    }
+
+	    $query_id = sanitize_key( $settings['post_query_query_id'] );
+
+	    if ( '' === $query_id ) {
+	        return;
+	    }
+
+	    self::$query_results[ $query_id ] = $query;
+	}
+
+	/**
+	 * Get the most recently completed Property Hive Elementor query.
+	 *
+	 * @return WP_Query|null
+	 */
+	public static function get_query_results() {
+	    if ( empty( self::$query_results ) ) {
+	        return null;
+	    }
+
+	    $query = end( self::$query_results );
+
+	    return $query instanceof \WP_Query ? $query : null;
+	}
+
+	/**
+	 * Replace the result-count placeholder after Elementor has rendered
+	 * the complete document.
+	 *
+	 * @param string $content Rendered Elementor document content.
+	 * @return string
+	 */
+	public function replace_result_count_placeholder( $content ) {
+	    $placeholder = '<!-- propertyhive-elementor-result-count -->';
+
+	    if ( false === strpos( $content, $placeholder ) ) {
+	        return $content;
+	    }
+
+	    $query = self::get_query_results();
+
+	    if ( ! $query instanceof \WP_Query ) {
+	        return str_replace( $placeholder, '', $content );
+	    }
+
+	    $paged = max( 1, (int) $query->get( 'paged' ) );
+	    $per_page = (int) $query->get( 'posts_per_page' );
+	    $total = (int) $query->found_posts;
+
+	    ob_start();
+
+	    propertyhive_result_count(
+	        $paged,
+	        $per_page,
+	        $total
+	    );
+
+	    $result_count = ob_get_clean();
+
+	    return str_replace(
+	        $placeholder,
+	        $result_count,
+	        $content
+	    );
 	}
 
 	public function elementor_query_args( $query_vars, $widget )
