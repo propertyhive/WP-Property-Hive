@@ -133,6 +133,8 @@ Services depend on enabled features and configuration:
 
 Bundled date-range picker: Dan Grossman's Date Range Picker 3.1.0, MIT license; source and license are included in assets/js/daterangepicker/.
 
+Bundled Mapbox GL JS 3.8.0 is copyright Mapbox, Inc. and is licensed under the [Mapbox Terms of Service](https://www.mapbox.com/legal/tos/) for use with authorised Mapbox products through an active Mapbox account. Property Hive does not provide a Mapbox account or licence. Users who enable Mapbox must supply their own public access token and ensure that their use is permitted by their Mapbox agreement. The applicable licence and third-party notices are included in assets/js/mapbox/LICENSE.txt.
+
 == Installation ==
 
 = Minimum Requirements =

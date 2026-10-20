@@ -394,10 +394,19 @@ class PH_Settings_General extends PH_Settings_Page {
             ),
 
             array(
-                'title'   => __( 'Mapbox API Key', 'propertyhive' ),
+                'title'   => __( 'Mapbox Public Access Token', 'propertyhive' ),
                 'id'      => 'propertyhive_mapbox_api_key',
                 'type'    => 'text',
-                'desc'  => '<p>' . __( 'If you have a Mapbox API key you can enter it here. You can generate an API key <a href="https://account.mapbox.com/" target="_blank">here</a>.', 'propertyhive' ) . '</p>'
+                'desc' => '<p>' . sprintf(
+                    wp_kses_post(
+                        __(
+                            'Enter a public access token from your own active Mapbox account. By configuring Mapbox, you are responsible for ensuring that your use, including production use for real-estate websites, is permitted by your Mapbox plan and complies with the Mapbox Terms of Service. Additional commercial licensing or charges may apply. Do not enter a secret token here. <a href="%1$s" target="_blank" rel="noopener noreferrer">Mapbox account</a> | <a href="%2$s" target="_blank" rel="noopener noreferrer">Mapbox terms</a>.',
+                            'propertyhive'
+                        )
+                    ),
+                    esc_url( 'https://account.mapbox.com/' ),
+                    esc_url( 'https://www.mapbox.com/legal/tos/' )
+                ) . '</p>',
             ),
 
             array(
