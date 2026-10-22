@@ -42,7 +42,6 @@ class PH_Admin_Onboarding {
 		add_action( 'load-dashboard_page_ph-onboarding', array( $this, 'remove_admin_toolbar_html_class' ) );
 		add_filter( 'propertyhive_screen_ids', array( $this, 'add_screen_id' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
-		add_action( 'propertyhive_settings_start', array( $this, 'output_restart_onboarding_notice' ) );
 
 		add_action( 'wp_ajax_propertyhive_onboarding_save_step', array( $this, 'ajax_save_step' ) );
 		add_action( 'wp_ajax_propertyhive_onboarding_skip', array( $this, 'ajax_skip' ) );
@@ -547,47 +546,6 @@ class PH_Admin_Onboarding {
 
 		wp_safe_redirect( admin_url( 'index.php?page=ph-onboarding' ) );
 		exit;
-	}
-
-	/**
-	 * Output a development-only setup restart prompt on the settings page.
-	 */
-	public function output_restart_onboarding_notice() {
-		if ( ! current_user_can( 'manage_options' ) || ! self::can_restart_onboarding() ) {
-			return;
-		}
-
-		?>
-		<div class="notice notice-info inline">
-			<p>
-				<strong><?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?></strong>
-			</p>
-			<p>
-				<?php
-				printf(
-					/* translators: %s: WordPress environment type. */
-					esc_html__( 'This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing.', 'propertyhive' ),
-					'<code>' . esc_html( self::get_environment_type() ) . '</code>'
-				);
-				?>
-			</p>
-			<p>
-				<a class="button" href="<?php echo esc_url( $this->get_restart_onboarding_url() ); ?>"><?php esc_html_e( 'Restart setup wizard', 'propertyhive' ); ?></a>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Get the onboarding restart URL.
-	 *
-	 * @return string
-	 */
-	private function get_restart_onboarding_url() {
-		return wp_nonce_url(
-			add_query_arg( 'propertyhive_restart_onboarding', '1', admin_url( 'admin.php?page=ph-settings' ) ),
-			self::RESTART_NONCE_ACTION
-		);
 	}
 
 	/**
