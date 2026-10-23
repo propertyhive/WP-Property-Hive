@@ -458,7 +458,6 @@ class PH_Licenses {
 		$data = array();
 		$data['license_key_type'] = $license_type;
 		$data['license_key'] = ( $license_type == 'old' ? get_option( 'propertyhive_license_key', '' ) : get_option( 'propertyhive_pro_license_key', '' ) );
-		$data['license_key_instance_id'] = ( $license_type == 'pro' ? get_option( 'propertyhive_pro_instance_id', '' ) : '' );
 		$data['url']         = home_url();
 
 		/*
