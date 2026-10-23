@@ -248,6 +248,11 @@ class PH_Settings_Licenses extends PH_Settings_Page {
         }
 
 
+        if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_license_transfer_lock', false ) ) {
+            PH_Admin_Settings::add_error( __( 'Please finish the pending license operation before changing license settings.', 'propertyhive' ) );
+            return;
+        }
+
         $license_type = isset( $_POST['propertyhive_license_type'] ) && is_string( $_POST['propertyhive_license_type'] ) ? sanitize_text_field( wp_unslash( $_POST['propertyhive_license_type'] ) ) : '';
         $license_key = isset( $_POST['propertyhive_pro_license_key'] ) && is_string( $_POST['propertyhive_pro_license_key'] ) ? ph_clean( wp_unslash( $_POST['propertyhive_pro_license_key'] ) ) : '';
         $license_action = isset( $_POST['pro_license_key_action'] ) && is_string( $_POST['pro_license_key_action'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_license_key_action'] ) ) : '';

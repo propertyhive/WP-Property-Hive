@@ -420,6 +420,13 @@ class PH_Admin_Onboarding {
 	 * @return array
 	 */
 	private function activate_pro_license_for_onboarding( $license_key ) {
+		if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_license_transfer_lock', false ) ) {
+			return array(
+				'activated' => false,
+				'message' => __( 'Please finish the pending license operation before changing license settings.', 'propertyhive' ),
+			);
+		}
+
 		$this->clear_pro_license_cache_surfaces();
 
 		update_option( 'propertyhive_license_type', 'pro' );
@@ -1009,7 +1016,10 @@ class PH_Admin_Onboarding {
 	 *
 	 * @return array
 	 */
-	private function get_license_render_state() {
+	private function get_license_render_state() 
+	{
+		PH()->license->check_pro_license_site_identity();
+		
 		$pro_status = get_transient( 'ph_pro_license_status' );
 		if ( false === $pro_status ) {
 			$pro_status = get_option( 'propertyhive_pro_license_key_status', '' );
