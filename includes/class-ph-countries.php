@@ -728,11 +728,23 @@ class PH_Countries {
 			{
 				// Get all currency exchange rates from GBP
 				// We're using the API from https://github.com/fawazahmed0/exchange-api
-				$url = 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/gbp.json'; // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Retrieves current exchange-rate data from the configured currency service.
-				$response = wp_remote_get( $url );
+				// Its README asks clients to fall back to the Cloudflare mirror when jsDelivr fails.
+				// The last URL serves the same JSON for the ECB currencies (rates by allratestoday.com).
+				$urls = array(
+					'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/gbp.json', // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Retrieves current exchange-rate data from the configured currency service.
+					'https://latest.currency-api.pages.dev/v1/currencies/gbp.json',
+					'https://allratestoday.com/api/compat/currency-api/latest/v1/currencies/gbp.json',
+				);
 
-				if ( is_array( $response ) )
+				foreach ( $urls as $url )
 				{
+					$response = wp_remote_get( $url );
+
+					if ( !is_array( $response ) )
+					{
+						continue;
+					}
+
 					$body = wp_remote_retrieve_body( $response );
 					$json = json_decode($body, true);
 
@@ -755,6 +767,8 @@ class PH_Countries {
 								}
 							}
 						}
+
+						break;
 					}
 				}
 			}
