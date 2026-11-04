@@ -545,6 +545,7 @@ class PH_Licenses {
 				$property_import = array();
 			}
 			$formats = array();
+			$reapit_customer_codes = array();
             foreach ( $property_import as $import_id => $options )
             {
             	if ( $options['running'] == '1' )
@@ -557,6 +558,18 @@ class PH_Licenses {
             		{
             			$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
             		}
+            		elseif ( $options['format'] == 'json_reapit_foundations' )
+					{
+					    if ( isset( $options['customer_id'] ) && is_string( $options['customer_id'] ) )
+					    {
+					        $customer_code = trim( $options['customer_id'] );
+
+					        if ( $customer_code !== '' )
+					        {
+					            $reapit_customer_codes[] = $customer_code;
+					        }
+					    }
+					}
             		elseif ( 
             			$options['format'] == 'rtdf' &&
             			get_option( 'propertyhive_rtdf_crm', '' )  != ''
@@ -568,6 +581,10 @@ class PH_Licenses {
             	}
 			}
 			$data['property_import_formats'] = $formats;
+			
+			$data['reapit_customer_codes'] = array_values(
+			    array_unique( $reapit_customer_codes )
+			);
 
 			// Exports
 			$formats = array();
