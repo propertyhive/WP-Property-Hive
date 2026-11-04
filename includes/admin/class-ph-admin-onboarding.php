@@ -42,7 +42,6 @@ class PH_Admin_Onboarding {
 		add_action( 'load-dashboard_page_ph-onboarding', array( $this, 'remove_admin_toolbar_html_class' ) );
 		add_filter( 'propertyhive_screen_ids', array( $this, 'add_screen_id' ) );
 		add_filter( 'admin_body_class', array( $this, 'admin_body_class' ) );
-		add_action( 'propertyhive_settings_start', array( $this, 'output_restart_onboarding_notice' ) );
 
 		add_action( 'wp_ajax_propertyhive_onboarding_save_step', array( $this, 'ajax_save_step' ) );
 		add_action( 'wp_ajax_propertyhive_onboarding_skip', array( $this, 'ajax_skip' ) );
@@ -421,6 +420,13 @@ class PH_Admin_Onboarding {
 	 * @return array
 	 */
 	private function activate_pro_license_for_onboarding( $license_key ) {
+		if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_license_transfer_lock', false ) ) {
+			return array(
+				'activated' => false,
+				'message' => __( 'Please finish the pending license operation before changing license settings.', 'propertyhive' ),
+			);
+		}
+
 		$this->clear_pro_license_cache_surfaces();
 
 		update_option( 'propertyhive_license_type', 'pro' );
@@ -547,47 +553,6 @@ class PH_Admin_Onboarding {
 
 		wp_safe_redirect( admin_url( 'index.php?page=ph-onboarding' ) );
 		exit;
-	}
-
-	/**
-	 * Output a development-only setup restart prompt on the settings page.
-	 */
-	public function output_restart_onboarding_notice() {
-		if ( ! current_user_can( 'manage_options' ) || ! self::can_restart_onboarding() ) {
-			return;
-		}
-
-		?>
-		<div class="notice notice-info inline">
-			<p>
-				<strong><?php esc_html_e( 'Development setup tools', 'propertyhive' ); ?></strong>
-			</p>
-			<p>
-				<?php
-				printf(
-					/* translators: %s: WordPress environment type. */
-					esc_html__( 'This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing.', 'propertyhive' ),
-					'<code>' . esc_html( self::get_environment_type() ) . '</code>'
-				);
-				?>
-			</p>
-			<p>
-				<a class="button" href="<?php echo esc_url( $this->get_restart_onboarding_url() ); ?>"><?php esc_html_e( 'Restart setup wizard', 'propertyhive' ); ?></a>
-			</p>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Get the onboarding restart URL.
-	 *
-	 * @return string
-	 */
-	private function get_restart_onboarding_url() {
-		return wp_nonce_url(
-			add_query_arg( 'propertyhive_restart_onboarding', '1', admin_url( 'admin.php?page=ph-settings' ) ),
-			self::RESTART_NONCE_ACTION
-		);
 	}
 
 	/**
@@ -1051,7 +1016,10 @@ class PH_Admin_Onboarding {
 	 *
 	 * @return array
 	 */
-	private function get_license_render_state() {
+	private function get_license_render_state() 
+	{
+		PH()->license->check_pro_license_site_identity();
+		
 		$pro_status = get_transient( 'ph_pro_license_status' );
 		if ( false === $pro_status ) {
 			$pro_status = get_option( 'propertyhive_pro_license_key_status', '' );
