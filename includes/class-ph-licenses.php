@@ -67,6 +67,7 @@ class PH_Licenses {
 
 		add_action( 'admin_notices', array( $this, 'pro_license_domain_notice' ) );
 		add_action( 'admin_post_ph_move_pro_license', array( $this, 'handle_move_pro_license' ) );
+		add_action( 'admin_post_ph_resume_pro_replacement', array( $this, 'handle_resume_pro_replacement' ) );
 	}
 
 	public function ph_check_add_on_can_be_used( $can, $slug )
@@ -908,6 +909,10 @@ class PH_Licenses {
 
 	    if ( $saved_identity === $current_identity ) {
 	        update_option( 'propertyhive_pro_site_host', base64_encode( $host ), false );
+	        $key = get_option( 'propertyhive_pro_license_key', '' );
+	        if ( '' !== $key ) {
+	            add_option( 'propertyhive_pro_activated_key_hash', hash( 'sha256', $key ), '', false );
+	        }
 	        return true;
 	    }
 
@@ -1530,6 +1535,161 @@ class PH_Licenses {
 		}
 	}
 
+
+	/** Remove only the lock owned by this request (or the exact expired lock). */
+	private function release_pro_license_lock( $expected )
+	{
+		global $wpdb;
+		$deleted = $wpdb->query( $wpdb->prepare(
+			"DELETE FROM {$wpdb->options} WHERE option_name = %s AND option_value = %s",
+			'propertyhive_pro_license_transfer_lock', maybe_serialize( $expected )
+		) );
+		if ( $deleted ) {
+			wp_cache_delete( 'propertyhive_pro_license_transfer_lock', 'options' );
+		}
+		return 1 === $deleted;
+	}
+
+	/** Existing numeric locks are supported during upgrades. */
+	public function is_pro_license_operation_running()
+	{
+		$lock = get_option( 'propertyhive_pro_license_transfer_lock', false );
+		if ( false === $lock ) {
+			return false;
+		}
+		$created = is_array( $lock ) ? ( $lock['created_at'] ?? 0 ) : $lock;
+		return is_numeric( $created ) && (int) $created > time() - 10 * MINUTE_IN_SECONDS;
+	}
+
+	private function acquire_pro_license_lock()
+	{
+		$lock = array( 'token' => wp_generate_uuid4(), 'created_at' => time() );
+		if ( add_option( 'propertyhive_pro_license_transfer_lock', $lock, '', false ) ) {
+			return $lock;
+		}
+		$previous = get_option( 'propertyhive_pro_license_transfer_lock', false );
+		$created = is_array( $previous ) ? ( $previous['created_at'] ?? 0 ) : $previous;
+		if ( false !== $previous && ( ! is_numeric( $created ) || (int) $created <= time() - 10 * MINUTE_IN_SECONDS ) ) {
+			$this->release_pro_license_lock( $previous );
+		}
+		if ( add_option( 'propertyhive_pro_license_transfer_lock', $lock, '', false ) ) {
+			return $lock;
+		}
+		return new WP_Error( 'ph_license_busy', __( 'A license operation is already running. Please wait before retrying.', 'propertyhive' ) );
+	}
+
+	private function clear_pro_license_caches()
+	{
+		delete_transient( 'ph_pro_license_product_id_and_package' );
+		delete_option( 'ph_pro_last_known_license_product_id_and_package' );
+		delete_transient( 'ph_pro_license_status' );
+		delete_option( 'propertyhive_pro_license_key_status' );
+		delete_option( 'propertyhive_pro_license_key_last_checked' );
+	}
+
+	/** Activate a different key without releasing the copied site's activation. */
+	public function activate_replacement_pro_license_key( $key )
+	{
+		if ( ! current_user_can( 'manage_options' ) || 'pro' !== $this->get_license_type() ) {
+			return array( 'success' => false, 'error' => __( 'You do not have permission to activate this license.', 'propertyhive' ) );
+		}
+		$lock = $this->acquire_pro_license_lock();
+		if ( is_wp_error( $lock ) ) {
+			return array( 'success' => false, 'error' => $lock->get_error_message() );
+		}
+		try {
+			if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) ) {
+				throw new RuntimeException( 'Please finish the pending license transfer first.' );
+			}
+			$host = wp_parse_url( get_site_url(), PHP_URL_HOST );
+			if ( ! is_string( $host ) || '' === $host || ! is_string( $key ) || '' === $key ) {
+				throw new RuntimeException( 'The license key or site domain is missing.' );
+			}
+			$host = strtolower( rtrim( $host, '.' ) );
+			$pending = get_option( 'propertyhive_pro_pending_license_replacement', array() );
+			if ( ! is_array( $pending ) ) {
+				throw new RuntimeException( 'The saved activation information is invalid. Please contact support.' );
+			}
+			if ( empty( $pending ) ) {
+				$bound_key = get_option( 'propertyhive_pro_activated_key_hash', '' );
+				if ( '' === $bound_key ) {
+					$bound_key = hash( 'sha256', (string) get_option( 'propertyhive_pro_license_key', '' ) );
+				}
+				if ( hash( 'sha256', $key ) === $bound_key ) {
+					throw new RuntimeException( 'Use the domain transfer options to activate the existing license here.' );
+				}
+				$instance = wp_generate_password( 12, false );
+				$product_id = $this->get_pro_domain_action_product_id( $key, $instance );
+				$pending = array( 'api_key' => $key, 'new_instance' => $instance,
+					'product_id' => $product_id, 'destination_host' => $host );
+				update_option( 'propertyhive_pro_pending_license_replacement', $pending, false );
+				if ( get_option( 'propertyhive_pro_pending_license_replacement' ) !== $pending ) {
+					throw new RuntimeException( 'Unable to save the activation. No remote changes were made.' );
+				}
+			}
+			foreach ( array( 'api_key', 'new_instance', 'product_id', 'destination_host' ) as $field ) {
+				if ( ! isset( $pending[$field] ) || ! is_scalar( $pending[$field] ) || '' === (string) $pending[$field] ) {
+					throw new RuntimeException( 'The saved activation information is incomplete. Please contact support.' );
+				}
+			}
+			if ( $pending['api_key'] !== $key || $pending['destination_host'] !== $host ) {
+				throw new RuntimeException( 'The key or domain changed during activation. Please contact support.' );
+			}
+			$parameters = array( 'api_key' => $key, 'instance' => $pending['new_instance'],
+				'product_id' => $pending['product_id'], 'object' => $host );
+			$status = $this->request_pro_license_transfer_api( 'status', $parameters );
+			if ( 'active' !== $status['status_check'] ) {
+				$this->request_pro_license_transfer_api( 'activate', $parameters );
+			}
+			$status = $this->request_pro_license_transfer_api( 'status', $parameters );
+			if ( 'active' !== $status['status_check'] ) {
+				throw new RuntimeException( 'The new activation could not be confirmed. Please resume the activation.' );
+			}
+			$this->clear_pro_license_caches();
+			$values = array(
+				'propertyhive_pro_instance_id' => $pending['new_instance'],
+				'propertyhive_pro_license_key' => $key,
+				'propertyhive_license_type' => 'pro',
+				'propertyhive_pro_activated_key_hash' => hash( 'sha256', $key ),
+				'propertyhive_pro_site_host' => base64_encode( $host ),
+				'propertyhive_pro_site_identity' => hash( 'sha256', $host ),
+			);
+			foreach ( $values as $option => $value ) {
+				update_option( $option, $value );
+				if ( get_option( $option ) !== $value ) {
+					throw new RuntimeException( 'The activation exists but could not be saved locally. Please resume the activation.' );
+				}
+			}
+			delete_option( 'propertyhive_pro_pending_license_replacement' );
+			return array( 'success' => true );
+		} catch ( Exception $exception ) {
+			return array( 'success' => false, 'error' => $exception->getMessage() );
+		} finally {
+			$this->release_pro_license_lock( $lock );
+		}
+	}
+
+	public function handle_resume_pro_replacement()
+	{
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'You do not have permission to activate this license.', 'Property Hive', array( 'response' => 403 ) );
+		}
+		if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+			wp_die( 'This action requires a POST request.', 'Property Hive', array( 'response' => 405 ) );
+		}
+		check_admin_referer( 'ph_resume_pro_replacement' );
+		$pending = get_option( 'propertyhive_pro_pending_license_replacement', array() );
+		if ( ! is_array( $pending ) || empty( $pending['api_key'] ) ) {
+			wp_die( 'No replacement activation is pending.', 'Property Hive', array( 'response' => 400 ) );
+		}
+		$result = $this->activate_replacement_pro_license_key( $pending['api_key'] );
+		if ( ! $result['success'] ) {
+			wp_die( esc_html( $result['error'] ), 'Property Hive', array( 'response' => 400, 'back_link' => true ) );
+		}
+		wp_safe_redirect( admin_url( 'admin.php?page=ph-settings&tab=licensekey' ) );
+		exit;
+	}
+
 	private function pro_product_allows_additional_sites( $product_id )
 	{
 		return in_array( (int) $product_id, array( 14493, 14494, 23794, 14496, 14497, 23792 ), true );
@@ -1573,7 +1733,24 @@ class PH_Licenses {
 
 	public function pro_license_domain_notice()
 	{
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if (
+	        ! current_user_can( 'manage_options' ) ||
+	        'pro' !== $this->get_license_type()
+	    ) {
+	        return;
+	    }
+
+		if ( get_option( 'propertyhive_pro_pending_license_replacement', array() ) ) {
+			?>
+			<div class="notice notice-warning">
+				<p><?php esc_html_e( 'A replacement license activation is unfinished. Resume it to confirm the result. The original activation has not been released.', 'propertyhive' ); ?></p>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<input type="hidden" name="action" value="ph_resume_pro_replacement">
+					<?php wp_nonce_field( 'ph_resume_pro_replacement' ); ?>
+					<p><button type="submit" class="button button-primary"><?php esc_html_e( 'Resume license activation', 'propertyhive' ); ?></button></p>
+				</form>
+			</div>
+			<?php
 			return;
 		}
 		$check = $this->check_pro_license_site_identity();
@@ -1759,30 +1936,37 @@ class PH_Licenses {
 	    }
 
 	    check_admin_referer( 'ph_move_pro_license' );
+
+	    if ( 'pro' !== $this->get_license_type() ) {
+		    wp_die(
+		        esc_html__(
+		            'This action only applies to Property Hive Pro licenses.',
+		            'propertyhive'
+		        ),
+		        'Property Hive',
+		        array( 'response' => 400 )
+		    );
+		}
+
 	    $mode = isset( $_POST['ph_license_domain_mode'] ) && is_string( $_POST['ph_license_domain_mode'] )
 	        ? sanitize_key( wp_unslash( $_POST['ph_license_domain_mode'] ) ) : 'move';
 	    if ( ! in_array( $mode, array( 'move', 'additional' ), true ) ) {
 	        wp_die( 'Invalid license action.', 'Property Hive', array( 'response' => 400 ) );
 	    }
 
-	    $lock_option = 'propertyhive_pro_license_transfer_lock';
 	    $pending_option = 'propertyhive_pro_pending_license_transfer';
 
-	    // add_option() prevents two requests acquiring the same lock.
-	    if ( ! add_option( $lock_option, time(), '', false ) ) {
-	        wp_die(
-	            'A license transfer is already running. Please wait before retrying.',
-	            'Property Hive',
-	            array(
-	                'response'  => 409,
-	                'back_link' => true,
-	            )
-	        );
+	    $lock = $this->acquire_pro_license_lock();
+	    if ( is_wp_error( $lock ) ) {
+	        wp_die( esc_html( $lock->get_error_message() ), 'Property Hive', array( 'response' => 409, 'back_link' => true ) );
 	    }
 
 	    $error = '';
 
 	    try {
+	        if ( get_option( 'propertyhive_pro_pending_license_replacement', array() ) ) {
+	            throw new RuntimeException( 'Please finish the pending replacement activation first.' );
+	        }
 	        $host = wp_parse_url( get_site_url(), PHP_URL_HOST );
 
 	        if ( ! is_string( $host ) || '' === $host ) {
@@ -2036,13 +2220,14 @@ class PH_Licenses {
 	            );
 	        }
 
+	        update_option( 'propertyhive_pro_activated_key_hash', hash( 'sha256', $pending['api_key'] ), false );
 	        delete_option( $pending_option );
 
 	    } catch ( Exception $exception ) {
 	        $error = $exception->getMessage();
 
 	    } finally {
-	        delete_option( $lock_option );
+	        $this->release_pro_license_lock( $lock );
 	    }
 
 	    if ( '' === $error ) {

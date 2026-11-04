@@ -103,7 +103,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$pro_input_border_color = '';
 		$pro_output = '';
 		$license_key_to_display = '';
-		if (get_option('propertyhive_pro_license_key', '') != '') 
+		if ( 'pro' === $license_type && get_option('propertyhive_pro_license_key', '') != '' )
 		{ 
 			$length = strlen(get_option('propertyhive_pro_license_key', '')); 
 			$license_key_to_display = get_option('propertyhive_pro_license_key', '');
@@ -248,7 +248,7 @@ class PH_Settings_Licenses extends PH_Settings_Page {
         }
 
 
-        if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_license_transfer_lock', false ) ) {
+        if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_pending_license_replacement', array() ) || PH()->license->is_pro_license_operation_running() ) {
             PH_Admin_Settings::add_error( __( 'Please finish the pending license operation before changing license settings.', 'propertyhive' ) );
             return;
         }
@@ -258,6 +258,22 @@ class PH_Settings_Licenses extends PH_Settings_Page {
         $license_action = isset( $_POST['pro_license_key_action'] ) && is_string( $_POST['pro_license_key_action'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_license_key_action'] ) ) : '';
 
 
+        // Activate replacement credentials before saving fields, so a failed
+        // request cannot overwrite the original key or shared instance.
+        $bound_key = get_option( 'propertyhive_pro_activated_key_hash', '' );
+        if ( '' === $bound_key ) {
+            $bound_key = hash( 'sha256', (string) get_option( 'propertyhive_pro_license_key', '' ) );
+        }
+        if ( 'pro' === $license_type && 'pro' === PH()->license->get_license_type() && '' !== get_option( 'propertyhive_pro_license_key', '' ) && '' !== $license_key && 'activate' === $license_action && hash( 'sha256', $license_key ) !== $bound_key ) {
+            $result = PH()->license->activate_replacement_pro_license_key( $license_key );
+            if ( ! $result['success'] ) {
+                PH_Admin_Settings::add_error( $result['error'] );
+            } else {
+                update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
+                PH_Admin_Settings::add_message( __( 'License key activated successfully. The previous activation has not been released.', 'propertyhive' ) );
+            }
+            return;
+        }
 		$settings = $this->get_settings();
 
 		PH_Admin_Settings::save_fields( $settings );
