@@ -67,6 +67,7 @@ class PH_Licenses {
 
 		add_action( 'admin_notices', array( $this, 'pro_license_domain_notice' ) );
 		add_action( 'admin_post_ph_move_pro_license', array( $this, 'handle_move_pro_license' ) );
+		add_action( 'admin_post_ph_dismiss_pro_domain_notice', array( $this, 'handle_dismiss_pro_domain_notice' ) );
 		add_action( 'admin_post_ph_resume_pro_replacement', array( $this, 'handle_resume_pro_replacement' ) );
 	}
 
@@ -1744,6 +1745,39 @@ class PH_Licenses {
 		return (int) reset( $matches );
 	}
 
+	/** Scope dismissal to this domain, source identity and license activation. */
+	private function pro_domain_notice_context()
+	{
+		$host = strtolower( rtrim( (string) wp_parse_url( get_site_url(), PHP_URL_HOST ), '.' ) );
+		return hash( 'sha256', wp_json_encode( array(
+			$host,
+			get_option( 'propertyhive_pro_site_identity', '' ),
+			get_option( 'propertyhive_pro_license_key', '' ),
+			get_option( 'propertyhive_pro_instance_id', '' ),
+		) ) );
+	}
+
+	public function handle_dismiss_pro_domain_notice()
+	{
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'You do not have permission to dismiss this notice.', 'Property Hive', array( 'response' => 403 ) );
+		}
+		if ( 'POST' !== ( $_SERVER['REQUEST_METHOD'] ?? '' ) ) {
+			wp_die( 'This action requires a POST request.', 'Property Hive', array( 'response' => 405 ) );
+		}
+		$context = $this->pro_domain_notice_context();
+		check_admin_referer( 'ph_dismiss_pro_domain_notice_' . $context );
+		if ( 'pro' !== $this->get_license_type() ) {
+			wp_die( 'This action only applies to Pro licenses.', 'Property Hive', array( 'response' => 400 ) );
+		}
+		if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_pending_license_replacement', array() ) ) {
+			wp_die( 'Please finish the pending license operation first.', 'Property Hive', array( 'response' => 409 ) );
+		}
+		update_option( 'propertyhive_pro_domain_notice_dismissed', $context, false );
+		wp_safe_redirect( admin_url() );
+		exit;
+	}
+
 	public function pro_license_domain_notice()
 	{
 		if (
@@ -1770,6 +1804,13 @@ class PH_Licenses {
 		$pending = get_option( 'propertyhive_pro_pending_license_transfer', array() );
 		$mismatch = is_wp_error( $check ) && 'ph_license_site_changed' === $check->get_error_code();
 		if ( ! $mismatch && empty( $pending ) ) {
+			return;
+		}
+		// Keep the actions available on the License settings page after dismissal.
+		$on_license_settings = isset( $_GET['page'], $_GET['tab'] ) &&
+			'ph-settings' === $_GET['page'] && 'licensekey' === $_GET['tab'];
+		if ( empty( $pending ) && ! $on_license_settings &&
+			$this->pro_domain_notice_context() === get_option( 'propertyhive_pro_domain_notice_dismissed', '' ) ) {
 			return;
 		}
 		$key = get_option( 'propertyhive_pro_license_key', '' );
@@ -1824,6 +1865,14 @@ class PH_Licenses {
 				<?php endif; ?>
 				</p>
 			</form>
+			<?php if ( ! $has_pending ) : ?>
+				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+					<input type="hidden" name="action" value="ph_dismiss_pro_domain_notice">
+					<?php wp_nonce_field( 'ph_dismiss_pro_domain_notice_' . $this->pro_domain_notice_context() ); ?>
+					<p><button type="submit" class="button"><?php esc_html_e( 'Dismiss warning', 'propertyhive' ); ?></button></p>
+					<p><?php esc_html_e( 'Keep Pro inactive on this domain and hide this warning. You can move or activate a license later under Property Hive > Settings > License.', 'propertyhive' ); ?></p>
+				</form>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
