@@ -1130,6 +1130,19 @@ class PH_Licenses {
 			{
 				if ( $body['success'] === true )
 				{
+					// Do not reuse an instance that may also exist on a cloned site.
+					// Rotate only after the server confirms deactivation.
+					$new_instance_id = wp_generate_password( 12, false );
+					update_option( 'propertyhive_pro_instance_id', $new_instance_id );
+					$this->clear_pro_license_caches();
+
+					if ( get_option( 'propertyhive_pro_instance_id', '' ) !== $new_instance_id ) {
+						return array(
+							'success' => false,
+							'error' => __( 'The license was deactivated, but the new instance ID could not be saved. Please retry before reactivating.', 'propertyhive' ),
+						);
+					}
+
 					$return = array(
 		        		'success' => true,
 		        	);
