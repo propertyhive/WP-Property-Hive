@@ -648,28 +648,31 @@ class PH_Admin_Matching_Applicants {
                                     }
                                 }
 
-                                $additional_checks = apply_filters( 'propertyhive_matching_applicants_check', true, $property, get_the_ID(), $applicant_profile );
+                                if ( $matching_elements == $elements_checked )
+                                {
+	                                $additional_checks = apply_filters( 'propertyhive_matching_applicants_check', true, $property, get_the_ID(), $applicant_profile );
 
-                                if ( $additional_checks === true && $matching_elements == $elements_checked )
-                                {  
-                                    $applicant_profile['applicant_profile_id'] = $i;
+	                                if ( $additional_checks === true )
+	                                {  
+	                                    $applicant_profile['applicant_profile_id'] = $i;
 
-                                    // Matched all criteria
-                                    if ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' )
-                                    {
-                                        $hot_applicants[] = array(
-                                            'contact_id' => get_the_ID(),
-                                            'applicant_profile' => $applicant_profile,
-                                        );
-                                    }
-                                    else
-                                    {
-                                        $applicants[] = array(
-                                            'contact_id' => get_the_ID(),
-                                            'applicant_profile' => $applicant_profile,
-                                        );
-                                    }
-                                }
+	                                    // Matched all criteria
+	                                    if ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' )
+	                                    {
+	                                        $hot_applicants[] = array(
+	                                            'contact_id' => get_the_ID(),
+	                                            'applicant_profile' => $applicant_profile,
+	                                        );
+	                                    }
+	                                    else
+	                                    {
+	                                        $applicants[] = array(
+	                                            'contact_id' => get_the_ID(),
+	                                            'applicant_profile' => $applicant_profile,
+	                                        );
+	                                    }
+	                                }
+	                            }
                             }
                         }
                     }
