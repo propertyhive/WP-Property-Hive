@@ -226,7 +226,7 @@ function propertyhive_wp_file_upload( $field ) {
 	propertyhive_wp_hidden_input( $field );
 
 	echo '
-	<p class="form-field ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '"';
+	<p class="form-field ph_uploaded_file ' . esc_attr( $field['id'] ) . '_field ' . esc_attr( $field['wrapper_class'] ) . '"';
 	if ( $field['value'] == '' )
 	{
 		echo ' style="display:none;"';
@@ -247,7 +247,7 @@ function propertyhive_wp_file_upload( $field ) {
 			echo 'Image doesn\'t exist';
 		}
 	}
-	echo '</span>
+	echo '</span> <a href="#" class="ph_remove_file_button' . esc_attr($field['id']) . '">' . esc_html__( 'Remove', 'propertyhive' ) . '</a>
 	</p>';
 
 	echo '
@@ -272,6 +272,12 @@ function propertyhive_wp_file_upload( $field ) {
 
 		jQuery(document).ready(function()
         {
+        	jQuery(\'body\').on(\'click\', \'.ph_remove_file_button' . esc_js($field['id']) . '\', function( event ){
+                event.preventDefault();
+                jQuery(\'#' . esc_js($field['id']) . '\').val(\'\').trigger(\'change\');
+                jQuery(this).closest(\'.ph_uploaded_file\').hide().find(\'span\').empty();
+            });
+
         	jQuery(\'body\').on(\'click\', \'.ph_upload_file_button' . esc_js($field['id']) . '\', function( event ){
                  
 	            event.preventDefault();
@@ -302,8 +308,8 @@ function propertyhive_wp_file_upload( $field ) {
 	                    // Do something with attachment.id and/or attachment.url here
 	                    console.log(attachment);
 	                    
-	                    jQuery(\'.form-field.' . esc_js($field['id']) . '_field\').show();
-	                    jQuery(\'.form-field.' . esc_js($field['id']) . '_field span\').html(\'<a href="\' + attachment.url + \'" target="_blank">\' + attachment.filename + \'</a>\');
+	                    jQuery(\'.form-field.ph_uploaded_file.' . esc_js($field['id']) . '_field\').show();
+	                    jQuery(\'.form-field.ph_uploaded_file.' . esc_js($field['id']) . '_field span\').html(\'<a href="\' + attachment.url + \'" target="_blank">\' + attachment.filename + \'</a>\');
 	                    jQuery(\'#' . esc_js($field['id']) . '\').val(attachment.id);
 	                });
 	            });
