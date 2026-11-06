@@ -443,8 +443,6 @@ class PH_Admin_Matching_Applicants {
                 {
                     $contacts_query->the_post();
 
-                    $contact = new PH_Contact(get_the_ID());
-
                     $dismissed_properties = get_post_meta( get_the_ID(), '_dismissed_properties', TRUE );
 
                     if ( is_array($dismissed_properties) && in_array($property_id, $dismissed_properties) )
