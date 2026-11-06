@@ -19,6 +19,12 @@ class PH_Contact {
     /** @public int Contact (post) ID */
     public $id;
 
+    /** @public string Property (post) Title */
+    public $post_title;
+
+    /** @public string Property (post) Status */
+    public $post_status;
+
     /**
      * Get the contact if ID is passed, otherwise the contact is new and empty.
      *
