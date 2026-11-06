@@ -433,6 +433,17 @@ class PH_Admin_Matching_Applicants {
                 'compare' => 'LIKE'
             );
 
+            if ( version_compare( get_bloginfo( 'version' ), '5.1', '>=' ) )
+			{
+				// If WP version contains compare_key, check contact has at least one applicant profile with Send Matching Properties checked
+				$meta_query[] = array(
+					'key' => '_applicant_profile_',
+					'compare_key' => 'LIKE',
+					'value' => 'send_matching_properties";s:3:"yes"',
+					'compare' => 'LIKE',
+				);
+			}
+
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Applicant membership is stored in serialized _contact_types metadata; preserve complete matching results and per-profile extension checks.
             $args['meta_query'] = $meta_query;
 
