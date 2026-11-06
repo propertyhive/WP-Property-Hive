@@ -1870,7 +1870,6 @@ class PH_Licenses {
 					<input type="hidden" name="action" value="ph_dismiss_pro_domain_notice">
 					<?php wp_nonce_field( 'ph_dismiss_pro_domain_notice_' . $this->pro_domain_notice_context() ); ?>
 					<p><button type="submit" class="button"><?php esc_html_e( 'Dismiss warning', 'propertyhive' ); ?></button></p>
-					<p><?php esc_html_e( 'Keep Pro inactive on this domain and hide this warning. You can move or activate a license later under Property Hive > Settings > License.', 'propertyhive' ); ?></p>
 				</form>
 			<?php endif; ?>
 		</div>
@@ -1953,7 +1952,8 @@ class PH_Licenses {
 	                'The licensing server did not confirm the "%s" request. '
 	                . 'Please retry or contact Property Hive support.',
 	                $action
-	            )
+	            ),
+	            'activate' === $action && isset( $body['success'] ) && false === $body['success'] ? 1001 : 0
 	        );
 	    }
 
@@ -1974,6 +1974,30 @@ class PH_Licenses {
 	    }
 
 	    return $body;
+	}
+
+	private function pro_activation_allowance_exhausted( $status )
+	{
+		$data = isset( $status['data'] ) && is_array( $status['data'] ) ? $status['data'] : array();
+		return ( $data['unlimited_activations'] ?? false ) !== true &&
+			isset( $data['activations_remaining'] ) && is_numeric( $data['activations_remaining'] ) &&
+			(float) $data['activations_remaining'] <= 0;
+	}
+
+	private function pro_activation_allowance_message()
+	{
+		return 'This license has no available site activations. Another site may be using the allowance, including the original site if it was reactivated after cloning. Deactivate the license on that site or release its activation in your Property Hive account, then try the move again. You can also dismiss the domain warning if this is a staging site and you want to leave Pro inactive here.';
+	}
+
+	/** Called only after the destination is confirmed inactive. */
+	private function clear_uncommitted_pro_transfer( $pending )
+	{
+		// Do not abandon a partially committed local activation.
+		if ( get_option( 'propertyhive_pro_instance_id', '' ) === $pending['old_instance'] &&
+			get_option( 'propertyhive_pro_site_identity', '' ) === $pending['source_hash'] &&
+			get_option( 'propertyhive_pro_pending_license_transfer', array() ) === $pending ) {
+			delete_option( 'propertyhive_pro_pending_license_transfer' );
+		}
 	}
 
 	public function handle_move_pro_license()
@@ -2224,10 +2248,31 @@ class PH_Licenses {
 	        }
 
 	        if ( 'active' !== $new_status['status_check'] ) {
-	            $this->request_pro_license_transfer_api(
-	                'activate',
-	                $new_parameters
-	            );
+	            // Refresh after releasing the old activation, or when resuming a
+	            // move made with an instance that is no longer active.
+	            $new_status = $this->request_pro_license_transfer_api( 'status', $new_parameters );
+	            if ( 'inactive' === $new_status['status_check'] && $this->pro_activation_allowance_exhausted( $new_status ) ) {
+	                $this->clear_uncommitted_pro_transfer( $pending );
+	                throw new RuntimeException( $this->pro_activation_allowance_message() );
+	            }
+	            if ( 'inactive' === $new_status['status_check'] ) {
+	                try {
+	                    $this->request_pro_license_transfer_api( 'activate', $new_parameters );
+	                } catch ( RuntimeException $activation_error ) {
+	                    // Only a definite rejection can abandon the pending move.
+	                    // Timeouts/invalid responses retain its instance for retry.
+	                    if ( 1001 !== $activation_error->getCode() ) {
+	                        throw $activation_error;
+	                    }
+	                    $confirmed = $this->request_pro_license_transfer_api( 'status', $new_parameters );
+	                    if ( 'active' !== $confirmed['status_check'] ) {
+	                        $this->clear_uncommitted_pro_transfer( $pending );
+	                        throw new RuntimeException( $this->pro_activation_allowance_exhausted( $confirmed )
+	                            ? $this->pro_activation_allowance_message()
+	                            : 'The licensing server declined activation on this domain. Check that your subscription is active and an activation is available in your Property Hive account, then try again. The previous activation may already have been released.' );
+	                    }
+	                }
+	            }
 	        }
 
 	        // Always confirm the destination before accepting it locally.
