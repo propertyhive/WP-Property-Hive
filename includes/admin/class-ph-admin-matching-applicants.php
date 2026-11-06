@@ -421,6 +421,7 @@ class PH_Admin_Matching_Applicants {
 
             $args = array(
                 'post_type' => 'contact',
+                'post_status' => 'publish',
                 'nopaging' => true,
             );
 
