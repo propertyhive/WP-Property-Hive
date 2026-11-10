@@ -232,7 +232,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
             
             foreach ( $images_hidden as $image_hidden ) 
             {
-                echo '<a href="' . esc_url($image_hidden['url']) . '" data-fancybox="divi-gallery"></a>';
+                echo '<a href="' . esc_url($image_hidden['url']) . '" aria-haspopup="dialog" data-fancybox="divi-gallery"></a>';
                 ++$image_number;
             }
         ?>
@@ -263,11 +263,11 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                         echo ' id="' . esc_attr( $id_text_mobile ) . '"';
                     }
 
-                    echo ' href="' . esc_url( $images[$image_number]['url'] ) . '" data-fancybox="divi-gallery" style="background-image:url(' . esc_url( $images[$image_number]['url'] ) . ')"></a>';
+                    echo ' href="' . esc_url( $images[$image_number]['url'] ) . '" aria-haspopup="dialog" data-fancybox="divi-gallery" style="background-image:url(' . esc_url( $images[$image_number]['url'] ) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
-                        echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" aria-haspopup="dialog" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
                             esc_html__( 'See all %d images', 'propertyhive' ),
@@ -277,7 +277,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
                     }
                     if ( $image_number == ($max_images - 1) )
                     {
-                        echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" aria-haspopup="dialog" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
                             esc_html__( 'See all %d images', 'propertyhive' ),
@@ -294,7 +294,7 @@ class Divi_Property_Gallery_Widget extends ET_Builder_Module
 
             while ( count($images) > ($image_number) )
             {
-                echo '<a href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="divi-gallery"></a>';
+                echo '<a href="' . esc_url($images[$image_number]['url']) . '" aria-haspopup="dialog" data-fancybox="divi-gallery"></a>';
                 ++$image_number;
             }
 

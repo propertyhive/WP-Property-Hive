@@ -1984,7 +1984,7 @@ function template_assistant_search_result_image_size_changes( $image_size )
     return $image_size;
 }
 
-add_action( 'wp', 'template_assistant_search_result_field_changes' );
+add_action( 'wp_loaded', 'template_assistant_search_result_field_changes' );
 // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper template_assistant_search_result_field_changes; the established callable name is part of the plugin/extension API and must remain stable.
 function template_assistant_search_result_field_changes()
 {
@@ -2161,5 +2161,54 @@ function propertyhive_get_flag()
     return $flag;
 }
 
+/**
+ * Add accessible page numbers to pagination using the WordPress HTML processor.
+ *
+ * @param string $html Pagination HTML.
+ * @param array  $args Pagination arguments.
+ * @return string
+ */
+add_filter( 'paginate_links_output', 'propertyhive_add_aria_label_to_pagination_numbers', 10, 2 );
+function propertyhive_add_aria_label_to_pagination_numbers( $html, $args ) 
+{
+    // Retain compatibility with WordPress versions predating the HTML processor.
+    if ( ! class_exists( 'WP_HTML_Tag_Processor' ) ) {
+        return $html;
+    }
 
+    $p         = new WP_HTML_Tag_Processor( $html );
+    $n         = 1;
+    $page_text = __( 'Page', 'propertyhive' );
 
+    while ( $p->next_tag( array( 'class_name' => 'page-numbers' ) ) ) {
+        if ( 'SPAN' !== $p->get_tag() && 'A' !== $p->get_tag() ) {
+            continue;
+        }
+
+        if ( $p->has_class( 'prev' ) || $p->has_class( 'next' ) ) {
+            if ( null === $p->get_attribute( 'aria-label' ) && null === $p->get_attribute( 'aria-labelledby' ) ) {
+                $p->set_attribute( 'aria-label', $p->has_class( 'prev' ) ? __( 'Previous page', 'propertyhive' ) : __( 'Next page', 'propertyhive' ) );
+            }
+            continue;
+        }
+
+        if ( $p->has_class( 'current' ) ) {
+            $n = $args['current'];
+        }
+
+        if ( $p->has_class( 'dots' ) ) {
+            if ( $args['current'] - $args['mid_size'] > $n ) {
+                $n = $args['current'] - $args['mid_size'] - 1;
+            } else {
+                $n = $args['total'] - $args['end_size'];
+            }
+            ++$n;
+            continue;
+        }
+
+        $p->set_attribute( 'aria-label', $page_text . ' ' . number_format_i18n( (int) $n ) );
+        ++$n;
+    }
+
+    return $p->get_updated_html();
+}

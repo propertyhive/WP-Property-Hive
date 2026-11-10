@@ -111,16 +111,16 @@ class PH_Emails {
         }
 	}
 
-		public function send_applicant_registration_alert( $contact_post_id, $user_id )
-		{
-			// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
-			$request_post = wp_unslash( $_POST );
-			$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
-			$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
+	public function send_applicant_registration_alert( $contact_post_id, $user_id )
+	{
+		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- This internal action callback is invoked by the nonce-checked applicant registration AJAX handler; it only formats that request's notification email.
+		$request_post = wp_unslash( $_POST );
+		$office_id = isset( $request_post['office_id'] ) && is_scalar( $request_post['office_id'] ) ? absint( $request_post['office_id'] ) : 0;
+		$department = isset( $request_post['department'] ) && is_string( $request_post['department'] ) ? sanitize_key( $request_post['department'] ) : '';
 
-			if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
-			{
-				$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
+		if ( get_option( 'propertyhive_new_registration_alert', '' ) == 'yes' && $office_id > 0 && '' !== $department )
+		{
+			$to = get_post_meta( $office_id, '_office_email_address_' . str_replace( 'residential-', '', $department ), TRUE );
 
 			if ( $to == '' )
 			{
@@ -567,8 +567,17 @@ class PH_Emails {
 							{
 								if ( $dry_run === true ) { echo 'Already sent properties before: ' . esc_html( wp_json_encode( $already_sent_properties, JSON_PRETTY_PRINT ) ) . "<br>\n"; }
 
+								$matching_property_lookup = array_fill_keys($matching_properties, true);
+
 								foreach ( $already_sent_properties as $already_sent_property_id => $sends )
 								{
+									if ( !isset($matching_property_lookup[$already_sent_property_id]) )
+								    {
+								    	if ( $dry_run === true ) { echo 'Already sent property no longer in matched list. Skipping checks for on market and price changes.' . "<br>\n"; }
+
+								        continue;
+								    }
+
 									$highest_send = $sends[count($sends) - 1]['date'];
 
 									if ( $highest_send != '' )
@@ -609,9 +618,9 @@ class PH_Emails {
 							$new_matching_properties = array();
 							foreach ($matching_properties as $matching_property)
 							{
-								if ( !isset($already_sent_properties[$matching_property->id]) && !in_array($matching_property->id, $dismissed_properties) )
+								if ( !isset($already_sent_properties[$matching_property]) && !in_array($matching_property, $dismissed_properties) )
 								{
-									$new_matching_properties[] = $matching_property->id;
+									$new_matching_properties[] = $matching_property;
 								}
 							}
 

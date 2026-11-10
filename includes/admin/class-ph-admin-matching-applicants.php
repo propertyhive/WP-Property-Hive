@@ -421,6 +421,7 @@ class PH_Admin_Matching_Applicants {
 
             $args = array(
                 'post_type' => 'contact',
+                'post_status' => 'publish',
                 'nopaging' => true,
             );
 
@@ -432,6 +433,17 @@ class PH_Admin_Matching_Applicants {
                 'compare' => 'LIKE'
             );
 
+            if ( version_compare( get_bloginfo( 'version' ), '5.1', '>=' ) )
+			{
+				// If WP version contains compare_key, check contact has at least one applicant profile with Send Matching Properties checked
+				$meta_query[] = array(
+					'key' => '_applicant_profile_',
+					'compare_key' => 'LIKE',
+					'value' => 'send_matching_properties";s:3:"yes"',
+					'compare' => 'LIKE',
+				);
+			}
+
             // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Applicant membership is stored in serialized _contact_types metadata; preserve complete matching results and per-profile extension checks.
             $args['meta_query'] = $meta_query;
 
@@ -442,8 +454,6 @@ class PH_Admin_Matching_Applicants {
                 while ( $contacts_query->have_posts() )
                 {
                     $contacts_query->the_post();
-
-                    $contact = new PH_Contact(get_the_ID());
 
                     $dismissed_properties = get_post_meta( get_the_ID(), '_dismissed_properties', TRUE );
 
@@ -638,28 +648,31 @@ class PH_Admin_Matching_Applicants {
                                     }
                                 }
 
-                                $additional_checks = apply_filters( 'propertyhive_matching_applicants_check', true, $property, get_the_ID(), $applicant_profile );
+                                if ( $matching_elements == $elements_checked )
+                                {
+	                                $additional_checks = apply_filters( 'propertyhive_matching_applicants_check', true, $property, get_the_ID(), $applicant_profile );
 
-                                if ( $additional_checks === true && $matching_elements == $elements_checked )
-                                {  
-                                    $applicant_profile['applicant_profile_id'] = $i;
+	                                if ( $additional_checks === true )
+	                                {  
+	                                    $applicant_profile['applicant_profile_id'] = $i;
 
-                                    // Matched all criteria
-                                    if ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' )
-                                    {
-                                        $hot_applicants[] = array(
-                                            'contact_id' => get_the_ID(),
-                                            'applicant_profile' => $applicant_profile,
-                                        );
-                                    }
-                                    else
-                                    {
-                                        $applicants[] = array(
-                                            'contact_id' => get_the_ID(),
-                                            'applicant_profile' => $applicant_profile,
-                                        );
-                                    }
-                                }
+	                                    // Matched all criteria
+	                                    if ( isset($applicant_profile['grading']) && $applicant_profile['grading'] == 'hot' )
+	                                    {
+	                                        $hot_applicants[] = array(
+	                                            'contact_id' => get_the_ID(),
+	                                            'applicant_profile' => $applicant_profile,
+	                                        );
+	                                    }
+	                                    else
+	                                    {
+	                                        $applicants[] = array(
+	                                            'contact_id' => get_the_ID(),
+	                                            'applicant_profile' => $applicant_profile,
+	                                        );
+	                                    }
+	                                }
+	                            }
                             }
                         }
                     }

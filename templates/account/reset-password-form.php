@@ -12,15 +12,15 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 ?>
 
-<form name="ph_reset_password_form" class="propertyhive-form reset-password-form" action="" method="post">
+<form name="ph_reset_password_form" class="propertyhive-form reset-password-form" action="" method="post" aria-label="<?php esc_attr_e( 'Reset password', 'propertyhive' ); ?>">
 
     <p><?php echo esc_html__( 'Enter a new password below.', 'propertyhive' ); ?></p>
  	
-    <div id="resetPasswordError" style="display:none;" class="alert alert-danger alert-box">
+    <div id="resetPasswordError" role="alert" style="display:none;" class="alert alert-danger alert-box">
         <?php echo esc_html(__( 'The passwords entered must match', 'propertyhive' )); ?>
     </div>
 
-    <div id="resetPasswordSuccess" style="display:none;" class="alert alert-success">
+    <div id="resetPasswordSuccess" role="status" style="display:none;" class="alert alert-success">
         <?php echo esc_html(__( 'Success. Your password has been changed successfully. You can now login with your new password.', 'propertyhive' )); ?><br>
         <a href="<?php echo esc_url(get_permalink( get_option( 'propertyhive_applicant_login_page_id', '' ) )); ?>">Login</a>
     </div>

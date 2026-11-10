@@ -1314,8 +1314,9 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         // so trigger focusout handlers to remove .ui-state-focus
                         ui.item.children( "h3" ).triggerHandler( "focusout" );
              
-                        // Refresh accordion to handle new order
+                        // Refresh the source first, then register fields moved to the destination.
                         $( this ).accordion( "refresh" );
+                        ui.item.parent().not( this ).accordion( "refresh" );
                     },
                     update: function( event, ui ) 
                     {
@@ -1347,8 +1348,9 @@ class PH_Settings_Frontend extends PH_Settings_Page {
                         // so trigger focusout handlers to remove .ui-state-focus
                         ui.item.children( "h3" ).triggerHandler( "focusout" );
              
-                        // Refresh accordion to handle new order
+                        // Refresh the source first, then register fields moved to the destination.
                         $( this ).accordion( "refresh" );
+                        ui.item.parent().not( this ).accordion( "refresh" );
                     },
                     update: function( event, ui ) 
                     {

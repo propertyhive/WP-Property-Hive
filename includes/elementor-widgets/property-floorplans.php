@@ -114,7 +114,7 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 
 	                foreach ($floorplan_urls as $floorplan)
 	                {
-	                	echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt=""></a>';
+	                	echo '<a href="' . esc_url($floorplan['url']) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url($floorplan['url']) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( ( isset( $floorplan['title'] ) ? $floorplan['title'] : '' ) ) ) !== '' ) ? wp_strip_all_tags( ( isset( $floorplan['title'] ) ? $floorplan['title'] : '' ) ) : __( 'View floorplan', 'propertyhive' ) ) . '"></a>';
 	                }
 
 	            echo '</div>';
@@ -134,7 +134,7 @@ class Elementor_Property_Floorplans_Widget extends \Elementor\Widget_Base {
 					{
 						if ( wp_attachment_is_image($attachment_id) )
 	                    {
-							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
+							echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="floorplans" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View floorplan', 'propertyhive' ) ) . '"></a>';
 						}
 						else
 						{

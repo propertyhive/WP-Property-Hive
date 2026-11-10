@@ -816,6 +816,20 @@ function ph_form_field( $key, $field )
 
     $output = '';
 
+    // Name unlabelled controls without changing their structure or label visibility.
+    $control_aria_label = '';
+    $field_label = isset( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : '';
+    if ( ( isset( $field['show_label'] ) && ! $field['show_label'] ) || '' === $field_label ) {
+        $control_aria_label = isset( $field['aria_label'] ) ? trim( wp_strip_all_tags( $field['aria_label'] ) ) : '';
+        if ( '' === $control_aria_label ) {
+            $control_aria_label = $field_label;
+        }
+        if ( '' === $control_aria_label ) {
+            // Custom fields can supply aria_label when the field key is not descriptive.
+            $control_aria_label = ucwords( str_replace( array( '_', '-' ), ' ', $key ) );
+        }
+    }
+
     switch ($field['type'])
     {
         case "text":
@@ -857,15 +871,15 @@ function ph_form_field( $key, $field )
 
             if ($field['show_label'])
             {
-                $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
+                $output .= '<label for="' . esc_attr( $field['id'] ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
 
-            $output .= '<input
+            $output .= '<input' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                     type="' . esc_attr( $field['type'] ) . '"
                     name="' . esc_attr( $key ) . '"
                     id="' . esc_attr( $field['id'] ) . '"
@@ -916,12 +930,12 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
 
-            $output .= '<textarea
+            $output .= '<textarea' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                     name="' . esc_attr( $key ) . '"
                     id="' . esc_attr( $key ) . '"
                     placeholder="' . esc_attr(  $field['placeholder'] ) . '"
@@ -962,7 +976,7 @@ function ph_form_field( $key, $field )
 
             $output .= $field['before'];
 
-            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input
+            $output .= '<label style="' . esc_attr( $field['label_style'] ) . '"><input' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                 type="' . esc_attr( $field['type'] ) . '"
                 name="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
@@ -982,7 +996,18 @@ function ph_form_field( $key, $field )
         case "radio":
         {
             $field['class'] = isset( $field['class'] ) ? $field['class'] : '';
-            $field['before'] = isset( $field['before'] ) ? $field['before'] : '<div class="control control-' . esc_attr( $key ) . '">';
+            // Name the default group without changing extension-provided wrappers.
+            if ( ! isset( $field['before'] ) ) {
+                $group_label = isset( $field['label'] ) ? trim( wp_strip_all_tags( $field['label'] ) ) : '';
+                if ( '' === $group_label && isset( $field['aria_label'] ) ) {
+                    $group_label = trim( wp_strip_all_tags( $field['aria_label'] ) );
+                }
+                if ( '' === $group_label ) {
+                    $group_label = ucwords( str_replace( array( '_', '-' ), ' ', $key ) );
+                }
+                $field['before'] = '<div class="control control-' . esc_attr( $key ) . '"'
+                    . ( '' !== $group_label ? ' role="group" aria-label="' . esc_attr( $group_label ) . '"' : '' ) . '>';
+            }
             $field['after'] = isset( $field['after'] ) ? $field['after'] : '</div>';
             $field['before_option'] = isset( $field['before_option'] ) ? $field['before_option'] : '<label>';
             $field['after_option'] = isset( $field['after_option'] ) ? $field['after_option'] : '</label>';
@@ -1077,7 +1102,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'];
                 if ($field['required'])
                 {
-                    $output .= '<span class="required"> *</span>';
+                    $output .= '<span class="required" aria-hidden="true"> *</span>';
                 }
                 $output .= '</label>';
             }
@@ -1092,7 +1117,7 @@ function ph_form_field( $key, $field )
                 }
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
@@ -1168,7 +1193,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
@@ -1247,7 +1272,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<select
+            $output .= '<select' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                 name="' . esc_attr( $key ) . '"
                 id="' . esc_attr( $key ) . '"
                 class="' . esc_attr( $field['class'] ) . '"
@@ -1499,7 +1524,7 @@ function ph_form_field( $key, $field )
                 $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
             }
 
-            $output .= '<input type="text" autocomplete="off"
+            $output .= '<input type="text" autocomplete="off"' . ( '' !== $control_aria_label ? ' aria-label="' . esc_attr( $control_aria_label ) . '"' : '' ) . '
                 name="' . esc_attr( $key ) . '"
                 id="' . esc_attr( $key ) . '"
                 value="' . esc_attr( $field['value'] ) . '"
@@ -1739,16 +1764,24 @@ function ph_form_field( $key, $field )
 
                 for ( $level_i = 1; $level_i <= $levels_of_taxonomy; ++$level_i )
                 {
+                    $level_id = ( $field['dynamic_population'] && $level_i > 1 ) ? $key . '_level_' . $level_i : $key;
+
                     $output .= $field['before'];
 
                     if ($field['show_label'])
                     {
-                        $output .= '<label for="' . esc_attr( $key ) . '">' . $field['label'] . '</label>';
+                        $output .= '<label for="' . esc_attr( $level_id ) . '">' . $field['label'] . '</label>';
                     }
 
-                    $output .= '<select
+                    $level_aria_label = $control_aria_label;
+                    if ( $field['dynamic_population'] && $levels_of_taxonomy > 1 && '' !== $level_aria_label ) {
+                        /* translators: 1: dropdown label, 2: location hierarchy level number. */
+                        $level_aria_label = sprintf( __( '%1$s level %2$s', 'propertyhive' ), $control_aria_label, number_format_i18n( $level_i ) );
+                    }
+
+                    $output .= '<select' . ( '' !== $level_aria_label ? ' aria-label="' . esc_attr( $level_aria_label ) . '"' : '' ) . ( ! empty( $field['required'] ) ? ' aria-required="true"' : '' ) . '
                         name="' . esc_attr( $key ) . ( $field['multiselect'] ? '[]' : '' ) . '"
-                        id="' . esc_attr( $key ) . '"
+                        id="' . esc_attr( $level_id ) . '"
                         class="' . esc_attr( $field['class'] ) . ( $field['multiselect'] ? ' ph-form-multiselect' : '' ) . '"
                         ' . ( $field['multiselect'] ? ' multiple="multiple"' : '' ) . 
                         ( $field['dynamic_population'] ? ' data-dynamic-population-level="' . $level_i . '"' : '' ) .

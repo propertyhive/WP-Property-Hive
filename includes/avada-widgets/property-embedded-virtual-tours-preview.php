@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	<div class="fusion-module-property-embedded-virtual-tours-preview">
 		{{{titleHTML}}}
-		<iframe src="https://www.youtube.com/embed/CbOQqvQDrVQ?si=8z8timInJgyT305L" height="315" width="560" allowfullscreen frameborder="0" allow="fullscreen"></iframe>
+		<iframe title="<?php esc_attr_e( 'Sample property virtual tour', 'propertyhive' ); ?>" src="https://www.youtube.com/embed/CbOQqvQDrVQ?si=8z8timInJgyT305L" height="315" width="560" allowfullscreen frameborder="0" allow="fullscreen"></iframe>
 	</div>
 
 </script>

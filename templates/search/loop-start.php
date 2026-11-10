@@ -12,4 +12,4 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @version     1.0.0
  */
 ?>
-<ul class="properties clear">
+<ul class="properties clear" aria-label="<?php esc_attr_e( 'Properties', 'propertyhive' ); ?>">

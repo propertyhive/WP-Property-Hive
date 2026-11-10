@@ -43,7 +43,7 @@ global $propertyhive;
         if ( !empty($results_orderby) )
         {
     ?>
-    <select name="orderby" class="orderby">
+    <select name="orderby" class="orderby" aria-label="<?php esc_attr_e( 'Sort properties', 'propertyhive' ); ?>">
     <?php
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
 		foreach ( $results_orderby as $id => $name )

@@ -77,9 +77,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     if ( isset($applicant['applicant_profile']['currency']) && !empty($applicant['applicant_profile']['currency']) )
                     {
                         // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
-                        $PH_Countries = new PH_Countries();
-                        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
-                        $selected_currency = $PH_Countries->get_currency($applicant['applicant_profile']['currency']);
+                        $selected_currency = PH()->countries->get_currency($applicant['applicant_profile']['currency']);
                         if ( $selected_currency !== false )
                         {
                             // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.

@@ -320,8 +320,6 @@ class PH_Admin_Matching_Properties {
 
 	public function get_matching_properties( $contact_id, $applicant_profile_id, $date_added_from = '' )
 	{
-		global $post;
-
 		$properties = array();
 
         $contact = get_post($contact_id);
@@ -341,7 +339,9 @@ class PH_Admin_Matching_Properties {
 
             $args = array(
                 'post_type' => 'property',
+                'post_status' => 'publish',
                 'nopaging' => true,
+                'fields' => 'ids',
                 // phpcs:ignore WordPressVIPMinimum.Performance.WPQueryParams.PostNotIn_post__not_in -- Exclude this contact's explicitly dismissed properties before applying existing matching and extension query conditions.
                 'post__not_in' => $dismissed_properties
             );
@@ -739,20 +739,12 @@ class PH_Admin_Matching_Properties {
 
             $args = apply_filters( 'propertyhive_matching_properties_args', $args, $contact_id, $applicant_profile );
 
+            // Preserve the ID-only return contract even if a query filter changes fields.
+            $args['fields'] = 'ids';
             $properties_query = new WP_Query( $args );
 
-            if ( $properties_query->have_posts() )
-            {
-                while ( $properties_query->have_posts() )
-                {
-                    $properties_query->the_post();
-
-                    $property = new PH_Property($post->ID);
-
-                    $properties[] = $property;
-                }
-            }
-            wp_reset_postdata();
+            // Read IDs directly; the_post() handles ID-only results differently across WP versions.
+            $properties = array_map( 'intval', $properties_query->posts );
         }
 
         return $properties;

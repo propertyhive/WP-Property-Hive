@@ -14,7 +14,7 @@ global $post;
 
 <li class="action-make-enquiry">
     
-    <a data-fancybox data-src="#makeEnquiry<?php echo (int)$post->ID; ?>" href="javascript:;"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
+    <a aria-haspopup="dialog" data-fancybox data-src="#makeEnquiry<?php echo (int)$post->ID; ?>" href="javascript:;"><?php echo esc_html(__( 'Make Enquiry', 'propertyhive' )); ?></a>
 
     <!-- LIGHTBOX FORM -->
     <div id="makeEnquiry<?php echo (int) $post->ID; ?>" style="display:none;">

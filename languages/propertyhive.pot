@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv3.
 msgid ""
 msgstr ""
-"Project-Id-Version: Property Hive 2.2.6\n"
+"Project-Id-Version: Property Hive 2.3.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/propertyhive\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-16T06:16:43+01:00\n"
+"POT-Creation-Date: 2026-09-23T20:14:16+01:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.6.0\n"
 "X-Domain: propertyhive\n"
@@ -20,6 +20,8 @@ msgstr ""
 #: includes/admin/class-ph-admin-menus.php:135
 #: includes/admin/class-ph-admin-menus.php:137
 #: includes/admin/class-ph-admin-menus.php:193
+#: includes/admin/class-ph-admin-onboarding.php:1190
+#: includes/admin/class-ph-admin-onboarding.php:1191
 #: includes/class-ph-ajax.php:2171
 #: includes/class-ph-elementor.php:242
 #: includes/salient-widgets/property-actions.php:41
@@ -318,8 +320,8 @@ msgstr ""
 #: includes/admin/class-ph-admin.php:191
 #: includes/admin/class-ph-admin.php:210
 #: includes/admin/class-ph-admin.php:231
-#: includes/admin/class-ph-admin.php:990
-#: includes/admin/class-ph-admin.php:1041
+#: includes/admin/class-ph-admin.php:991
+#: includes/admin/class-ph-admin.php:1042
 #: includes/admin/post-types/class-ph-admin-meta-boxes.php:214
 #: includes/class-ph-ajax.php:181
 #: includes/class-ph-ajax.php:396
@@ -329,84 +331,84 @@ msgstr ""
 msgid "Insufficient permissions"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:206
+#: includes/admin/class-ph-admin-assets.php:213
 #: includes/class-ph-frontend-scripts.php:209
 msgid "selected"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:260
+#: includes/admin/class-ph-admin-assets.php:272
 msgid "Enter the Property's Display Address"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:261
+#: includes/admin/class-ph-admin-assets.php:273
 msgid "This is the title or address that will be shown publicly. Make it clear and appealing for your audience."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:268
+#: includes/admin/class-ph-admin-assets.php:280
 msgid "Explore the Property Record"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:269
+#: includes/admin/class-ph-admin-assets.php:281
 msgid "The property record is organized into sections for easy navigation. Use these tabs to switch between sections.<br><br>Go ahead, try clicking them now."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:278
+#: includes/admin/class-ph-admin-assets.php:290
 msgid "Enter the Property Details"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:279
+#: includes/admin/class-ph-admin-assets.php:291
 msgid "Use these fields to input essential property information like address, price, bedrooms, and more. You can also upload images to showcase the property."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:287
+#: includes/admin/class-ph-admin-assets.php:299
 msgid "Put it on the Market"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:288
+#: includes/admin/class-ph-admin-assets.php:300
 msgid "For a property to show on your website it will need to be set to 'On Market' under the 'Marketing' tab."
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:297
+#: includes/admin/class-ph-admin-assets.php:309
 msgid "Publish your Property"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:298
+#: includes/admin/class-ph-admin-assets.php:310
 msgid "When you're done and are ready to save your changes, simply click 'Publish'"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:401
+#: includes/admin/class-ph-admin-assets.php:413
 msgid "Please check the box to confirm that you are happy to remove this term"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:402
+#: includes/admin/class-ph-admin-assets.php:414
 msgid "Please select at least one active department"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:403
+#: includes/admin/class-ph-admin-assets.php:415
 msgid "The chosen primary department has not been selected as active"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:404
+#: includes/admin/class-ph-admin-assets.php:416
 msgid "Please select which countries you operate in"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:405
+#: includes/admin/class-ph-admin-assets.php:417
 msgid "The default country hasn't been selected as a country you operate in"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:451
+#: includes/admin/class-ph-admin-assets.php:463
 msgid "If you have a moment, please let us know why you are deactivating:"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:452
+#: includes/admin/class-ph-admin-assets.php:464
 msgid "Quick Feedback"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:453
+#: includes/admin/class-ph-admin-assets.php:465
 msgid "Skip & Deactivate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:454
+#: includes/admin/class-ph-admin-assets.php:466
 #: includes/admin/class-ph-admin-merge-contacts.php:157
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:155
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-actions.php:216
@@ -433,39 +435,39 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:455
+#: includes/admin/class-ph-admin-assets.php:467
 msgid "Submit & Deactivate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:457
+#: includes/admin/class-ph-admin-assets.php:469
 msgid "The plugin broke my site"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:458
+#: includes/admin/class-ph-admin-assets.php:470
 msgid "The plugin is confusing"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:459
+#: includes/admin/class-ph-admin-assets.php:471
 msgid "The support/documentation is inadequate"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:460
+#: includes/admin/class-ph-admin-assets.php:472
 msgid "The plugin is too slow/affects performance"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:461
+#: includes/admin/class-ph-admin-assets.php:473
 msgid "I no longer need the plugin"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:462
+#: includes/admin/class-ph-admin-assets.php:474
 msgid "I found a better plugin"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:463
+#: includes/admin/class-ph-admin-assets.php:475
 msgid "It's a temporary deactivation"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:464
+#: includes/admin/class-ph-admin-assets.php:476
 #: includes/class-ph-third-party-contacts.php:38
 #: includes/ph-property-functions.php:625
 #: includes/ph-property-functions.php:655
@@ -479,19 +481,19 @@ msgstr ""
 msgid "Other"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:466
+#: includes/admin/class-ph-admin-assets.php:478
 msgid "Oh no! Can you tell us more? (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:467
+#: includes/admin/class-ph-admin-assets.php:479
 msgid "What's the plugin's name? (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:468
+#: includes/admin/class-ph-admin-assets.php:480
 msgid "Additional feedback or comments: (optional)"
 msgstr ""
 
-#: includes/admin/class-ph-admin-assets.php:470
+#: includes/admin/class-ph-admin-assets.php:482
 msgid "Anonymous feedback"
 msgstr ""
 
@@ -604,12 +606,12 @@ msgid "Owners &amp; Landlords"
 msgstr ""
 
 #: includes/admin/class-ph-admin-menus.php:200
-#: includes/admin/class-ph-admin-post-types.php:810
+#: includes/admin/class-ph-admin-post-types.php:809
 msgid "Applicants"
 msgstr ""
 
 #: includes/admin/class-ph-admin-menus.php:201
-#: includes/admin/class-ph-admin-post-types.php:824
+#: includes/admin/class-ph-admin-post-types.php:823
 msgid "Third Party Contacts"
 msgstr ""
 
@@ -748,6 +750,696 @@ msgstr ""
 msgid "Use as Primary Contact"
 msgstr ""
 
+#: includes/admin/class-ph-admin-onboarding.php:58
+#: includes/admin/class-ph-admin-onboarding.php:59
+msgid "Property Hive Setup"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:269
+msgid "Invalid setup step."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:365
+msgid "Please choose a valid license type."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:373
+#: includes/admin/class-ph-admin-onboarding.php:1608
+msgid "Please enter your license key."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:433
+#: includes/admin/class-ph-admin-onboarding.php:442
+#: includes/admin/class-ph-admin-onboarding.php:481
+#: includes/admin/class-ph-admin-onboarding.php:494
+#: includes/admin/class-ph-admin-onboarding.php:1612
+msgid "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost."
+msgstr ""
+
+#. translators: %s: license service error detail.
+#: includes/admin/class-ph-admin-onboarding.php:472
+msgid "That key wasn't recognised. Check for typos, or recover your key. You can keep going and add it later - nothing is lost. %s"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:481
+msgid "Your Property Hive license key is inactive. You can keep going and add it later - nothing is lost."
+msgstr ""
+
+#. translators: %s: license expiry date.
+#: includes/admin/class-ph-admin-onboarding.php:492
+msgid "License expired on %s."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:536
+msgid "You do not have permission to restart setup."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:542
+msgid "The setup wizard can only be restarted on local, development or staging sites."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:563
+msgid "Development setup tools"
+msgstr ""
+
+#. translators: %s: WordPress environment type.
+#: includes/admin/class-ph-admin-onboarding.php:569
+msgid "This site is marked as %s, so administrators can restart the Property Hive setup wizard for testing."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:575
+msgid "Restart setup wizard"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:601
+#: includes/admin/class-ph-admin-onboarding.php:1154
+msgid "You do not have permission to run setup."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:776
+#: includes/admin/class-ph-admin-onboarding.php:778
+#: includes/admin/class-ph-admin-onboarding.php:1616
+msgid "Please choose at least one property sector."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:809
+#: includes/admin/class-ph-admin-onboarding.php:811
+#: includes/admin/class-ph-admin-onboarding.php:1617
+msgid "Please choose a valid country."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:843
+msgid "Please check your office details."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:854
+msgid "My Office"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:864
+msgid "Office details could not be saved."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:914
+#: includes/admin/class-ph-admin-onboarding.php:916
+#: includes/admin/class-ph-admin-onboarding.php:1618
+msgid "Please choose how you will use Property Hive."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:977
+#: includes/admin/class-ph-admin-onboarding.php:979
+#: includes/admin/class-ph-admin-onboarding.php:1619
+msgid "Please choose whether to import demo data."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:986
+#: includes/admin/class-ph-admin-onboarding.php:988
+msgid "Demo data could not be imported. Please try again or choose No."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1064
+msgid "You already have an active Property Hive subscription on this site."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1081
+msgid "Your license is active - add-on updates are enabled."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1193
+msgid "Skip setup"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1204
+msgid "Let's get Property Hive set up for you. Answer a few quick questions and we'll take care of the basics."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1212
+msgid "Which property sectors do you work in?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1213
+msgid "Choose the ones you want to use in Property Hive."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1215
+msgid "Residential sales"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1215
+msgid "Market and manage properties for sale."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1216
+msgid "Residential lettings"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1216
+msgid "Manage lettings, tenancies and landlords."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1217
+#: includes/admin/settings/class-ph-settings-custom-fields.php:268
+#: includes/admin/settings/class-ph-settings-custom-fields.php:300
+#: includes/ph-core-functions.php:220
+msgid "Commercial"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1217
+msgid "Manage commercial properties."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1220
+#: includes/admin/settings/class-ph-settings-general.php:31
+#: includes/admin/settings/class-ph-settings-general.php:46
+msgid "General"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1224
+msgid "Where does your agency operate?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1225
+msgid "Choose your country and we'll set the right currency and regional settings for Property Hive."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1227
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:163
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-correspondence-address.php:114
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-address.php:225
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-owner.php:365
+msgid "Country"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1235
+msgid "General > International"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1239
+msgid "What are your office details?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1240
+msgid "Tell us about your main office and we'll get it set up in Property Hive."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1244
+msgid "Find address"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1245
+msgid "Start typing an address or postcode"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1253
+#: includes/admin/class-ph-admin-onboarding.php:1720
+msgid "Office name"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1258
+#: includes/admin/class-ph-admin-onboarding.php:1721
+#: includes/admin/settings/class-ph-settings-offices.php:103
+msgid "Address Line 1"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1263
+#: includes/admin/class-ph-admin-onboarding.php:1722
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property-owner.php:158
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:85
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-correspondence-address.php:59
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-address.php:127
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-owner.php:315
+#: includes/admin/settings/class-ph-settings-offices.php:112
+#: includes/bricks-builder-widgets/property-address-line-2.php:19
+#: includes/elementor-widgets/property-address-line-2.php:14
+#: includes/elementor-widgets/property-address-line-2.php:35
+#: includes/salient-widgets/property-address-line-2.php:38
+msgid "Address Line 2"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1268
+#: includes/admin/class-ph-admin-onboarding.php:1723
+#: includes/admin/settings/class-ph-settings-offices.php:121
+msgid "Address Line 3"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1273
+#: includes/admin/class-ph-admin-onboarding.php:1724
+#: includes/admin/settings/class-ph-settings-offices.php:130
+msgid "Address Line 4"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1278
+#: includes/admin/class-ph-admin-onboarding.php:1725
+#: includes/admin/settings/class-ph-settings-offices.php:139
+msgid "Postcode"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1283
+#: includes/admin/class-ph-admin-onboarding.php:1726
+msgid "Phone number"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1288
+#: includes/admin/class-ph-admin-onboarding.php:1727
+msgid "Email address"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1293
+#: includes/admin/settings/class-ph-settings-offices.php:29
+#: includes/admin/settings/class-ph-settings-offices.php:66
+#: includes/admin/settings/class-ph-settings-offices.php:417
+#: includes/class-ph-post-types.php:657
+msgid "Offices"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1297
+msgid "What else do you need?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1298
+msgid "You've got the property website foundations. Now choose how else you'd like to use Property Hive."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1300
+msgid "Import properties"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1300
+msgid "Keep your website in sync with properties from your CRM."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1301
+msgid "Use it as a CRM"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1301
+msgid "Manage contacts, appraisals, viewings, offers and tenancies."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1302
+msgid "Upload to portals"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1302
+msgid "Automatically send your properties to third party portals."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1303
+msgid "Just the website for now"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1303
+msgid "No problem. You can always choose later."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1308
+msgid "Pro features are included with our paid plans."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1309
+msgid "You can try them free for 7 days."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1312
+#: includes/admin/class-ph-admin-onboarding.php:1336
+#: includes/admin/class-ph-admin-onboarding.php:1388
+msgid "Start your free 7-day trial"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1313
+#: includes/admin/class-ph-admin-onboarding.php:1389
+msgid "What's included?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1320
+msgid "Do you have a Property Hive subscription?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1332
+msgid "Try Property Hive Pro free for 7 days."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1333
+msgid "Pro features need a subscription."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1337
+msgid "View pricing"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1343
+msgid "Yes, I already have a subscription"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1343
+msgid "Enter your licence key to connect it to this site."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1344
+msgid "No, not yet"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1344
+msgid "That's fine. You can carry on with the free version."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1353
+msgid "Pro subscription key"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1360
+msgid "Old-style key (purchased before October 2023)"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1367
+msgid "License key"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1370
+msgid "Activate"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1373
+msgid "You can find your license key in your order confirmation email or your account on the Property Hive website."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1377
+msgid "Old-style keys enable updates for add-ons you've already purchased. Pro features need a Pro subscription."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1384
+msgid "Want to try the paid features?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1385
+msgid "Try all Property Hive features free for 7 days."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1395
+#: includes/admin/settings/class-ph-settings-licenses.php:31
+msgid "License"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1399
+msgid "Would you like to import demo data?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1400
+msgid "Add sample properties, contacts and other data so you can explore how Property Hive works before using your own."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1403
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-offer-property.php:76
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:305
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:356
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-sale-property.php:68
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-property.php:76
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-viewing-property.php:76
+#: includes/admin/settings/class-ph-settings-custom-fields.php:961
+#: includes/admin/settings/class-ph-settings-custom-fields.php:964
+#: includes/admin/settings/class-ph-settings-custom-fields.php:969
+#: includes/admin/views/html-bulk-edit-property.php:27
+#: includes/admin/views/html-bulk-edit-property.php:49
+#: includes/admin/views/html-viewing-details-meta-box.php:63
+#: includes/admin/views/html-viewing-details-meta-box.php:171
+#: includes/avada-widgets/property-embedded-virtual-tours.php:21
+#: includes/avada-widgets/property-embedded-virtual-tours.php:31
+#: includes/avada-widgets/property-epcs.php:21
+#: includes/avada-widgets/property-floorplans.php:21
+#: includes/avada-widgets/property-full-description.php:21
+#: includes/avada-widgets/property-images.php:21
+#: includes/avada-widgets/property-map.php:35
+#: includes/avada-widgets/property-summary-description.php:21
+#: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:38
+#: includes/bricks-builder-widgets/property-images.php:50
+#: includes/class-ph-elementor.php:411
+#: includes/divi-widgets/property-negotiator-email-address.php:25
+#: includes/divi-widgets/property-negotiator-telephone-number.php:25
+#: includes/elementor-widgets/property-embedded-virtual-tours.php:89
+#: includes/elementor-widgets/property-images.php:45
+#: includes/elementor-widgets/property-negotiator-email-address.php:71
+#: includes/elementor-widgets/property-negotiator-telephone-number.php:71
+#: includes/elementor-widgets/property-office-email-address.php:71
+#: includes/elementor-widgets/property-office-telephone-number.php:71
+#: includes/salient-widgets/property-embedded-virtual-tours.php:51
+#: includes/salient-widgets/property-embedded-virtual-tours.php:62
+#: includes/salient-widgets/property-epcs.php:51
+#: includes/salient-widgets/property-features.php:51
+#: includes/salient-widgets/property-floorplans.php:51
+#: includes/salient-widgets/property-images.php:51
+msgid "No"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1403
+msgid "Skip the demo data and use my own."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1404
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:306
+#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:357
+#: includes/admin/settings/class-ph-settings-custom-fields.php:961
+#: includes/admin/settings/class-ph-settings-custom-fields.php:964
+#: includes/admin/settings/class-ph-settings-custom-fields.php:969
+#: includes/admin/views/html-bulk-edit-property.php:26
+#: includes/admin/views/html-bulk-edit-property.php:48
+#: includes/admin/views/html-viewing-details-meta-box.php:63
+#: includes/admin/views/html-viewing-details-meta-box.php:171
+#: includes/avada-widgets/property-embedded-virtual-tours.php:20
+#: includes/avada-widgets/property-embedded-virtual-tours.php:30
+#: includes/avada-widgets/property-epcs.php:20
+#: includes/avada-widgets/property-floorplans.php:20
+#: includes/avada-widgets/property-full-description.php:20
+#: includes/avada-widgets/property-images.php:20
+#: includes/avada-widgets/property-map.php:34
+#: includes/avada-widgets/property-summary-description.php:20
+#: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:39
+#: includes/bricks-builder-widgets/property-images.php:51
+#: includes/class-ph-elementor.php:410
+#: includes/divi-widgets/property-negotiator-email-address.php:24
+#: includes/divi-widgets/property-negotiator-telephone-number.php:24
+#: includes/elementor-widgets/property-embedded-virtual-tours.php:88
+#: includes/elementor-widgets/property-images.php:44
+#: includes/elementor-widgets/property-negotiator-email-address.php:70
+#: includes/elementor-widgets/property-negotiator-telephone-number.php:70
+#: includes/elementor-widgets/property-office-email-address.php:70
+#: includes/elementor-widgets/property-office-telephone-number.php:70
+#: includes/salient-widgets/property-embedded-virtual-tours.php:50
+#: includes/salient-widgets/property-embedded-virtual-tours.php:61
+#: includes/salient-widgets/property-epcs.php:50
+#: includes/salient-widgets/property-features.php:50
+#: includes/salient-widgets/property-floorplans.php:50
+#: includes/salient-widgets/property-images.php:50
+msgid "Yes"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1404
+msgid "Add example data so I can explore Property Hive first."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1410
+msgid "Demo data will import when you continue."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1410
+msgid "The Demo Data feature will be activated and the data imported when you continue."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1415
+#: includes/admin/settings/class-ph-settings-demo-data.php:29
+msgid "Demo Data"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1419
+msgid "You're all set"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1420
+msgid "Property Hive is ready to go. What would you like to do next?"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1435
+msgid "Learn about property imports"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1436
+msgid "See how it works and check if your CRM is supported."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1440
+msgid "Learn about portal exports"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1441
+msgid "See how it works and where you can send your properties."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1445
+msgid "Create a property import"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1446
+msgid "Bring properties in from your CRM"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1449
+msgid "View and manage properties"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1450
+msgid "Open the property list in the dashboard"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1457
+msgid "Explore more settings"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1458
+msgid "Take a look at your setup and make any changes"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1466
+msgid "Back"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1467
+#: includes/admin/class-ph-admin-onboarding.php:1601
+#: includes/admin/views/html-admin-matching-applicants.php:345
+#: includes/admin/views/html-admin-matching-properties.php:475
+msgid "Continue"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1474
+msgid "Help improve Property Hive"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1475
+msgid "Share non-sensitive setup and feature usage data to help us improve Property Hive. We don't collect personal, contact or property details."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1515
+msgid "Pro"
+msgstr ""
+
+#. translators: %s: settings location, for example General > International.
+#: includes/admin/class-ph-admin-onboarding.php:1558
+msgid "You can change this later under 'Property Hive > Settings > %s'."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1602
+msgid "Saving..."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1603
+msgid "Importing demo data..."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1604
+msgid "Activating Demo Data..."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1605
+msgid "Demo data imported."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1606
+msgid "Demo data could not be imported. You can continue setup and try again later."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1607
+msgid "The Demo Data feature could not be activated on this site."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1609
+msgid "Checking your key... Contacting wp-property-hive.com - a couple of seconds."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1610
+msgid "Pro activated. The features in your plan are ready to use."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1611
+msgid "License valid - updates are enabled for your purchased add-ons."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1613
+msgid "Want the Pro features too? Start a free 7-day trial."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1614
+msgid "Property Import feature enabled"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1615
+#: includes/admin/settings/class-ph-settings-licenses.php:56
+msgid "Renew License"
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1620
+msgid "Office name must be 120 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1621
+msgid "Address Line 1 must be 120 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1622
+msgid "Address Line 2 must be 120 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1623
+msgid "Address Line 3 must be 120 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1624
+msgid "Address Line 4 must be 120 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1625
+msgid "Postcode must be 20 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1626
+msgid "Phone number must be 30 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1627
+msgid "Please enter a valid phone number."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1628
+msgid "Email address must be 100 characters or fewer."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1629
+#: includes/admin/class-ph-admin-onboarding.php:1771
+msgid "Please enter a valid email address."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1630
+msgid "Searching addresses..."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1631
+msgid "No matching addresses found."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1632
+msgid "Address lookup could not be completed. Please enter the address manually."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1633
+msgid "Address selected."
+msgstr ""
+
+#: includes/admin/class-ph-admin-onboarding.php:1634
+msgid "Skip setup? You can still configure Property Hive from settings later."
+msgstr ""
+
+#. translators: 1: field label, 2: maximum character count.
+#: includes/admin/class-ph-admin-onboarding.php:1756
+msgid "%1$s must be %2$d characters or fewer."
+msgstr ""
+
 #: includes/admin/class-ph-admin-post-types.php:139
 #: includes/admin/class-ph-admin-post-types.php:190
 #: includes/admin/post-types/class-ph-admin-meta-boxes.php:160
@@ -777,210 +1469,210 @@ msgid "An error occurred while unarchiving the post."
 msgstr ""
 
 #. translators: %s: URL to view the property
-#: includes/admin/class-ph-admin-post-types.php:337
+#: includes/admin/class-ph-admin-post-types.php:336
 msgid "Property updated. <a href=\"%s\">View property</a>"
+msgstr ""
+
+#: includes/admin/class-ph-admin-post-types.php:337
+#: includes/admin/class-ph-admin-post-types.php:356
+#: includes/admin/class-ph-admin-post-types.php:371
+#: includes/admin/class-ph-admin-post-types.php:387
+msgid "Custom field updated."
 msgstr ""
 
 #: includes/admin/class-ph-admin-post-types.php:338
 #: includes/admin/class-ph-admin-post-types.php:357
 #: includes/admin/class-ph-admin-post-types.php:372
 #: includes/admin/class-ph-admin-post-types.php:388
-msgid "Custom field updated."
-msgstr ""
-
-#: includes/admin/class-ph-admin-post-types.php:339
-#: includes/admin/class-ph-admin-post-types.php:358
-#: includes/admin/class-ph-admin-post-types.php:373
-#: includes/admin/class-ph-admin-post-types.php:389
 msgid "Custom field deleted."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:340
+#: includes/admin/class-ph-admin-post-types.php:339
 msgid "Property updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:341
-#: includes/admin/class-ph-admin-post-types.php:360
-#: includes/admin/class-ph-admin-post-types.php:375
-#: includes/admin/class-ph-admin-post-types.php:391
+#: includes/admin/class-ph-admin-post-types.php:340
+#: includes/admin/class-ph-admin-post-types.php:359
+#: includes/admin/class-ph-admin-post-types.php:374
+#: includes/admin/class-ph-admin-post-types.php:390
 msgid "Revision restored."
 msgstr ""
 
 #. translators: %s: URL to view the property
-#: includes/admin/class-ph-admin-post-types.php:343
+#: includes/admin/class-ph-admin-post-types.php:342
 msgid "Property published. <a href=\"%s\">View property</a>"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:344
+#: includes/admin/class-ph-admin-post-types.php:343
 msgid "Property saved."
 msgstr ""
 
 #. translators: %s: URL to preview the property
-#: includes/admin/class-ph-admin-post-types.php:346
+#: includes/admin/class-ph-admin-post-types.php:345
 msgid "Property submitted. <a target=\"_blank\" href=\"%s\">Preview property</a>"
 msgstr ""
 
 #. translators: 1: formatted date, 2: URL to preview the property
-#: includes/admin/class-ph-admin-post-types.php:348
+#: includes/admin/class-ph-admin-post-types.php:347
 msgid "Property scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview property</a>"
 msgstr ""
 
 #. translators: 1: formatted date
-#: includes/admin/class-ph-admin-post-types.php:349
-#: includes/admin/class-ph-admin-post-types.php:365
-#: includes/admin/class-ph-admin-post-types.php:381
-#: includes/admin/class-ph-admin-post-types.php:397
+#: includes/admin/class-ph-admin-post-types.php:348
+#: includes/admin/class-ph-admin-post-types.php:364
+#: includes/admin/class-ph-admin-post-types.php:380
+#: includes/admin/class-ph-admin-post-types.php:396
 msgid "M j, Y @ G:i"
 msgstr ""
 
 #. translators: %s: URL to preview the property
-#: includes/admin/class-ph-admin-post-types.php:351
+#: includes/admin/class-ph-admin-post-types.php:350
 msgid "Property draft updated. <a target=\"_blank\" href=\"%s\">Preview property</a>"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:356
-#: includes/admin/class-ph-admin-post-types.php:359
+#: includes/admin/class-ph-admin-post-types.php:355
+#: includes/admin/class-ph-admin-post-types.php:358
 msgid "Contact updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:361
+#: includes/admin/class-ph-admin-post-types.php:360
 msgid "Contact published."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:362
+#: includes/admin/class-ph-admin-post-types.php:361
 msgid "Contact saved."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:363
+#: includes/admin/class-ph-admin-post-types.php:362
 msgid "Contact submitted."
 msgstr ""
 
 #. translators: 1: formatted date
-#: includes/admin/class-ph-admin-post-types.php:365
+#: includes/admin/class-ph-admin-post-types.php:364
 msgid "Contact scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:366
+#: includes/admin/class-ph-admin-post-types.php:365
 msgid "Contact draft updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:371
-#: includes/admin/class-ph-admin-post-types.php:374
+#: includes/admin/class-ph-admin-post-types.php:370
+#: includes/admin/class-ph-admin-post-types.php:373
 msgid "Office updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:376
+#: includes/admin/class-ph-admin-post-types.php:375
 msgid "Office published."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:377
+#: includes/admin/class-ph-admin-post-types.php:376
 msgid "Office saved."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:378
+#: includes/admin/class-ph-admin-post-types.php:377
 msgid "Office submitted."
 msgstr ""
 
 #. translators: 1: formatted date
-#: includes/admin/class-ph-admin-post-types.php:380
+#: includes/admin/class-ph-admin-post-types.php:379
 msgid "Office scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:382
+#: includes/admin/class-ph-admin-post-types.php:381
 msgid "Office draft updated. "
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:387
-#: includes/admin/class-ph-admin-post-types.php:390
+#: includes/admin/class-ph-admin-post-types.php:386
+#: includes/admin/class-ph-admin-post-types.php:389
 msgid "Enquiry updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:392
+#: includes/admin/class-ph-admin-post-types.php:391
 msgid "Enquiry published."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:393
+#: includes/admin/class-ph-admin-post-types.php:392
 msgid "Enquiry saved."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:394
+#: includes/admin/class-ph-admin-post-types.php:393
 msgid "Enquiry submitted."
 msgstr ""
 
 #. translators: 1: formatted date
-#: includes/admin/class-ph-admin-post-types.php:396
+#: includes/admin/class-ph-admin-post-types.php:395
 msgid "Enquiry scheduled for: <strong>%1$s</strong>."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:398
+#: includes/admin/class-ph-admin-post-types.php:397
 msgid "Enquiry draft updated."
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:507
+#: includes/admin/class-ph-admin-post-types.php:506
 msgid "All Departments"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:533
-#: includes/admin/class-ph-admin-post-types.php:945
+#: includes/admin/class-ph-admin-post-types.php:532
+#: includes/admin/class-ph-admin-post-types.php:944
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:358
 msgid "All Offices"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:575
-#: includes/admin/class-ph-admin-post-types.php:986
+#: includes/admin/class-ph-admin-post-types.php:574
+#: includes/admin/class-ph-admin-post-types.php:985
 msgid "All Negotiators"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:590
+#: includes/admin/class-ph-admin-post-types.php:589
 msgid "Any Time"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:663
+#: includes/admin/class-ph-admin-post-types.php:662
 #: includes/ph-form-functions.php:769
 msgid "All Locations"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:709
+#: includes/admin/class-ph-admin-post-types.php:708
 msgid "All Availabilities"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:740
+#: includes/admin/class-ph-admin-post-types.php:739
 msgid "All Marketing Statuses"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:743
+#: includes/admin/class-ph-admin-post-types.php:742
 msgid "On Market Only"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:744
+#: includes/admin/class-ph-admin-post-types.php:743
 msgid "Not On Market Only"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:745
+#: includes/admin/class-ph-admin-post-types.php:744
 msgid "Featured Only"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:758
+#: includes/admin/class-ph-admin-post-types.php:757
 msgid "Has Marketing Flag"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:796
+#: includes/admin/class-ph-admin-post-types.php:795
 msgid "Owners and Landlords"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:803
+#: includes/admin/class-ph-admin-post-types.php:802
 msgid "Potential Owners and Landlords"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:817
+#: includes/admin/class-ph-admin-post-types.php:816
 msgid "Hot Applicants"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:835
+#: includes/admin/class-ph-admin-post-types.php:834
 msgid "Show all contact types"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:907
+#: includes/admin/class-ph-admin-post-types.php:906
 #: includes/admin/class-ph-admin-profile.php:68
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:256
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:288
@@ -998,7 +1690,7 @@ msgstr ""
 msgid "Office"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:908
+#: includes/admin/class-ph-admin-post-types.php:907
 #: includes/admin/post-types/class-ph-admin-cpt-enquiry.php:289
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-enquiry-record-details.php:115
 #: includes/class-ph-rest-api.php:313
@@ -1006,16 +1698,16 @@ msgstr ""
 msgid "Website"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:919
+#: includes/admin/class-ph-admin-post-types.php:918
 msgid "Show all sources"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1024
-#: includes/admin/class-ph-admin-post-types.php:1086
-#: includes/admin/class-ph-admin-post-types.php:1158
-#: includes/admin/class-ph-admin-post-types.php:1203
-#: includes/admin/class-ph-admin-post-types.php:1247
-#: includes/admin/class-ph-admin-post-types.php:1347
+#: includes/admin/class-ph-admin-post-types.php:1023
+#: includes/admin/class-ph-admin-post-types.php:1085
+#: includes/admin/class-ph-admin-post-types.php:1157
+#: includes/admin/class-ph-admin-post-types.php:1202
+#: includes/admin/class-ph-admin-post-types.php:1246
+#: includes/admin/class-ph-admin-post-types.php:1346
 #: includes/admin/views/html-contact-enquiries-meta-box.php:71
 #: includes/admin/views/html-contact-offers-meta-box.php:56
 #: includes/admin/views/html-contact-sales-meta-box.php:56
@@ -1027,9 +1719,9 @@ msgstr ""
 msgid "All Statuses"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1028
-#: includes/admin/class-ph-admin-post-types.php:1251
-#: includes/admin/class-ph-admin-post-types.php:1367
+#: includes/admin/class-ph-admin-post-types.php:1027
+#: includes/admin/class-ph-admin-post-types.php:1250
+#: includes/admin/class-ph-admin-post-types.php:1366
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:45
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:301
 #: includes/class-ph-tenancy.php:136
@@ -1039,29 +1731,29 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1032
+#: includes/admin/class-ph-admin-post-types.php:1031
 #: includes/ph-core-functions.php:233
 #: includes/ph-formatting-functions.php:85
 msgid "Carried Out"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1036
+#: includes/admin/class-ph-admin-post-types.php:1035
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:282
 msgid "Won"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1040
+#: includes/admin/class-ph-admin-post-types.php:1039
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:284
 msgid "Lost"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1044
+#: includes/admin/class-ph-admin-post-types.php:1043
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:283
 msgid "Instructed"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1048
-#: includes/admin/class-ph-admin-post-types.php:1375
+#: includes/admin/class-ph-admin-post-types.php:1047
+#: includes/admin/class-ph-admin-post-types.php:1374
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:285
 #: includes/ph-core-functions.php:237
 #: includes/ph-formatting-functions.php:89
@@ -1072,7 +1764,7 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1255
+#: includes/admin/class-ph-admin-post-types.php:1254
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:52
 #: includes/class-ph-tenancy.php:143
 #: includes/ph-core-functions.php:353
@@ -1080,39 +1772,39 @@ msgstr ""
 msgid "Current"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1259
+#: includes/admin/class-ph-admin-post-types.php:1258
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-details.php:56
 #: includes/class-ph-tenancy.php:147
 msgid "Finished"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1284
+#: includes/admin/class-ph-admin-post-types.php:1283
 msgid "All Management Types"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1321
+#: includes/admin/class-ph-admin-post-types.php:1320
 #: includes/admin/views/html-management-dates-meta-box.php:144
 msgid "All Types"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1351
+#: includes/admin/class-ph-admin-post-types.php:1350
 msgid "Upcoming & Overdue"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1355
+#: includes/admin/class-ph-admin-post-types.php:1354
 msgid "Overdue"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1359
+#: includes/admin/class-ph-admin-post-types.php:1358
 #: includes/admin/reports/class-ph-report-sales-pipeline.php:280
 msgid "Booked"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1363
+#: includes/admin/class-ph-admin-post-types.php:1362
 msgid "Complete"
 msgstr ""
 
-#: includes/admin/class-ph-admin-post-types.php:1371
+#: includes/admin/class-ph-admin-post-types.php:1370
 msgid "On Hold"
 msgstr ""
 
@@ -1340,62 +2032,62 @@ msgstr ""
 msgid "Welcome to Property Hive"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:763
+#: includes/admin/class-ph-admin.php:764
 msgid "<strong>Finding Property Hive useful?</strong> Please take a minute to <a href=\"https://wordpress.org/support/plugin/propertyhive/reviews/#new-post\" target=\"_blank\">leave us a review</a>"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:781
+#: includes/admin/class-ph-admin.php:782
 msgid "<strong>It looks like you're also running Easy Property Listings.</strong> This will cause conflicts with Property Hive and should be deactivated."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:806
+#: includes/admin/class-ph-admin.php:807
 msgid "<strong>New To Property Hive?</strong> Did you know that you can quickly import demo data to get a feel for how Property Hive works?"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:830
+#: includes/admin/class-ph-admin.php:831
 msgid "We noticed that you haven't assigned a page to be your 'Search Results' page yet. We recommend that you do this in order to display properties on your site."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:833
+#: includes/admin/class-ph-admin.php:834
 msgid "Go To Property Hive Settings"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:834
-#: includes/admin/class-ph-admin.php:865
-#: includes/admin/class-ph-admin.php:903
+#: includes/admin/class-ph-admin.php:835
+#: includes/admin/class-ph-admin.php:866
+#: includes/admin/class-ph-admin.php:904
 msgid "Dismiss"
 msgstr ""
 
 #. translators: %s: URL to plugin settings page where the Google Maps API key can be entered
-#: includes/admin/class-ph-admin.php:859
+#: includes/admin/class-ph-admin.php:860
 msgid "We noticed that you haven't entered a Google Maps API key. If wishing to display a map on your website it's recommended that you <a href=\"https://developers.google.com/maps/documentation/javascript/get-api-key\" target=\"_blank\">create one</a> and <a href=\"%s\">enter it</a>."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:864
+#: includes/admin/class-ph-admin.php:865
 msgid "Enter Google Maps API Key"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:888
+#: includes/admin/class-ph-admin.php:889
 msgid "Your Property Hive license key is inactive."
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:902
+#: includes/admin/class-ph-admin.php:903
 msgid "Go To License Key Settings"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:921
+#: includes/admin/class-ph-admin.php:922
 msgid "The Property Hive email queue does not appear to be running"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:924
+#: includes/admin/class-ph-admin.php:925
 msgid "Go To Email Queue"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:936
+#: includes/admin/class-ph-admin.php:937
 msgid "Contacts merged successfully"
 msgstr ""
 
-#: includes/admin/class-ph-admin.php:999
+#: includes/admin/class-ph-admin.php:1000
 #: includes/class-ph-ajax.php:231
 #: includes/class-ph-ajax.php:265
 msgid "Insufficient permissions."
@@ -2256,19 +2948,6 @@ msgstr ""
 msgid "e.g. High Street"
 msgstr ""
 
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property-owner.php:158
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:85
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-correspondence-address.php:59
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-address.php:127
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-owner.php:315
-#: includes/admin/settings/class-ph-settings-offices.php:112
-#: includes/bricks-builder-widgets/property-address-line-2.php:19
-#: includes/elementor-widgets/property-address-line-2.php:14
-#: includes/elementor-widgets/property-address-line-2.php:35
-#: includes/salient-widgets/property-address-line-2.php:38
-msgid "Address Line 2"
-msgstr ""
-
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property-owner.php:166
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:93
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-correspondence-address.php:66
@@ -2353,13 +3032,6 @@ msgstr ""
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-viewing-applicant.php:311
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-viewing-property.php:201
 msgid "No results found for"
-msgstr ""
-
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:163
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-contact-correspondence-address.php:114
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-address.php:225
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-owner.php:365
-msgid "Country"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-appraisal-property.php:174
@@ -2925,47 +3597,6 @@ msgid "Email"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-offer-property.php:76
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:305
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:356
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-sale-property.php:68
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-property.php:76
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-viewing-property.php:76
-#: includes/admin/settings/class-ph-settings-custom-fields.php:961
-#: includes/admin/settings/class-ph-settings-custom-fields.php:964
-#: includes/admin/settings/class-ph-settings-custom-fields.php:969
-#: includes/admin/views/html-bulk-edit-property.php:27
-#: includes/admin/views/html-bulk-edit-property.php:49
-#: includes/admin/views/html-viewing-details-meta-box.php:63
-#: includes/admin/views/html-viewing-details-meta-box.php:171
-#: includes/avada-widgets/property-embedded-virtual-tours.php:21
-#: includes/avada-widgets/property-embedded-virtual-tours.php:31
-#: includes/avada-widgets/property-epcs.php:21
-#: includes/avada-widgets/property-floorplans.php:21
-#: includes/avada-widgets/property-full-description.php:21
-#: includes/avada-widgets/property-images.php:21
-#: includes/avada-widgets/property-map.php:35
-#: includes/avada-widgets/property-summary-description.php:21
-#: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:38
-#: includes/bricks-builder-widgets/property-images.php:50
-#: includes/class-ph-elementor.php:411
-#: includes/divi-widgets/property-negotiator-email-address.php:25
-#: includes/divi-widgets/property-negotiator-telephone-number.php:25
-#: includes/elementor-widgets/property-embedded-virtual-tours.php:89
-#: includes/elementor-widgets/property-images.php:45
-#: includes/elementor-widgets/property-negotiator-email-address.php:71
-#: includes/elementor-widgets/property-negotiator-telephone-number.php:71
-#: includes/elementor-widgets/property-office-email-address.php:71
-#: includes/elementor-widgets/property-office-telephone-number.php:71
-#: includes/salient-widgets/property-embedded-virtual-tours.php:51
-#: includes/salient-widgets/property-embedded-virtual-tours.php:62
-#: includes/salient-widgets/property-epcs.php:51
-#: includes/salient-widgets/property-features.php:51
-#: includes/salient-widgets/property-floorplans.php:51
-#: includes/salient-widgets/property-images.php:51
-msgid "No"
-msgstr ""
-
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-offer-property.php:76
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-sale-property.php:68
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-tenancy-property.php:76
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-viewing-property.php:76
@@ -3301,43 +3932,6 @@ msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:302
 msgid "Flooded in last 5 years?"
-msgstr ""
-
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:306
-#: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:357
-#: includes/admin/settings/class-ph-settings-custom-fields.php:961
-#: includes/admin/settings/class-ph-settings-custom-fields.php:964
-#: includes/admin/settings/class-ph-settings-custom-fields.php:969
-#: includes/admin/views/html-bulk-edit-property.php:26
-#: includes/admin/views/html-bulk-edit-property.php:48
-#: includes/admin/views/html-viewing-details-meta-box.php:63
-#: includes/admin/views/html-viewing-details-meta-box.php:171
-#: includes/avada-widgets/property-embedded-virtual-tours.php:20
-#: includes/avada-widgets/property-embedded-virtual-tours.php:30
-#: includes/avada-widgets/property-epcs.php:20
-#: includes/avada-widgets/property-floorplans.php:20
-#: includes/avada-widgets/property-full-description.php:20
-#: includes/avada-widgets/property-images.php:20
-#: includes/avada-widgets/property-map.php:34
-#: includes/avada-widgets/property-summary-description.php:20
-#: includes/bricks-builder-widgets/property-embedded-virtual-tours.php:39
-#: includes/bricks-builder-widgets/property-images.php:51
-#: includes/class-ph-elementor.php:410
-#: includes/divi-widgets/property-negotiator-email-address.php:24
-#: includes/divi-widgets/property-negotiator-telephone-number.php:24
-#: includes/elementor-widgets/property-embedded-virtual-tours.php:88
-#: includes/elementor-widgets/property-images.php:44
-#: includes/elementor-widgets/property-negotiator-email-address.php:70
-#: includes/elementor-widgets/property-negotiator-telephone-number.php:70
-#: includes/elementor-widgets/property-office-email-address.php:70
-#: includes/elementor-widgets/property-office-telephone-number.php:70
-#: includes/salient-widgets/property-embedded-virtual-tours.php:50
-#: includes/salient-widgets/property-embedded-virtual-tours.php:61
-#: includes/salient-widgets/property-epcs.php:50
-#: includes/salient-widgets/property-features.php:50
-#: includes/salient-widgets/property-floorplans.php:50
-#: includes/salient-widgets/property-images.php:50
-msgid "Yes"
 msgstr ""
 
 #: includes/admin/post-types/meta-boxes/class-ph-meta-box-property-material-information.php:312
@@ -3769,12 +4363,6 @@ msgstr ""
 
 #: includes/admin/settings/class-ph-settings-custom-fields.php:263
 msgid "Residential "
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-custom-fields.php:268
-#: includes/admin/settings/class-ph-settings-custom-fields.php:300
-#: includes/ph-core-functions.php:220
-msgid "Commercial"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-custom-fields.php:280
@@ -4425,10 +5013,6 @@ msgstr ""
 msgid "Edit Property Feature"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-demo-data.php:29
-msgid "Demo Data"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-emails.php:31
 msgid "Emails"
 msgstr ""
@@ -4895,11 +5479,6 @@ msgstr ""
 #: includes/elementor-widgets/property-actions.php:127
 #: includes/elementor-widgets/property-actions.php:162
 msgid "Text Colour"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-general.php:31
-#: includes/admin/settings/class-ph-settings-general.php:46
-msgid "General"
 msgstr ""
 
 #: includes/admin/settings/class-ph-settings-general.php:47
@@ -5375,14 +5954,6 @@ msgstr ""
 msgid "Help improve Property Hive by periodically sending us non-sensitive plugin data. Untick this option to opt-out. <a href=\"https://docs.wp-property-hive.com/user-guide/share-usage-data/\" target=\"_blank\">Learn more</a>"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-licenses.php:31
-msgid "License"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-licenses.php:56
-msgid "Renew License"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-licenses.php:61
 msgid "Invalid license key entered. If you're seeing this message and the license key is correct please contact Property Hive support."
 msgstr ""
@@ -5442,13 +6013,6 @@ msgid ""
 "\t\t\t\t\t<br><p><a href=\"%1$s\" class=\"button button-primary\" target=\"_blank\">Get PRO</a></p>"
 msgstr ""
 
-#: includes/admin/settings/class-ph-settings-offices.php:29
-#: includes/admin/settings/class-ph-settings-offices.php:66
-#: includes/admin/settings/class-ph-settings-offices.php:417
-#: includes/class-ph-post-types.php:657
-msgid "Offices"
-msgstr ""
-
 #: includes/admin/settings/class-ph-settings-offices.php:91
 #: includes/admin/settings/class-ph-settings-offices.php:413
 #: includes/admin/settings/class-ph-settings-offices.php:511
@@ -5464,22 +6028,6 @@ msgstr ""
 #: includes/elementor-widgets/property-office-name.php:14
 #: includes/elementor-widgets/property-office-name.php:34
 msgid "Office Name"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-offices.php:103
-msgid "Address Line 1"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-offices.php:121
-msgid "Address Line 3"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-offices.php:130
-msgid "Address Line 4"
-msgstr ""
-
-#: includes/admin/settings/class-ph-settings-offices.php:139
-msgid "Postcode"
 msgstr ""
 
 #. translators: %s: department (e.g. Sales, Lettings, Commercial)
@@ -5607,11 +6155,6 @@ msgstr ""
 #: includes/admin/views/html-admin-matching-applicants.php:199
 #: includes/admin/views/html-admin-matching-properties.php:142
 msgid "Minimum Beds"
-msgstr ""
-
-#: includes/admin/views/html-admin-matching-applicants.php:345
-#: includes/admin/views/html-admin-matching-properties.php:475
-msgid "Continue"
 msgstr ""
 
 #: includes/admin/views/html-admin-matching-applicants.php:355
@@ -7949,116 +8492,116 @@ msgstr ""
 msgid "Property Hive Contact"
 msgstr ""
 
-#: includes/class-ph-licenses.php:478
+#: includes/class-ph-licenses.php:521
 msgid "The license service could not be reached securely. Your saved license details have been retained."
 msgstr ""
 
-#: includes/class-ph-licenses.php:484
+#: includes/class-ph-licenses.php:527
 msgid "The license service returned an invalid response."
 msgstr ""
 
-#: includes/class-ph-licenses.php:495
+#: includes/class-ph-licenses.php:538
 msgid "The license service returned invalid license data."
 msgstr ""
 
-#: includes/class-ph-licenses.php:554
+#: includes/class-ph-licenses.php:597
 msgid "Failed to activate license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:565
+#: includes/class-ph-licenses.php:608
 msgid "Received response code %s when activating license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:580
+#: includes/class-ph-licenses.php:623
 msgid "Failed to decode response when activating license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:598
+#: includes/class-ph-licenses.php:641
 msgid "Error when activating license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:607
+#: includes/class-ph-licenses.php:650
 msgid "Something went wrong when trying to activate license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:653
+#: includes/class-ph-licenses.php:696
 msgid "Failed to deactivate license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:664
+#: includes/class-ph-licenses.php:707
 msgid "Received response code %s when deactivating license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:679
+#: includes/class-ph-licenses.php:722
 msgid "Failed to decode response when deactivating license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:697
+#: includes/class-ph-licenses.php:740
 msgid "Error when deactivating license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:706
+#: includes/class-ph-licenses.php:749
 msgid "Something went wrong when trying to deactivate license key"
 msgstr ""
 
-#: includes/class-ph-licenses.php:737
-#: includes/class-ph-licenses.php:928
+#: includes/class-ph-licenses.php:780
+#: includes/class-ph-licenses.php:977
 msgid "No license key entered"
 msgstr ""
 
-#: includes/class-ph-licenses.php:767
+#: includes/class-ph-licenses.php:810
 msgid "Failed to request license product list"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:786
+#: includes/class-ph-licenses.php:829
 msgid "Received response code %s when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:809
+#: includes/class-ph-licenses.php:852
 msgid "Failed to decode response when requesting license key product list. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:859
+#: includes/class-ph-licenses.php:908
 msgid "API key exists but unable to establish the plan"
 msgstr ""
 
-#: includes/class-ph-licenses.php:867
+#: includes/class-ph-licenses.php:916
 msgid "API key doesn't appear to belong to any orders"
 msgstr ""
 
-#: includes/class-ph-licenses.php:875
+#: includes/class-ph-licenses.php:924
 msgid "Error when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:887
+#: includes/class-ph-licenses.php:936
 msgid "Something went wrong when requesting license key product list"
 msgstr ""
 
-#: includes/class-ph-licenses.php:967
+#: includes/class-ph-licenses.php:1016
 msgid "Failed to request license status"
 msgstr ""
 
 #. translators: %s: HTTP header response code
-#: includes/class-ph-licenses.php:986
+#: includes/class-ph-licenses.php:1035
 msgid "Received response code %s when requesting license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:1002
+#: includes/class-ph-licenses.php:1051
 msgid "Failed to decode response when requesting license key status. Please try again"
 msgstr ""
 
-#: includes/class-ph-licenses.php:1030
+#: includes/class-ph-licenses.php:1079
 msgid "License key inactive"
 msgstr ""
 
-#: includes/class-ph-licenses.php:1038
+#: includes/class-ph-licenses.php:1087
 msgid "Error when requesting license key status"
 msgstr ""
 
-#: includes/class-ph-licenses.php:1052
+#: includes/class-ph-licenses.php:1101
 msgid "Something went wrong when requesting license key status"
 msgstr ""
 

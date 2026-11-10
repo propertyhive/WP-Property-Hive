@@ -40,7 +40,7 @@ class Divi_Property_Epcs_Widget extends ET_Builder_Module
             {
                 foreach ($epc_urls as $epc)
                 {
-                    echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt=""></a>';
+                    echo '<a href="' . esc_url($epc['url']) . '" data-fancybox="epcs" rel="nofollow"><img src="' . esc_url($epc['url']) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( ( isset( $epc['title'] ) ? $epc['title'] : '' ) ) ) !== '' ) ? wp_strip_all_tags( ( isset( $epc['title'] ) ? $epc['title'] : '' ) ) : __( 'View EPC', 'propertyhive' ) ) . '"></a>';
                 }
             }
         }
@@ -58,7 +58,7 @@ class Divi_Property_Epcs_Widget extends ET_Builder_Module
                     {
                         if ( wp_attachment_is_image($attachment_id) )
                         {
-                            echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epc" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt=""></a>';
+                            echo '<a href="' . esc_url(wp_get_attachment_url($attachment_id)) . '" data-fancybox="epc" rel="nofollow"><img src="' . esc_url(wp_get_attachment_url($attachment_id)) . '" alt="' . esc_attr( ( trim( wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) ) !== '' ) ? wp_strip_all_tags( get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) ) : __( 'View EPC', 'propertyhive' ) ) . '"></a>';
                         }
                         else
                         {

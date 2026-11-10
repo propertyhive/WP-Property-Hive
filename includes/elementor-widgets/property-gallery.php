@@ -296,7 +296,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
             
             foreach ( $images_hidden as $image_hidden ) 
             {
-                echo '<a href="' . esc_url($image_hidden['url']) . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($image_hidden['url']) . '" aria-haspopup="dialog" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
         ?>
@@ -316,11 +316,11 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     $id_text_mobile = $image_number == 1 ? 'id="more-images-link-mobile"' : '';
 
                     // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Both ID attribute fragments are fixed plugin literals, including their quotes.
-                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
+                    echo '<a ' . $id_text . ' ' . $id_text_mobile . ' href="' . esc_url($images[$image_number]['url']) . '" aria-haspopup="dialog" data-fancybox="elementor-gallery" style="background-image:url(' . esc_url($images[$image_number]['url']) . ')"></a>';
 
                     if ( $image_number == 1 )
                     {
-                        echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        echo '<div class="more-images-container mobile"><div class="more-images"><a href="javascript:;" aria-haspopup="dialog" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
                             esc_html__( 'See all %d images', 'propertyhive' ),
@@ -330,7 +330,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
                     }
                     if ( $image_number == ($max_images - 1) )
                     {
-                        echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" onclick="openGallery();">';
+                        echo '<div class="more-images-container desktop"><div class="more-images"><a href="javascript:;" aria-haspopup="dialog" onclick="openGallery();">';
                         printf( 
                             /* translators: %d: number of images (1, 2, 3 etc) */
                             esc_html__( 'See all %d images', 'propertyhive' ),
@@ -347,7 +347,7 @@ class Elementor_Property_Gallery_Widget extends \Elementor\Widget_Base {
 
             while ( count($images) > ($image_number) )
             {
-                echo '<a href="' . esc_url($images[$image_number]['url']) . '" data-fancybox="elementor-gallery"></a>';
+                echo '<a href="' . esc_url($images[$image_number]['url']) . '" aria-haspopup="dialog" data-fancybox="elementor-gallery"></a>';
                 ++$image_number;
             }
 

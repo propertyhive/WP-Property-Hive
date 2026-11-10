@@ -23,11 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		if ( !empty($upcoming_viewings) )
 		{
 			echo '
-			<table class="viewings-table upcoming-viewings-table" width="100%">
+			<table class="viewings-table upcoming-viewings-table" width="100%" aria-label="' . esc_attr__( 'Upcoming viewings', 'propertyhive' ) . '">
 				<tr>
-					<th>&nbsp;</th>
-					<th>' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
-					<th>' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
+					<th scope="col">&nbsp;</th>
+					<th scope="col">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
+					<th scope="col">' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
 				</tr>
 			';
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
@@ -75,11 +75,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 		if ( !empty($past_viewings) )
 		{
 			echo '
-			<table class="viewings-table upcoming-viewings-table" width="100%">
+			<table class="viewings-table upcoming-viewings-table" width="100%" aria-label="' . esc_attr__( 'Past viewings', 'propertyhive' ) . '">
 				<tr>
-					<th>&nbsp;</th>
-					<th>' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
-					<th>' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
+					<th scope="col">&nbsp;</th>
+					<th scope="col">' . esc_html(__( 'Viewing Date/Time', 'propertyhive' )) . '</th>
+					<th scope="col">' . esc_html(__( 'Property', 'propertyhive' )) . '</th>
 				</tr>
 			';
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable; the template is included through a helper/function scope, so PrefixAllGlobals misclassifies the file when checked standalone.
