@@ -161,6 +161,28 @@ class PH_Enquiry {
     }
 
     /**
+     * Get the custom fields passed when the enquiry was created via the REST API
+     *
+     * @access public
+     * @return array Key => value pairs. Empty if the enquiry has no custom fields.
+     */
+    public function get_custom_fields()
+    {
+        $custom_fields = array();
+
+        $keys = get_post_meta( $this->id, '_custom_field_keys', true );
+        if ( is_array($keys) )
+        {
+            foreach ( $keys as $key )
+            {
+                $custom_fields[$key] = (string)get_post_meta( $this->id, $key, true );
+            }
+        }
+
+        return $custom_fields;
+    }
+
+    /**
      * Get the text for use in the Properties column of the enquiry list
      *
      * @access public
