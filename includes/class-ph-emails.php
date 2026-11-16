@@ -74,6 +74,9 @@ class PH_Emails {
 		// Send applicant registration email 
 		add_action( 'propertyhive_applicant_registered', array( $this, 'send_applicant_registration_alert' ), 10, 2 );
 
+		// Send enquiry email for enquiries created via the REST API
+		add_action( 'propertyhive_rest_api_enquiry_created', array( $this, 'send_rest_api_enquiry_alert' ), 10, 2 );
+
 		add_action( 'admin_init', array( $this, 'run_custom_email_cron' ), 10, 1 );
 
 		add_action( 'init', array( $this, 'check_email_queue_is_scheduled'), 99 );
@@ -820,6 +823,226 @@ class PH_Emails {
 		$message = ob_get_clean();
 
 		return $message;
+	}
+
+	/**
+	 * Send the enquiry email for an enquiry created via the REST API, mirroring the email sent
+	 * when an enquiry form is submitted on the website.
+	 *
+	 * Off by default. Sent only when the enquiry was created with 'send_email' set to true, or when
+	 * the 'propertyhive_rest_api_enquiry_send_email' filter returns true. Uses only data stored
+	 * against the enquiry, so it can also be called later (e.g. from a queued job), in which case
+	 * $request is null.
+	 *
+	 * As with website enquiry forms, 'propertyhive_property_enquiry_sent' fires once the email has
+	 * been sent successfully.
+	 *
+	 * @param int $enquiry_post_id
+	 * @param WP_REST_Request|null $request The original request, when available. Passed to filters.
+	 * @return bool Whether the email was sent.
+	 */
+	public function send_rest_api_enquiry_alert( $enquiry_post_id, $request = null )
+	{
+		$send_email = ( get_post_meta( $enquiry_post_id, '_send_email', true ) == 'yes' );
+		$send_email = (bool)apply_filters( 'propertyhive_rest_api_enquiry_send_email', $send_email, $enquiry_post_id, $request );
+
+		if ( !$send_email )
+		{
+			return false;
+		}
+
+		$enquiry = new PH_Enquiry( $enquiry_post_id );
+
+		$custom_fields = $enquiry->get_custom_fields();
+
+		$property_ids = array_values( array_filter( array_map( 'intval', (array)get_post_meta( $enquiry_post_id, 'property_id', false ) ) ) );
+
+		$name = (string)get_post_meta( $enquiry_post_id, 'name', true );
+		$email_address = (string)get_post_meta( $enquiry_post_id, 'email_address', true );
+		$telephone_number = (string)get_post_meta( $enquiry_post_id, 'telephone_number', true );
+		$enquiry_message = (string)get_post_meta( $enquiry_post_id, 'message', true );
+
+		$to = $this->get_enquiry_alert_recipient( $enquiry_post_id );
+
+		// Subject
+		if ( count($property_ids) == 1 )
+		{
+			$subject = __( 'New Property Enquiry', 'propertyhive' ) . ': ' . get_the_title( $property_ids[0] );
+		}
+		elseif ( count($property_ids) > 1 )
+		{
+			$subject = __( 'Multiple Property Enquiry', 'propertyhive' ) . ': ' . count($property_ids) . ' Properties';
+		}
+		else
+		{
+			$subject = __( 'New Enquiry', 'propertyhive' ) . ( $name != '' ? ' ' . __( 'from', 'propertyhive' ) . ' ' . $name : '' );
+		}
+
+		// Body
+		$message = __( "You have received an enquiry. Please find details of the enquiry below", 'propertyhive' ) . "\n\n";
+
+		if ( !empty($property_ids) )
+		{
+			$message = apply_filters( 'propertyhive_property_enquiry_pre_body', $message, $property_ids );
+
+			$message .= ( count($property_ids) > 1 ? __( 'Properties', 'propertyhive' ) : __( 'Property', 'propertyhive' ) ) . ":\n";
+			foreach ( $property_ids as $property_id )
+			{
+				$property = new PH_Property( $property_id );
+				$message .= apply_filters( 'propertyhive_property_enquiry_property_output', $property->get_formatted_full_address() . "\n" . html_entity_decode(wp_strip_all_tags($property->get_formatted_price())) . "\n" . get_permalink( $property_id ), $property_id ) . "\n\n";
+			}
+		}
+
+		$fields = array(
+			__( 'Name', 'propertyhive' ) => $name,
+			__( 'Email Address', 'propertyhive' ) => $email_address,
+			__( 'Telephone Number', 'propertyhive' ) => $telephone_number,
+			__( 'Message', 'propertyhive' ) => $enquiry_message,
+		);
+
+		// Custom fields to leave out of the email (by key). None by default.
+		$excluded_custom_fields = (array)apply_filters( 'propertyhive_rest_api_enquiry_email_excluded_custom_fields', array(), $enquiry_post_id, $request );
+
+		foreach ( $custom_fields as $key => $value )
+		{
+			if ( in_array( $key, $excluded_custom_fields, true ) ) { continue; }
+
+			$fields[ ucwords( str_replace( array( '_', '-' ), ' ', $key ) ) ] = $value;
+		}
+		$fields = apply_filters( 'propertyhive_rest_api_enquiry_email_fields', $fields, $enquiry_post_id, $request );
+
+		foreach ( $fields as $label => $value )
+		{
+			if ( (string)$value === '' ) { continue; }
+			$message .= wp_strip_all_tags($label) . ": " . wp_strip_all_tags($value) . "\n";
+		}
+
+		if ( apply_filters('propertyhive_enquiry_email_show_manage_link', true) )
+		{
+			$message .= "\n" . __( "To manage this enquiry please visit the following URL", 'propertyhive' ) . ':' . "\n\n";
+			$message .= admin_url( 'post.php?post=' . (int)$enquiry_post_id . '&action=edit' );
+		}
+
+		if ( !empty($property_ids) )
+		{
+			$message = apply_filters( 'propertyhive_property_enquiry_post_body', $message, $property_ids );
+		}
+
+		// Headers
+		$from_email_address = get_option( 'propertyhive_email_from_address', '' );
+		if ( $from_email_address == '' )
+		{
+			$from_email_address = get_option( 'admin_email' );
+		}
+		$from_email_address = sanitize_email( $from_email_address );
+
+		$from_name = str_replace( array( "\r", "\n" ), '', $name );
+
+		$headers = array();
+		$headers[] = ( $from_name !== '' ) ? sprintf( 'From: %s <%s>', $from_name, $from_email_address ) : sprintf( 'From: <%s>', $from_email_address );
+		if ( is_email($email_address) )
+		{
+			$headers[] = 'Reply-To: ' . $email_address;
+		}
+
+		// Apply the same filters as website enquiry form emails so existing customisations carry over
+		if ( !empty($property_ids) )
+		{
+			$to = apply_filters( 'propertyhive_property_enquiry_to', $to, $property_ids );
+			$subject = apply_filters( 'propertyhive_property_enquiry_subject', $subject, $property_ids );
+			$headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $property_ids );
+			$message = apply_filters( 'propertyhive_property_enquiry_body', $message, $property_ids );
+		}
+
+		$to = apply_filters( 'propertyhive_rest_api_enquiry_email_to', $to, $enquiry_post_id, $request );
+		$subject = apply_filters( 'propertyhive_rest_api_enquiry_email_subject', $subject, $enquiry_post_id, $request );
+		$headers = apply_filters( 'propertyhive_rest_api_enquiry_email_headers', $headers, $enquiry_post_id, $request );
+		$message = apply_filters( 'propertyhive_rest_api_enquiry_email_body', $message, $enquiry_post_id, $request );
+
+		if ( empty($to) )
+		{
+			return false;
+		}
+
+		do_action( 'propertyhive_before_property_enquiry_sent' );
+
+		$sent = wp_mail( $to, $subject, $message, $headers );
+
+		do_action( 'propertyhive_after_property_enquiry_sent' );
+
+		// Record the outcome against the enquiry (underscore prefixed so it isn't shown as an enquiry detail)
+		update_post_meta( $enquiry_post_id, '_email_sent', $sent ? 'yes' : 'failed' );
+
+		do_action( 'propertyhive_rest_api_enquiry_email_sent', $enquiry_post_id, $sent, $to );
+
+		if ( $sent )
+		{
+			// Fire the same action as website enquiry forms, with the enquiry's details in the same
+			// flat shape as a form submission (custom fields alongside the standard fields)
+			$enquiry_data = array_filter( array(
+				'name' => $name,
+				'email_address' => $email_address,
+				'telephone_number' => $telephone_number,
+				'message' => $enquiry_message,
+				'property_id' => implode( '|', $property_ids ),
+			), 'strlen' );
+			$enquiry_data = array_merge( $enquiry_data, $custom_fields );
+
+			do_action( 'propertyhive_property_enquiry_sent', $enquiry_data, $to, $enquiry_post_id );
+		}
+
+		return (bool)$sent;
+	}
+
+	/**
+	 * Get the email address an enquiry's email should be sent to, before filters are applied.
+	 *
+	 * Uses the office explicitly passed when the enquiry was created, else the (first) property's
+	 * office, else the enquiry's office. Prefers the office's email address for the property's
+	 * department, falling back through the other departments as website enquiry forms do, and
+	 * finally to the site admin email address.
+	 *
+	 * @param int $enquiry_post_id
+	 * @return string
+	 */
+	private function get_enquiry_alert_recipient( $enquiry_post_id )
+	{
+		$property_ids = array_values( array_filter( array_map( 'intval', (array)get_post_meta( $enquiry_post_id, 'property_id', false ) ) ) );
+
+		$office_id = '';
+		$department = '';
+		if ( !empty($property_ids) )
+		{
+			$office_id = get_post_meta( $property_ids[0], '_office_id', true );
+			$department = get_post_meta( $property_ids[0], '_department', true );
+		}
+		if ( get_post_meta( $enquiry_post_id, '_office_id_requested', true ) == 'yes' || $office_id == '' )
+		{
+			$office_id = get_post_meta( $enquiry_post_id, '_office_id', true );
+		}
+
+		if ( !empty($office_id) && get_post_type( (int)$office_id ) == 'office' )
+		{
+			switch ( $department )
+			{
+				case "residential-lettings": { $keys = array( 'lettings', 'sales', 'commercial' ); break; }
+				case "commercial": { $keys = array( 'commercial', 'lettings', 'sales' ); break; }
+				case "residential-sales":
+				case "": { $keys = array( 'sales', 'lettings', 'commercial' ); break; }
+				default: { $keys = array( str_replace( 'residential-', '', $department ), 'sales', 'lettings', 'commercial' ); break; }
+			}
+
+			foreach ( $keys as $key )
+			{
+				$to = get_post_meta( (int)$office_id, '_office_email_address_' . $key, true );
+				if ( $to != '' )
+				{
+					return $to;
+				}
+			}
+		}
+
+		return get_option( 'admin_email' );
 	}
 
 	public function send_enquiry_auto_responder( $data = array() )
