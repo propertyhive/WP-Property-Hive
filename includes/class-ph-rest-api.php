@@ -97,7 +97,7 @@ class PH_Rest_Api {
 		// Enquiry - Create
 		add_action( 'rest_api_init', array( $this, 'register_enquiry_rest_route' ), 11 );
 		add_action( "rest_after_insert_enquiry", array( $this, 'ensure_key_enquiry_fields_set' ), 10, 3 );
-		add_action( 'propertyhive_rest_api_enquiry_created', array( $this, 'maybe_send_enquiry_email' ), 10, 3 );
+		add_action( 'propertyhive_rest_api_enquiry_created', array( $this, 'maybe_send_enquiry_email' ), 10, 2 );
 
 		// Enquiry - Read
 		add_filter( 'pre_get_posts', array( $this, 'restrict_enquiry_rest_listing' ));
@@ -481,6 +481,21 @@ class PH_Rest_Api {
 	    {
 	    	update_post_meta( $post_id, $key, $value );
 	    }
+	    if ( !empty($custom_fields) )
+	    {
+	    	// Record which meta keys are custom fields, so they can be identified later from the enquiry alone
+	    	update_post_meta( $post_id, '_custom_field_keys', array_keys($custom_fields) );
+	    }
+
+	    // Record request options needed by the notification email, so it can be built from the enquiry alone
+	    if ( rest_sanitize_boolean( $request->get_param('send_email') ) )
+	    {
+	    	update_post_meta( $post_id, '_send_email', 'yes' );
+	    }
+	    if ( isset($params['office_id']) && !empty($params['office_id']) && is_numeric($params['office_id']) )
+	    {
+	    	update_post_meta( $post_id, '_office_id_requested', 'yes' );
+	    }
 
 	    do_action( 'propertyhive_rest_api_enquiry_created', $post_id, $request, $custom_fields );
 
@@ -488,21 +503,55 @@ class PH_Rest_Api {
 	}
 
 	/**
-	 * Send a notification email for an enquiry created via the REST API, mirroring the email
-	 * sent when an enquiry form is submitted on the website.
-	 *
-	 * Off by default. Sent only when the request includes 'send_email' set to true, or when the
-	 * 'propertyhive_rest_api_enquiry_send_email' filter returns true.
+	 * Get the custom fields stored against an enquiry created via the REST API, as key => value.
 	 */
-	public function maybe_send_enquiry_email( $post_id, $request, $custom_fields )
+	public function get_enquiry_custom_fields( $post_id )
 	{
-		$send_email = rest_sanitize_boolean( $request->get_param('send_email') );
+		$custom_fields = array();
+
+		$keys = get_post_meta( $post_id, '_custom_field_keys', true );
+		if ( is_array($keys) )
+		{
+			foreach ( $keys as $key )
+			{
+				$custom_fields[$key] = (string)get_post_meta( $post_id, $key, true );
+			}
+		}
+
+		return $custom_fields;
+	}
+
+	/**
+	 * Send the notification email for an enquiry created via the REST API, if it was requested.
+	 *
+	 * Off by default. Sent only when the enquiry was created with 'send_email' set to true, or when
+	 * the 'propertyhive_rest_api_enquiry_send_email' filter returns true. Hooked onto
+	 * 'propertyhive_rest_api_enquiry_created', but needs only the enquiry ID, so it can also be
+	 * called later (e.g. from a queued job), in which case $request is null.
+	 */
+	public function maybe_send_enquiry_email( $post_id, $request = null )
+	{
+		$send_email = ( get_post_meta( $post_id, '_send_email', true ) == 'yes' );
 		$send_email = (bool)apply_filters( 'propertyhive_rest_api_enquiry_send_email', $send_email, $post_id, $request );
 
 		if ( !$send_email )
 		{
 			return;
 		}
+
+		$this->send_enquiry_email( $post_id, $request );
+	}
+
+	/**
+	 * Build and send the notification email for an enquiry, mirroring the email sent when an
+	 * enquiry form is submitted on the website. Uses only data stored against the enquiry.
+	 * $request is passed to filters when available and is null otherwise.
+	 *
+	 * @return bool Whether the email was sent.
+	 */
+	public function send_enquiry_email( $post_id, $request = null )
+	{
+		$custom_fields = $this->get_enquiry_custom_fields( $post_id );
 
 		$property_ids = array_values( array_filter( array_map( 'intval', (array)get_post_meta( $post_id, 'property_id', false ) ) ) );
 
@@ -517,8 +566,7 @@ class PH_Rest_Api {
 			$office_id = get_post_meta( $property_ids[0], '_office_id', true );
 			$department = get_post_meta( $property_ids[0], '_department', true );
 		}
-		$requested_office_id = (int)$request->get_param('office_id');
-		if ( !empty($requested_office_id) || $office_id == '' )
+		if ( get_post_meta( $post_id, '_office_id_requested', true ) == 'yes' || $office_id == '' )
 		{
 			$office_id = get_post_meta( $post_id, '_office_id', true );
 		}
@@ -625,7 +673,7 @@ class PH_Rest_Api {
 
 		if ( empty($to) )
 		{
-			return;
+			return false;
 		}
 
 		do_action( 'propertyhive_before_property_enquiry_sent' );
@@ -638,6 +686,8 @@ class PH_Rest_Api {
 		update_post_meta( $post_id, '_email_sent', $sent ? 'yes' : 'failed' );
 
 		do_action( 'propertyhive_rest_api_enquiry_email_sent', $post_id, $sent, $to );
+
+		return (bool)$sent;
 	}
 
 	/**
