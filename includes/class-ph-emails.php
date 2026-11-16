@@ -1005,7 +1005,7 @@ class PH_Emails {
 	 * @param int $enquiry_post_id
 	 * @return string
 	 */
-	public function get_enquiry_alert_recipient( $enquiry_post_id )
+	private function get_enquiry_alert_recipient( $enquiry_post_id )
 	{
 		$property_ids = array_values( array_filter( array_map( 'intval', (array)get_post_meta( $enquiry_post_id, 'property_id', false ) ) ) );
 
