@@ -564,8 +564,13 @@ class PH_Rest_Api {
 			__( 'Telephone Number', 'propertyhive' ) => (string)get_post_meta( $post_id, 'telephone_number', true ),
 			__( 'Message', 'propertyhive' ) => (string)get_post_meta( $post_id, 'message', true ),
 		);
+		// Custom fields to leave out of the email (by key). None by default.
+		$excluded_custom_fields = (array)apply_filters( 'propertyhive_rest_api_enquiry_email_excluded_custom_fields', array(), $post_id, $request );
+
 		foreach ( (array)$custom_fields as $key => $value )
 		{
+			if ( in_array( $key, $excluded_custom_fields, true ) ) { continue; }
+
 			$fields[ ucwords( str_replace( array( '_', '-' ), ' ', $key ) ) ] = $value;
 		}
 		$fields = apply_filters( 'propertyhive_rest_api_enquiry_email_fields', $fields, $post_id, $request );
