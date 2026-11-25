@@ -89,6 +89,7 @@ class PH_Rest_Api {
 	public function __construct() {
 		// Property
 		add_filter( 'rest_property_query', array( $this, 'modify_rest_property_query' ), 10, 2 );
+		add_filter( 'rest_request_before_callbacks', array( $this, 'check_property_read_visibility' ), 10, 3 );
 		add_filter( 'rest_prepare_property', array( $this, 'rest_prepare_property' ), 10, 3 );
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_property_fields' ), 99 );
 		add_filter( 'rest_property_collection_params', array( $this, 'modify_rest_order_by' ), 10, 1 );
@@ -105,6 +106,36 @@ class PH_Rest_Api {
 
 		// Office
 		add_action( 'rest_api_init', array( $this, 'register_rest_api_office_fields' ), 99 );
+	}
+
+	/**
+	 * Enforce the off-market rule before a property item is read through REST.
+	 *
+	 * The matched REST route also covers ?rest_route= requests and internal
+	 * embedded requests. Do not gate writes or replace core permission checks.
+	 *
+	 * @param mixed           $response Existing short-circuit result.
+	 * @param array           $handler  Matched endpoint handler.
+	 * @param WP_REST_Request $request  Current REST request.
+	 * @return mixed|WP_Error
+	 */
+	public function check_property_read_visibility( $response, $handler, $request ) {
+		if ( is_wp_error( $response ) || ! in_array( $request->get_method(), array( 'GET', 'HEAD' ), true )
+			|| ! preg_match( '#^/wp/v2/property/[0-9]+/?$#', $request->get_route() ) ) {
+			return $response;
+		}
+
+		// Use the same resolved ID parameter as the core property item callback.
+		$post = get_post( (int) $request['id'] );
+		if ( $post && 'property' === $post->post_type && ! propertyhive_can_view_off_market_property( $post->ID ) ) {
+			return new WP_Error(
+				'rest_post_invalid_id',
+				__( 'Invalid post ID.', 'propertyhive' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		return $response;
 	}
 
 	// Restrict listing of enquiries via REST API

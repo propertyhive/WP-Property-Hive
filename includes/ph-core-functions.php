@@ -530,3 +530,19 @@ function propertyhive_is_post_publicly_viewable( $post ) {
     $status = get_post_status_object( $post->post_status );
     return $status && ! empty( $status->public );
 }
+
+/**
+ * Check Property Hive's off-market access rule for a property.
+ *
+ * This supplements, rather than replaces, WordPress post-status/password and
+ * REST permission checks. Off-market details remain public under the default
+ * "Still show the property details" setting. Staff access is object-specific.
+ *
+ * @param int $property_id Property post ID.
+ * @return bool Whether the off-market setting permits access.
+ */
+function propertyhive_can_view_off_market_property( $property_id ) {
+    return 'redirect' !== get_option( 'propertyhive_off_market_behaviour', '' )
+        || 'yes' === get_post_meta( $property_id, '_on_market', true )
+        || current_user_can( 'edit_post', $property_id );
+}

@@ -544,17 +544,10 @@ if ( get_option('propertyhive_off_market_behaviour', '') == 'redirect' )
     // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedFunctionFound -- Legacy public global helper ph_redirect_off_market_properties; the established callable name is part of the plugin/extension API and must remain stable.
     function ph_redirect_off_market_properties()
     {
-        // If we're viewing an off market property, redirect to the search form
-        if (is_singular('property'))
-        {
-            if ( get_post_meta(get_the_ID(), '_on_market', TRUE) === '' )
-            {
-                if ( !is_user_logged_in() || !current_user_can('administrator') && !current_user_can('editor') )
-                {
-                    wp_safe_redirect(get_permalink(ph_get_page_id('search_results')), 301);
-                    exit;
-                }
-            }
+        // Use the same off-market rule as REST; staff must be able to edit this property.
+        if ( is_singular( 'property' ) && ! propertyhive_can_view_off_market_property( get_the_ID() ) ) {
+            wp_safe_redirect( get_permalink( ph_get_page_id( 'search_results' ) ), 301 );
+            exit;
         }
     }
     add_action( 'template_redirect', 'ph_redirect_off_market_properties', 5 );
