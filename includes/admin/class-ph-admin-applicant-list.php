@@ -1022,7 +1022,7 @@ class PH_Admin_Applicant_List {
         fwrite( $out, "\xEF\xBB\xBF" );
 
         $csv_context = $this->get_csv_context();
-        fputcsv( $out, $csv_context['columns'], ',', '"', '' );
+        fputcsv( $out, array_map( 'ph_escape_csv_cell', $csv_context['columns'] ), ',', '"', '' );
 
         $offset = 0;
 
@@ -1035,7 +1035,7 @@ class PH_Admin_Applicant_List {
             foreach ( $batch['results'] as $result )
             {
                 $row = $this->get_csv_row( $result, $csv_context );				
-                fputcsv( $out, $row, ',', '"', '' );
+                fputcsv( $out, array_map( 'ph_escape_csv_cell', $row ), ',', '"', '' );
             }
 
             $offset += $processed;

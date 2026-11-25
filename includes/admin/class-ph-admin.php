@@ -267,7 +267,13 @@ class PH_Admin {
                 $columns['amount'] = __( 'Sale Amount', 'propertyhive' );
             }
 
-            fputcsv($df, $columns);
+            fputcsv(
+                $df,
+                array_map( 'ph_escape_csv_cell', $columns ),
+                ',',
+                '"',
+                ''
+            );
 
             if ( ! empty( $record_ids ) )
             {
@@ -314,7 +320,13 @@ class PH_Admin {
                                     $viewing->_feedback
                                 );
 
-                                fputcsv($df, $columns);
+                                fputcsv(
+                                    $df,
+                                    array_map( 'ph_escape_csv_cell', $columns ),
+                                    ',',
+                                    '"',
+                                    ''
+                                );
                             }
                         }
                     }
@@ -358,7 +370,13 @@ class PH_Admin {
                                     html_entity_decode($offer->get_formatted_amount())
                                 );
 
-                                fputcsv($df, $columns);
+                                fputcsv(
+                                    $df,
+                                    array_map( 'ph_escape_csv_cell', $columns ),
+                                    ',',
+                                    '"',
+                                    ''
+                                );
                             }
                         }
                     }
@@ -402,7 +420,13 @@ class PH_Admin {
                                     html_entity_decode($sale->get_formatted_amount())
                                 );
 
-                                fputcsv($df, $columns);
+                                fputcsv(
+                                    $df,
+                                    array_map( 'ph_escape_csv_cell', $columns ),
+                                    ',',
+                                    '"',
+                                    ''
+                                );
                             }
                         }
                     }

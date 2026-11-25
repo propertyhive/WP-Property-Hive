@@ -18,6 +18,58 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
+ * Prepare a cell for CSV files intended for spreadsheet viewing.
+ *
+ * Prefix potentially dangerous values with a tab so spreadsheet software
+ * treats them as text. The tab becomes part of the exported value.
+ *
+ * Apply once, after all formatting and filters, immediately before fputcsv().
+ * This does not replace CSV quoting and must not be used when storing data.
+ *
+ * @param mixed $value Cell value; expected to be scalar or null.
+ * @return string|int|float
+ */
+function ph_escape_csv_cell( $value ) 
+{
+    if ( null === $value || !is_scalar( $value ) ) 
+    {
+        return '';
+    }
+
+    if ( is_int( $value ) || is_float( $value ) ) 
+    {
+	    return $value;
+	}
+
+    $value = (string)$value;
+
+    if ( '' === $value ) 
+    {
+        return '';
+    }
+
+    /*
+     * Protect formula prefixes, leading whitespace/control characters,
+     * Unicode separators, BOM, and full-width formula prefix variants.
+     *
+     * Protecting whitespace-prefixed cells also prevents whitespace being
+     * used to conceal a formula prefix from this check.
+     */
+    $dangerous = preg_match(
+        '/\A(?:[\x00-\x20\x7F=+\-@]|\p{Z}|\x{FEFF}|[\x{FF1D}\x{FF0B}\x{FF0D}\x{FF20}])/u',
+        $value
+    );
+
+    // Fail safely if invalid UTF-8 prevents the check from completing.
+    if ( false === $dangerous || 1 === $dangerous ) 
+    {
+        return "\t" . $value;
+    }
+
+    return $value;
+}
+
+/**
  * Clean stored description HTML while retaining ordinary links and tour frames.
  */
 function propertyhive_sanitize_description( $html ) {
