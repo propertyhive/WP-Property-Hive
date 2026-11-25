@@ -141,7 +141,7 @@ class PH_Meta_Box_Property_Description {
                     {
                         description_name = \'(' . esc_js(__('untitled', 'propertyhive')) . ')\';
                     }
-                    jQuery(this).parent().parent().parent().children(\'h3\').children(\'strong\').html(description_name);
+                    jQuery(this).parent().parent().parent().children(\'h3\').children(\'strong\').text(description_name);
                 });
                 
                 jQuery(\'.add_property_description\').click(function()

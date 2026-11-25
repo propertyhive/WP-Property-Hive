@@ -163,7 +163,7 @@ class PH_Meta_Box_Property_Rooms {
                     {
                         room_name = \'(' . esc_js(__('untitled', 'propertyhive')) . ')\';
                     }
-                    jQuery(this).parent().parent().parent().children(\'h3\').children(\'strong\').html(room_name);
+                    jQuery(this).parent().parent().parent().children(\'h3\').children(\'strong\').text(room_name);
                 });
                 
                 jQuery(\'.add_property_room\').click(function()
