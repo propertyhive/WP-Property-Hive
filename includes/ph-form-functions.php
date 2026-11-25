@@ -342,6 +342,148 @@ function propertyhive_enquiry_form( $property_id = '' )
 }
 
 /**
+ * Validate public enquiry fields without allowing callers to choose CRM meta keys.
+ *
+ * Template-only fields must be registered with propertyhive_property_enquiry_allowed_keys.
+ * Field definitions support maxlength and max_items overrides. Limits are applied
+ * before sanitisation; arrays are accepted only for explicitly multiselect controls.
+ *
+ * @param array $request Slashed WordPress request values. Never modified.
+ * @param array $controls Trusted, filtered form definitions.
+ * @return array Unslashed data and validation errors.
+ */
+function ph_validate_property_enquiry_data( $request, $controls ) {
+    $controls = is_array( $controls ) ? $controls : array();
+    $tracking_keys = array( 'utm_source', 'utm_medium', 'utm_term', 'utm_content', 'utm_campaign', 'gclid', 'fbclid' );
+    $allowed_keys = array_merge( array_keys( $controls ), $tracking_keys, array( 'property_id', 'disclaimer' ) );
+
+    /** Register extra public input names for custom enquiry templates. */
+    $allowed_keys = apply_filters( 'propertyhive_property_enquiry_allowed_keys', $allowed_keys );
+    $allowed_keys = is_array( $allowed_keys ) ? $allowed_keys : array();
+    $limits = apply_filters( 'propertyhive_property_enquiry_input_limits', array(
+        'max_fields' => 100,
+        'max_total_bytes' => 65536,
+        'text_length' => 255,
+        'textarea_length' => 10000,
+        'max_items' => 20,
+    ) );
+    $defaults = array( 'max_fields' => 100, 'max_total_bytes' => 65536, 'text_length' => 255, 'textarea_length' => 10000, 'max_items' => 20 );
+    $limits = is_array( $limits ) ? $limits : array();
+    foreach ( $defaults as $key => $default ) {
+        $limits[$key] = isset( $limits[$key] ) && is_numeric( $limits[$key] ) && $limits[$key] > 0 ? (int) $limits[$key] : $default;
+    }
+
+    $data = array();
+    $errors = array();
+    $total_bytes = 0;
+    $field_count = 0;
+    $seen = array();
+    $transport_keys = array( 'action', 'security', 'nonce', '_wpnonce', '_wp_http_referer', 'g-recaptcha-response', 'h-captcha-response', 'cf-turnstile-response', 'recaptcha', 'recaptcha-v3', 'hCaptcha', 'turnstile' );
+    foreach ( $allowed_keys as $key ) {
+        // Run these restrictions AFTER registration filters, including internal names.
+        if ( ! is_string( $key ) || ! preg_match( '/\A[A-Za-z0-9][A-Za-z0-9_-]{0,127}\z/', $key ) || in_array( $key, $transport_keys, true ) || isset( $seen[$key] ) ) {
+            continue;
+        }
+        $seen[$key] = true;
+        $control = isset( $controls[$key] ) && is_array( $controls[$key] ) ? $controls[$key] : array();
+        $type = isset( $control['type'] ) ? $control['type'] : 'text';
+        if ( in_array( $type, array( 'html', 'recaptcha', 'recaptcha-v3', 'hCaptcha', 'turnstile', 'submit', 'button', 'password', 'file' ), true ) ) {
+            continue;
+        }
+        // Core fields must remain scalar even if a custom definition is misconfigured.
+        $core_types = array( 'name' => 'text', 'email_address' => 'email', 'telephone_number' => 'text', 'message' => 'textarea', 'property_id' => 'hidden', 'disclaimer' => 'checkbox' );
+        if ( isset( $core_types[$key] ) ) {
+            $type = $core_types[$key];
+        }
+        $multiple = ! isset( $core_types[$key] ) && ( 'multiselect' === $type || ( 'select' === $type && ! empty( $control['multiselect'] ) ) );
+        $required = ! empty( $control['required'] ) || ( 'disclaimer' === $key && '' !== get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) );
+        if ( ! array_key_exists( $key, $request ) ) {
+            if ( $required ) {
+                $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
+            }
+            continue;
+        }
+        if ( ++$field_count > $limits['max_fields'] ) {
+            $errors[] = __( 'Too many enquiry fields supplied.', 'propertyhive' );
+            break;
+        }
+        $value = $request[$key];
+        $max_items = isset( $control['max_items'] ) && is_numeric( $control['max_items'] ) && $control['max_items'] > 0 ? (int) $control['max_items'] : $limits['max_items'];
+        if ( ( ! $multiple && ! is_string( $value ) ) || ( $multiple && ( ! is_array( $value ) || count( $value ) > $max_items || array_values( $value ) !== $value ) ) ) {
+            $errors[] = __( 'Invalid field format', 'propertyhive' ) . ': ' . $key;
+            continue;
+        }
+        $values = $multiple ? $value : array( $value );
+        $clean = array();
+        $max_length = 'textarea' === $type ? $limits['textarea_length'] : $limits['text_length'];
+        if ( 'property_id' === $key ) {
+            $max_length = 2048;
+        } elseif ( isset( $control['maxlength'] ) && is_numeric( $control['maxlength'] ) && $control['maxlength'] > 0 ) {
+            $max_length = (int) $control['maxlength'];
+        }
+        foreach ( $values as $item ) {
+            if ( ! is_string( $item ) ) {
+                $errors[] = __( 'Invalid field format', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            $total_bytes += strlen( $item );
+            if ( $total_bytes > $limits['max_total_bytes'] ) {
+                $errors[] = __( 'Enquiry data is too large.', 'propertyhive' );
+                break 2;
+            }
+            $item = wp_unslash( $item );
+            if ( preg_match( '/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/', $item ) ) {
+                $errors[] = __( 'Invalid field format', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            // Avoid expensive Unicode processing on overlong input; validate UTF-8 too.
+            $length = strlen( $item ) <= $max_length * 4 ? preg_match_all( '/./us', $item ) : false;
+            if ( false === $length || $length > $max_length ) {
+                $errors[] = __( 'Field is too long or contains invalid text', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            if ( '' !== $item && in_array( $type, array( 'select', 'radio', 'multiselect' ), true ) && ( ! isset( $control['options'] ) || ! is_array( $control['options'] ) || ! in_array( $item, array_map( 'strval', array_keys( $control['options'] ) ), true ) ) ) {
+                $errors[] = __( 'Invalid field choice', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            if ( '' !== $item && 'checkbox' === $type && $item !== ( isset( $control['value'] ) ? (string) $control['value'] : 'yes' ) ) {
+                $errors[] = __( 'Invalid field choice', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            if ( '' !== $item && 'email' === $type && ! is_email( $item ) ) {
+                $errors[] = __( 'Invalid email address provided', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            if ( '' !== $item && 'number' === $type && ( ! is_numeric( $item ) || ! is_finite( (float) $item ) || ( isset( $control['min'] ) && (float) $item < (float) $control['min'] ) || ( isset( $control['max'] ) && (float) $item > (float) $control['max'] ) ) ) {
+                $errors[] = __( 'Invalid number provided', 'propertyhive' ) . ': ' . $key;
+                continue;
+            }
+            if ( '' !== $item && 'date' === $type ) {
+                $valid_date = false;
+                foreach ( array( 'Y-m-d', 'd/m/Y' ) as $format ) {
+                    $date = DateTime::createFromFormat( '!' . $format, $item );
+                    if ( $date && $date->format( $format ) === $item ) {
+                        $valid_date = true;
+                    }
+                }
+                if ( ! $valid_date ) {
+                    $errors[] = __( 'Invalid date provided', 'propertyhive' ) . ': ' . $key;
+                    continue;
+                }
+            }
+            $clean[] = 'textarea' === $type ? sanitize_textarea_field( $item ) : ( 'email' === $type ? sanitize_email( $item ) : sanitize_text_field( $item ) );
+        }
+        $nonempty = array_filter( $clean, static function ( $item ) { return '' !== trim( $item ); } );
+        if ( $required && empty( $nonempty ) ) {
+            $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
+        }
+        $data[$key] = $multiple ? $clean : ( isset( $clean[0] ) ? $clean[0] : '' );
+    }
+    return array( 'data' => $data, 'errors' => array_values( array_unique( $errors ) ) );
+}
+
+
+/**
  * Get default fields to be shown on search forms
  *
  * @return array

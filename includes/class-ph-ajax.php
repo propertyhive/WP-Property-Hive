@@ -2428,38 +2428,24 @@ class PH_AJAX {
         // Validate
         $errors = array();
         $form_controls = array();
+        // Public guest input: this snapshot is validated before delivery or persistence.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry endpoint; field allowlist, property visibility and CAPTCHA checks enforce its public input contract.
+        $request = $_POST;
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-        if ( ! isset( $_POST['property_id'] ) || ! is_string( $_POST['property_id'] ) || empty( $_POST['property_id'] ) )
+        if ( ! isset( $request['property_id'] ) || ! is_string( $request['property_id'] ) || strlen( $request['property_id'] ) > 2048 || ! preg_match( '/\A[1-9][0-9]*(?:\|[1-9][0-9]*)*\z/', $request['property_id'] ) )
         {
             $errors[] = __( 'Property ID is a required field and must be supplied when making an enquiry', 'propertyhive' );
         }
         else
         {
-            //$post = get_post((int)$_POST['property_id']);
-            
             $form_controls = ph_get_property_enquiry_form_fields();
 
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) );
+            $form_controls = apply_filters( 'propertyhive_property_enquiry_form_fields', $form_controls, sanitize_text_field( wp_unslash( $request['property_id'] ) ) );
         }
         
+        $form_controls = is_array( $form_controls ) ? $form_controls : array();
         foreach ( $form_controls as $key => $control )
         {
-            if ( isset( $control ) && isset( $control['required'] ) && $control['required'] === TRUE )
-            {
-                // This field is mandatory. Lets check we received it in the post
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                if ( ! isset( $_POST[$key] ) || ( isset( $_POST[$key] ) && empty( $_POST[$key] ) ) )
-                {
-                    $errors[] = __( 'Missing required field', 'propertyhive' ) . ': ' . $key;
-                }
-            }
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-            if ( isset( $control['type'] ) && $control['type'] == 'email' && isset( $_POST[$key] ) && ! empty( $_POST[$key] ) && ( ! is_string( $_POST[$key] ) || ! is_email( wp_unslash( $_POST[$key] ) ) ) )
-            {
-                $errors[] = __( 'Invalid email address provided', 'propertyhive' ) . ': ' . $key;
-            }
             if ( in_array( $key, array('recaptcha', 'recaptcha-v3') ) )
             {
                 $errors = $this->check_recaptcha_form_response($errors, $key, $control);
@@ -2467,8 +2453,7 @@ class PH_AJAX {
             if ( $key == 'hCaptcha' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                $response = ( isset( $_POST['h-captcha-response'] ) && is_string( $_POST['h-captcha-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['h-captcha-response'] ) ) : '';
+                $response = ( isset( $request['h-captcha-response'] ) && is_string( $request['h-captcha-response'] ) ) ? sanitize_text_field( wp_unslash( $request['h-captcha-response'] ) ) : '';
 
                 $response = wp_remote_post(
                     'https://hcaptcha.com/siteverify',
@@ -2505,8 +2490,7 @@ class PH_AJAX {
             if ( $key == 'turnstile' )
             {
                 $secret = isset( $control['secret'] ) ? $control['secret'] : '';
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                $response = ( isset( $_POST['cf-turnstile-response'] ) && is_string( $_POST['cf-turnstile-response'] ) ) ? sanitize_text_field( wp_unslash( $_POST['cf-turnstile-response'] ) ) : '';
+                $response = ( isset( $request['cf-turnstile-response'] ) && is_string( $request['cf-turnstile-response'] ) ) ? sanitize_text_field( wp_unslash( $request['cf-turnstile-response'] ) ) : '';
 
                 $response = wp_remote_post(
                     'https://challenges.cloudflare.com/turnstile/v0/siteverify', // phpcs:ignore PluginCheck.CodeAnalysis.Offloading.OffloadedContent -- Server-side CAPTCHA token verification API.
@@ -2545,58 +2529,13 @@ class PH_AJAX {
             }
         }
 
-        if ( 
-            get_option( 'propertyhive_property_enquiry_form_disclaimer', '' ) != '' &&
-            ( 
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                !isset( $_POST['disclaimer'] ) || 
-                ( 
-                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                    isset( $_POST['disclaimer'] ) && empty( $_POST['disclaimer'] ) 
-                ) 
-            )
-        )
-        {
-            $errors[] = __( 'Missing required field', 'propertyhive' ) . ': disclaimer';
-        }
-
-        // Check only expected fields are received
-        /*$allowed_keys = array_keys($form_controls);
-        $allowed_keys[] = 'action';
-        $allowed_keys[] = 'utm_source';
-        $allowed_keys[] = 'utm_medium';
-        $allowed_keys[] = 'utm_term';
-        $allowed_keys[] = 'utm_content';
-        $allowed_keys[] = 'utm_campaign';
-        $allowed_keys[] = 'gclid';
-        $allowed_keys[] = 'fbclid';
-        $allowed_keys[] = 'property_id';
-        $allowed_keys[] = 'disclaimer';
-        $allowed_keys[] = 'g-recaptcha-response';
-        $allowed_keys[] = 'h-captcha-response';
-        $allowed_keys[] = 'cf-turnstile-response';
-
-        $allowed_keys = apply_filters(
-            'propertyhive_property_enquiry_allowed_keys',
-            $allowed_keys
-        );
-
-        foreach ( $_POST as $key => $value )
-        {
-            if ( !in_array($key, $allowed_keys) )
-            {
-                // Unexpected field
-                $errors[] = sprintf(
-                    esc_html__( 'Unexpected field %s received', 'propertyhive' ),
-                    esc_html( $key )
-                );
-                break;
-            }
-        }*/
+        $validated = ph_validate_property_enquiry_data( $request, $form_controls );
+        $enquiry_data = $validated['data']; // Sanitised, unslashed values; unknown/internal keys are absent.
+        $errors = array_merge( $errors, $validated['errors'] );
 
         // Passed validation
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-        $property_ids = isset( $_POST['property_id'] ) && is_string( $_POST['property_id'] ) ? array_values( array_filter( array_map( 'absint', explode( '|', sanitize_text_field( wp_unslash( $_POST['property_id'] ) ) ) ) ) ) : array();
+        $property_ids = isset( $enquiry_data['property_id'] ) && preg_match( '/\A[1-9][0-9]*(?:\|[1-9][0-9]*)*\z/', $enquiry_data['property_id'] )
+            ? array_map( 'absint', explode( '|', $enquiry_data['property_id'] ) ) : array();
         if ( empty( $property_ids ) ) {
             $errors[] = __( 'Invalid property supplied', 'propertyhive' );
         }
@@ -2610,6 +2549,11 @@ class PH_AJAX {
                 $errors[] = __( 'Invalid property supplied', 'propertyhive' );
                 break;
             }
+        }
+
+        if ( ! empty( $property_ids ) ) {
+            $property_ids = array_values( array_unique( $property_ids ) );
+            $enquiry_data['property_id'] = implode( '|', $property_ids );
         }
 
         if ( !empty($errors) )
@@ -2702,7 +2646,6 @@ class PH_AJAX {
             }
 
             unset($form_controls['action']);
-            unset($_POST['action']);
             unset($form_controls['property_id']); // Unset so the field doesn't get shown in the enquiry details
             
             $form_controls = apply_filters( 'propertyhive_property_enquiry_body_form_fields', $form_controls );
@@ -2713,8 +2656,9 @@ class PH_AJAX {
 
                 $label = ( isset($control['label']) ) ? $control['label'] : $key;
                 $label = ( isset($control['email_label']) ) ? $control['email_label'] : $label;
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                $value = ( isset($_POST[$key]) && is_string($_POST[$key]) ) ? sanitize_textarea_field( wp_unslash( $_POST[$key] ) ) : '';
+                // Email-only filters cannot authorise additional submitted fields.
+                if ( ! array_key_exists( $key, $enquiry_data ) ) { continue; }
+                $value = is_array( $enquiry_data[$key] ) ? implode( ', ', $enquiry_data[$key] ) : $enquiry_data[$key];
 
                 $message .= wp_strip_all_tags($label) . ": " . wp_strip_all_tags($value) . "\n";
             }
@@ -2742,16 +2686,11 @@ class PH_AJAX {
             if ( $from_email_address == '' )
             {
                 // Should never get here
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                $from_email_address = ( isset( $_POST['email_address'] ) && is_string( $_POST['email_address'] ) ) ? sanitize_email( wp_unslash( $_POST['email_address'] ) ) : '';
+                $from_email_address = isset( $enquiry_data['email_address'] ) ? $enquiry_data['email_address'] : '';
             }
 
             $headers = array();
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-            $name = isset( $_POST['name'] )
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                ? sanitize_text_field( wp_unslash( $_POST['name'] ) )
-                : '';
+            $name = isset( $enquiry_data['name'] ) ? $enquiry_data['name'] : '';
 
             $name = str_replace( array( "\r", "\n" ), '', $name );
 
@@ -2766,11 +2705,9 @@ class PH_AJAX {
                 $headers[] = sprintf( 'From: <%s>', $from_email_address );
             }
 
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-            if ( isset($_POST['email_address']) ) 
+            if ( isset($enquiry_data['email_address']) ) 
             {
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                $reply_to = sanitize_email(wp_unslash($_POST['email_address']));
+                $reply_to = $enquiry_data['email_address'];
 
                 if ( is_email($reply_to) ) 
                 {
@@ -2783,11 +2720,11 @@ class PH_AJAX {
             $headers = apply_filters( 'propertyhive_property_enquiry_headers', $headers, $property_ids );
             $message = apply_filters( 'propertyhive_property_enquiry_body', $message, $property_ids );
             
-            do_action( 'propertyhive_before_property_enquiry_sent' );
+            do_action( 'propertyhive_before_property_enquiry_sent', $enquiry_data );
 
             $sent = wp_mail( $to, $subject, $message, $headers );
 
-            do_action( 'propertyhive_after_property_enquiry_sent' );
+            do_action( 'propertyhive_after_property_enquiry_sent', $enquiry_data );
             
             if ( ! $sent )
             {
@@ -2812,11 +2749,9 @@ class PH_AJAX {
                     {
                         $title = __( 'Multiple Property Enquiry', 'propertyhive' );
                     }
-                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                    if ( isset($_POST['name']) && ! empty($_POST['name']) )
+                    if ( isset($enquiry_data['name']) && ! empty($enquiry_data['name']) )
                     {
-                        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                        $title .= ' ' . __( 'from', 'propertyhive' ) . ' ' . ph_clean(wp_unslash($_POST['name']));
+                        $title .= ' ' . __( 'from', 'propertyhive' ) . ' ' . $enquiry_data['name'];
                     }
                     
                     $enquiry_post = array(
@@ -2829,47 +2764,42 @@ class PH_AJAX {
                     );
                     
                     // Insert the post into the database
-                    $enquiry_post_id = wp_insert_post( $enquiry_post );
+                    $enquiry_post_id = wp_insert_post( wp_slash( $enquiry_post ), true );
                     
+                    if ( is_wp_error( $enquiry_post_id ) || ! $enquiry_post_id ) {
+                        $this->json_headers();
+                        echo wp_json_encode( array( 'success' => false, 'reason' => 'storage', 'errors' => array( __( 'Unable to store enquiry.', 'propertyhive' ) ) ) );
+                        die();
+                    }
+
                     add_post_meta( $enquiry_post_id, '_status', 'open' );
                     add_post_meta( $enquiry_post_id, '_source', 'website' );
                     add_post_meta( $enquiry_post_id, '_negotiator_id', '' );
                     add_post_meta( $enquiry_post_id, '_office_id', $office_id );
                     
-                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                    foreach ($_POST as $key => $value)
-                    {
-                        $meta_key = is_string( $key ) ? $key : '';
-
-                        // Only store non-empty keys containing characters safe for use as post meta.
-                        if ( $meta_key === '' || ! preg_match( '/\A[A-Za-z0-9_-]+\z/', $meta_key ) )
-                        {
-                            continue;
-                        }
-
-                        if ( $meta_key == 'property_id' )
-                        {
-                            foreach ( $property_ids as $property_id )
-                            {
-                                add_post_meta( $enquiry_post_id, $meta_key, (int)$property_id );
+                    // Never use submitted field names as authority to write CRM metadata.
+                    foreach ( $enquiry_data as $meta_key => $value ) {
+                        if ( 'property_id' === $meta_key ) {
+                            foreach ( $property_ids as $property_id ) {
+                                add_post_meta( $enquiry_post_id, 'property_id', $property_id );
                             }
-                        }
-                        else
-                        {
-                            add_post_meta( $enquiry_post_id, $meta_key, sanitize_textarea_field(wp_unslash($value)) );
+                        } else {
+                            // Existing enquiry readers expect text. Keep multiselect metadata readable.
+                            $meta_value = is_array( $value ) ? implode( ', ', $value ) : $value;
+                            // Metadata APIs unslash their input.
+                            add_post_meta( $enquiry_post_id, $meta_key, wp_slash( $meta_value ), true );
                         }
                     }
                 }
 
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                do_action('propertyhive_property_enquiry_sent', $_POST, $to, $enquiry_post_id);
+                // Preserve the historical WordPress-slashed hook argument, but expose only validated fields.
+                do_action('propertyhive_property_enquiry_sent', wp_slash( $enquiry_data ), $to, $enquiry_post_id);
 
                 // Send auto-responder
                 if ( get_option( 'propertyhive_enquiry_auto_responder', '' ) == 'yes' )
                 {
                     // Auto-responder enabled
-                    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Public enquiry submission accepts guest data without using account authority; published-property validation and configured CAPTCHA checks precede delivery/storage. Existing third-party forms share this public contract.
-                    PH()->email->send_enquiry_auto_responder( $_POST );
+                    PH()->email->send_enquiry_auto_responder( wp_slash( $enquiry_data ) );
                 }
             }
         }
