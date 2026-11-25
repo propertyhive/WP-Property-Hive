@@ -349,6 +349,8 @@ class PH_Admin_Settings {
 									'checked'     => true,
 									'disabled'    => true,
 									'placeholder' => true,
+                                    'autocomplete' => true,
+                                    'spellcheck' => true,
 								);
 
 								$allowed_html['select'] = array(

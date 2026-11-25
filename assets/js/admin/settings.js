@@ -414,7 +414,7 @@ function ph_toggle_license_key_settings()
         jQuery('#row_propertyhive_pro_license_key').hide();
         jQuery('#row_license_key_info').show();
         jQuery('#row_propertyhive_license_key').show();
-        jQuery('p.submit button.button-primary').text(initial_save_changes_value);
+        jQuery('p.submit button.button-primary').text(jQuery('[name=\'legacy_license_key_action\']').val() === 'remove' ? 'Remove key' : 'Activate key');
     }
     else
     {
@@ -424,7 +424,7 @@ function ph_toggle_license_key_settings()
         jQuery('#row_license_key_info').hide();
         jQuery('#row_propertyhive_license_key').hide();
 
-        if ( propertyhive_admin_settings.valid_pro_license_key )
+        if ( jQuery('[name=\'pro_license_key_action\']').val() === 'deactivate' )
         {
             jQuery('p.submit button.button-primary').text('Deactivate key');
         }

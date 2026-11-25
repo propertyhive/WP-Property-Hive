@@ -48,6 +48,9 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			$license_type = 'pro';
 		}
 
+		$stored_pro_key = (string) get_option( 'propertyhive_pro_license_key', '' );
+		$stored_legacy_key = (string) get_option( 'propertyhive_license_key', '' );
+
 		// get old license information
 		$license = PH()->license->get_current_license();
 
@@ -102,21 +105,8 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 		$valid_pro_license = false;
 		$pro_input_border_color = '';
 		$pro_output = '';
-		$license_key_to_display = '';
 		if ( 'pro' === $license_type && get_option('propertyhive_pro_license_key', '') != '' )
 		{ 
-			$length = strlen(get_option('propertyhive_pro_license_key', '')); 
-			$license_key_to_display = get_option('propertyhive_pro_license_key', '');
-			if ( $length >= 6 )
-			{
-				$license_key_to_display = get_option('propertyhive_pro_license_key', '')[0] . 
-				get_option('propertyhive_pro_license_key', '')[1] . 
-				get_option('propertyhive_pro_license_key', '')[2] . 
-				str_repeat('*', $length - 4) . 
-				get_option('propertyhive_pro_license_key', '')[$length-3] . 
-				get_option('propertyhive_pro_license_key', '')[$length-2] . 
-				get_option('propertyhive_pro_license_key', '')[$length-1]; 
-			}
 
 			if ( PH()->license->is_valid_pro_license_key(true) )
 			{
@@ -161,31 +151,27 @@ class PH_Settings_Licenses extends PH_Settings_Page {
                 ) . '</p><input type="hidden" name="pro_license_key_action" value="' . ( $valid_pro_license ? 'deactivate' : 'activate' ) . '">',
 		);
 
-		if ( $valid_pro_license )
-		{
-			$settings[] = array(
-				'type'        => 'html',
-				'id' 		  => 'pro_license_key_display',
-				'title'		  => __( 'License Key', 'propertyhive' ),
-				'html' 		  => '<input type="text" disabled="disabled" value="' . esc_attr( $license_key_to_display ) . '" style="min-width:350px; border:1px solid ' . esc_attr( $pro_input_border_color ) . '"> ' . esc_html( $pro_output )
-			);
-
-			$settings[] = array(
-				'title'       => __( 'License Key', 'propertyhive' ),
-				'id'          => 'propertyhive_pro_license_key',
-				'type'        => 'hidden'
-			);
-		}
-		else
-		{
-			$settings[] = array(
-				'title'       => __( 'License Key', 'propertyhive' ),
-				'id'          => 'propertyhive_pro_license_key',
-				'type'        => 'text',
-				'css' 	  => 'min-width:350px; border:1px solid ' . $pro_input_border_color,
-				'desc' 		  => $pro_output
-			);
-		}
+        // Never include a saved key in an editable or hidden input, even if expired.
+        $pro_output = $this->redact_license_message( $pro_output );
+        $output = $this->redact_license_message( $output );
+        if ( '' !== $stored_pro_key ) {
+            $settings[] = array(
+                'type' => 'html',
+                'id' => 'pro_license_key_display',
+                'title' => __( 'License Key', 'propertyhive' ),
+                'html' => '<input type="text" disabled="disabled" value="' . esc_attr( $this->masked_license_key( $stored_pro_key ) ) . '" style="min-width:350px; border:1px solid ' . esc_attr( $pro_input_border_color ) . '"> <span>' . esc_html( $pro_output ) . '</span>',
+            );
+        }
+        if ( ! $valid_pro_license ) {
+            // The generic password renderer would refill this from get_option().
+            $settings[] = array(
+                'type' => 'html',
+                'id' => 'propertyhive_pro_license_key',
+                'title' => __( 'License Key', 'propertyhive' ),
+                'html' => '<input type="password" name="propertyhive_pro_license_key" id="propertyhive_pro_license_key" value="" autocomplete="new-password" spellcheck="false" style="min-width:350px;">' .
+                    ( '' !== $stored_pro_key ? '<p class="description">' . esc_html__( 'Enter a license key, or leave blank to retry activation of the saved key.', 'propertyhive' ) . '</p>' : '' ),
+            );
+        }
 
 		$legacy_license_message = '';
 
@@ -215,13 +201,15 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 			),
 		);
 
-		$settings[] = array(
-			'title'       => __( 'License Key', 'propertyhive' ),
-			'id'          => 'propertyhive_license_key',
-			'type'        => 'text',
-			'css'         => 'min-width:350px; border:1px solid ' . $input_border_color,
-			'desc' 		  => $output,
-		);
+        $settings[] = array(
+            'title' => __( 'License Key', 'propertyhive' ),
+            'id' => 'propertyhive_license_key',
+            'type' => 'html',
+            'html' => ( '' !== $stored_legacy_key
+                ? '<input type="text" disabled="disabled" value="' . esc_attr( $this->masked_license_key( $stored_legacy_key ) ) . '" style="min-width:350px; border:1px solid ' . esc_attr( $input_border_color ) . '">'
+                : '<input type="password" name="propertyhive_license_key" id="propertyhive_license_key" value="" autocomplete="new-password" spellcheck="false" style="min-width:350px;">'
+            ) . '<input type="hidden" name="legacy_license_key_action" value="' . ( '' !== $stored_legacy_key ? 'remove' : 'activate' ) . '"><div>' . wp_kses_post( $output ) . '</div>',
+        );
 
 		$settings[] = array( 'type' => 'sectionend', 'id' => 'license_options' );
 
@@ -236,81 +224,174 @@ class PH_Settings_Licenses extends PH_Settings_Page {
 
         $settings = $this->get_settings();
 
+        $type = PH()->license->get_license_type();
+        $GLOBALS['save_button_text'] = 'old' === $type
+            ? ( '' !== (string) get_option( 'propertyhive_license_key', '' ) ? __( 'Remove key', 'propertyhive' ) : __( 'Activate key', 'propertyhive' ) )
+            : ( PH()->license->is_valid_pro_license_key() ? __( 'Deactivate key', 'propertyhive' ) : __( 'Activate key', 'propertyhive' ) );
 		PH_Admin_Settings::output_fields( $settings );
 	}
 
-	/**
-	 * Save settings.
-	 */
-	public function save() {
+    /** Save licence operations without round-tripping stored credentials. */
+    public function save() {
         if ( ! current_user_can( 'manage_options' ) || ! isset( $_REQUEST['_wpnonce'] ) || ! is_string( $_REQUEST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_REQUEST['_wpnonce'] ) ), 'propertyhive-settings' ) ) {
             return;
         }
-
-
         if ( get_option( 'propertyhive_pro_pending_license_transfer', array() ) || get_option( 'propertyhive_pro_pending_license_replacement', array() ) || PH()->license->is_pro_license_operation_running() ) {
             PH_Admin_Settings::add_error( __( 'Please finish the pending license operation before changing license settings.', 'propertyhive' ) );
             return;
         }
 
         $license_type = isset( $_POST['propertyhive_license_type'] ) && is_string( $_POST['propertyhive_license_type'] ) ? sanitize_text_field( wp_unslash( $_POST['propertyhive_license_type'] ) ) : '';
-        $license_key = isset( $_POST['propertyhive_pro_license_key'] ) && is_string( $_POST['propertyhive_pro_license_key'] ) ? ph_clean( wp_unslash( $_POST['propertyhive_pro_license_key'] ) ) : '';
-        $license_action = isset( $_POST['pro_license_key_action'] ) && is_string( $_POST['pro_license_key_action'] ) ? sanitize_text_field( wp_unslash( $_POST['pro_license_key_action'] ) ) : '';
+        if ( ! in_array( $license_type, array( 'pro', 'old' ), true ) ) {
+            PH_Admin_Settings::add_error( __( 'Invalid license type.', 'propertyhive' ) );
+            return;
+        }
+        foreach ( array( 'propertyhive_pro_license_key', 'propertyhive_license_key', 'pro_license_key_action', 'legacy_license_key_action' ) as $field ) {
+            if ( isset( $_POST[$field] ) && ! is_string( $_POST[$field] ) ) {
+                PH_Admin_Settings::add_error( __( 'Invalid license settings.', 'propertyhive' ) );
+                return;
+            }
+        }
+        $license_key = isset( $_POST['propertyhive_pro_license_key'] ) ? ph_clean( wp_unslash( $_POST['propertyhive_pro_license_key'] ) ) : '';
+        $legacy_key = isset( $_POST['propertyhive_license_key'] ) ? ph_clean( wp_unslash( $_POST['propertyhive_license_key'] ) ) : '';
+        $saved_pro_key = (string) get_option( 'propertyhive_pro_license_key', '' );
+        $saved_legacy_key = (string) get_option( 'propertyhive_license_key', '' );
+        $action_field = 'pro' === $license_type ? 'pro_license_key_action' : 'legacy_license_key_action';
+        $action = isset( $_POST[$action_field] ) ? sanitize_text_field( wp_unslash( $_POST[$action_field] ) ) : '';
+        $allowed_actions = 'pro' === $license_type ? array( '', 'activate', 'deactivate' ) : array( '', 'activate', 'remove' );
+        if ( ! in_array( $action, $allowed_actions, true ) ) {
+            PH_Admin_Settings::add_error( __( 'Invalid license operation.', 'propertyhive' ) );
+            return;
+        }
 
-
-        // Activate replacement credentials before saving fields, so a failed
-        // request cannot overwrite the original key or shared instance.
+        // Preserve the existing safe replacement workflow for inactive keys and
+        // integrations. The UI does not offer replacement while a key is active.
         $bound_key = get_option( 'propertyhive_pro_activated_key_hash', '' );
         if ( '' === $bound_key ) {
-            $bound_key = hash( 'sha256', (string) get_option( 'propertyhive_pro_license_key', '' ) );
+            $bound_key = hash( 'sha256', $saved_pro_key );
         }
-        if ( 'pro' === $license_type && 'pro' === PH()->license->get_license_type() && '' !== get_option( 'propertyhive_pro_license_key', '' ) && '' !== $license_key && 'activate' === $license_action && hash( 'sha256', $license_key ) !== $bound_key ) {
+        if ( 'pro' === $license_type && 'activate' === $action && '' !== $saved_pro_key && '' !== $license_key && hash( 'sha256', $license_key ) !== $bound_key ) {
+            if ( 'pro' !== PH()->license->get_license_type() ) {
+                PH_Admin_Settings::add_error( __( 'Switch to Pro using the saved key before changing it.', 'propertyhive' ) );
+                return;
+            }
             $result = PH()->license->activate_replacement_pro_license_key( $license_key );
-            if ( ! $result['success'] ) {
-                PH_Admin_Settings::add_error( $result['error'] );
+            if ( empty( $result['success'] ) ) {
+                PH_Admin_Settings::add_error( $this->redact_license_message( $result['error'], array( $license_key ) ) );
             } else {
                 update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
                 PH_Admin_Settings::add_message( __( 'License key activated successfully. The previous activation has not been released.', 'propertyhive' ) );
             }
             return;
         }
-		$settings = $this->get_settings();
 
-		PH_Admin_Settings::save_fields( $settings );
+        if ( 'pro' === $license_type && 'deactivate' === $action ) {
+            if ( '' === $saved_pro_key ) {
+                PH_Admin_Settings::add_error( __( 'No saved license key to deactivate.', 'propertyhive' ) );
+                return;
+            }
+            // The licensing client reads the existing key and instance on the server.
+            $result = PH()->license->deactivate_pro_license_key();
+            if ( empty( $result['success'] ) ) {
+                PH_Admin_Settings::add_error( $this->redact_license_message( $result['error'], array( $license_key ) ) );
+                return;
+            }
+            // Do not discard the credential unless the server confirmed deactivation.
+            delete_option( 'propertyhive_pro_license_key' );
+            if ( '' !== (string) get_option( 'propertyhive_pro_license_key', '' ) ) {
+                PH_Admin_Settings::add_error( __( 'The license was deactivated but the saved key could not be removed. Please retry or contact support.', 'propertyhive' ) );
+                return;
+            }
+            delete_option( 'propertyhive_pro_activated_key_hash' );
+            $this->clear_pro_display_caches();
+            PH_Admin_Settings::add_message( __( 'License key deactivated and removed from this site.', 'propertyhive' ) );
+        }
 
-		update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
+        if ( 'old' === $license_type && 'remove' === $action ) {
+            delete_option( 'propertyhive_license_key' );
+            if ( '' !== (string) get_option( 'propertyhive_license_key', '' ) ) {
+                PH_Admin_Settings::add_error( __( 'The saved license key could not be removed.', 'propertyhive' ) );
+                return;
+            }
+            delete_option( 'propertyhive_license_key_details' );
+            delete_option( 'propertyhive_license_key_error' );
+            delete_option( 'propertyhive_last_license_check' );
+            PH_Admin_Settings::add_message( __( 'License key removed from this site.', 'propertyhive' ) );
+        }
 
-		if ( 'pro' === $license_type && ! empty( $license_key ) && 'activate' === $license_action )
-		{
-			$return = PH()->license->activate_pro_license_key();
-			if ( $return['success'] === false )
-			{
-				PH_Admin_Settings::add_error($return['error']);
-			}
-			else
-			{
-				PH_Admin_Settings::add_message('License key activated successfully');
-			}
-		}
+        if ( 'activate' === $action && ( 'pro' === $license_type ? '' === $license_key && '' === $saved_pro_key : '' === $legacy_key && '' === $saved_legacy_key ) ) {
+            PH_Admin_Settings::add_error( __( 'Please enter a license key.', 'propertyhive' ) );
+            return;
+        }
 
-		if ( 'pro' === $license_type && ! empty( $license_key ) && 'deactivate' === $license_action )
-		{
-			$return = PH()->license->deactivate_pro_license_key();
-			if ( $return['success'] === false )
-			{
-				PH_Admin_Settings::add_error($return['error']);
-			}
-			else
-			{
-				PH_Admin_Settings::add_message('License key deactivated successfully');
-			}
-		}
+        $settings = $this->get_settings();
+        // The generic saver must never clear or repopulate either credential.
+        foreach ( $settings as $index => $setting ) {
+            if ( isset( $setting['id'] ) && in_array( $setting['id'], array( 'propertyhive_pro_license_key', 'propertyhive_license_key' ), true ) ) {
+                unset( $settings[$index] );
+            }
+        }
+        PH_Admin_Settings::save_fields( $settings );
+        update_option( 'missing_invalid_expired_license_key_notice_dismissed', '' );
 
-		if ( 'old' === $license_type )
-		{
-			PH()->license->ph_check_licenses(true);
-		}
-	}
+        if ( 'pro' === $license_type && 'activate' === $action ) {
+            // Blank entry retries the saved inactive key; it never erases it.
+            if ( '' !== $license_key ) {
+                update_option( 'propertyhive_pro_license_key', $license_key );
+                if ( get_option( 'propertyhive_pro_license_key', '' ) !== $license_key ) {
+                    PH_Admin_Settings::add_error( __( 'The license key could not be saved. No activation was requested.', 'propertyhive' ) );
+                    return;
+                }
+                $this->clear_pro_display_caches();
+            }
+            $result = PH()->license->activate_pro_license_key();
+            if ( empty( $result['success'] ) ) {
+                // Keep the attempted credential for retry if the remote outcome is uncertain.
+                PH_Admin_Settings::add_error( $this->redact_license_message( $result['error'], array( $license_key ) ) );
+            } else {
+                update_option( 'propertyhive_pro_activated_key_hash', hash( 'sha256', (string) get_option( 'propertyhive_pro_license_key', '' ) ), false );
+                $this->clear_pro_display_caches();
+                PH_Admin_Settings::add_message( __( 'License key activated successfully.', 'propertyhive' ) );
+            }
+        }
+        if ( 'old' === $license_type && 'remove' !== $action ) {
+            if ( 'activate' === $action && '' !== $legacy_key ) {
+                update_option( 'propertyhive_license_key', $legacy_key );
+                if ( get_option( 'propertyhive_license_key', '' ) !== $legacy_key ) {
+                    PH_Admin_Settings::add_error( __( 'The license key could not be saved.', 'propertyhive' ) );
+                    return;
+                }
+            }
+            PH()->license->ph_check_licenses( true );
+        }
+    }
+
+    /** Clear cached Pro entitlement data without changing instance/domain identity. */
+    private function clear_pro_display_caches() {
+        delete_transient( 'ph_pro_license_product_id_and_package' );
+        delete_transient( 'ph_pro_license_status' );
+        delete_option( 'ph_pro_last_known_license_product_id_and_package' );
+        delete_option( 'propertyhive_pro_license_key_status' );
+        delete_option( 'propertyhive_pro_license_key_last_checked' );
+    }
+
+    /** Never echo a stored credential back through a service error message. */
+    private function redact_license_message( $message, $extra_keys = array() ) {
+        $message = is_scalar( $message ) ? (string) $message : __( 'The license operation failed. Please try again or contact support.', 'propertyhive' );
+        $keys = array_merge( $extra_keys, array( get_option( 'propertyhive_pro_license_key', '' ), get_option( 'propertyhive_license_key', '' ) ) );
+        foreach ( $keys as $key ) {
+            if ( is_string( $key ) && '' !== $key ) {
+                $message = str_replace( array( $key, esc_html( $key ), rawurlencode( $key ), urlencode( $key ) ), '[redacted]', $message );
+            }
+        }
+        return $message;
+    }
+
+    /** A short identifier only; short/invalid keys must not be revealed in full. */
+    private function masked_license_key( $key ) {
+        return strlen( $key ) > 8 ? str_repeat( '*', strlen( $key ) - 4 ) . substr( $key, -4 ) : '********';
+    }
+
 }
 
 endif;
