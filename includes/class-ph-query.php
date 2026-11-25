@@ -1185,15 +1185,44 @@ class PH_Query {
 		return $meta_query;
 	}
 
-	public function where_properties_in_polygon( $where, $query )
-	{
-		global $wpdb;
+    public function where_properties_in_polygon( $where, $query )
+    {
+        global $wpdb;
 
-		if ( !empty($this->address_keyword_polygon_points) )
-		{
-			$where .= " AND 
+        // This filter is temporary. Remove it on both success and rejection.
+        remove_filter( 'posts_where', array( $this, 'where_properties_in_polygon' ), 1 );
+
+        // Validate at the SQL boundary: fresh external and cached points are untrusted.
+        $points = $this->address_keyword_polygon_points;
+        if ( ! is_array( $points ) || count( $points ) < 4 ) {
+            return $where . ' AND 1=0';
+        }
+        $validated_points = array();
+        foreach ( $points as $point ) {
+            if ( ! is_string( $point ) ) {
+                return $where . ' AND 1=0';
+            }
+            $coordinates = preg_split( '/\s+/', trim( $point ) );
+            if ( count( $coordinates ) !== 2 || ! is_numeric( $coordinates[0] ) || ! is_numeric( $coordinates[1] ) ) {
+                return $where . ' AND 1=0';
+            }
+            // Existing polygon and property WKT both use latitude, then longitude.
+            $latitude = (float) $coordinates[0] + 0.0;
+            $longitude = (float) $coordinates[1] + 0.0;
+            if ( ! is_finite( $latitude ) || ! is_finite( $longitude ) || $latitude < -90 || $latitude > 90 || $longitude < -180 || $longitude > 180 ) {
+                return $where . ' AND 1=0';
+            }
+            // Uppercase F always uses a decimal point, regardless of PHP locale.
+            $validated_points[] = sprintf( '%.10F %.10F', $latitude, $longitude );
+        }
+        if ( $validated_points[0] !== $validated_points[count( $validated_points ) - 1] || count( array_unique( $validated_points ) ) < 3 ) {
+            return $where . ' AND 1=0';
+        }
+        $polygon_wkt = 'POLYGON((' . implode( ', ', $validated_points ) . '))';
+
+        $where .= $wpdb->prepare( " AND 
 			ST_CONTAINS(
-			    ST_GEOMFROMTEXT('POLYGON((" . implode(", ", $this->address_keyword_polygon_points) . "))'), 
+			    ST_GEOMFROMTEXT(%s), 
 			    ST_GEOMFROMTEXT(
 			        CONCAT(
 			            'POINT(', 
@@ -1203,13 +1232,10 @@ class PH_Query {
 			            ')'
 			        )
 			    )
-			)";
-		}
+			)", $polygon_wkt );
 
-		remove_filter( 'posts_where' , array( $this, 'where_properties_in_polygon' ), 1, 2 );
-
-		return $where;
-	}
+        return $where;
+    }
 
 	/**
      * Returns a meta query to handle country
