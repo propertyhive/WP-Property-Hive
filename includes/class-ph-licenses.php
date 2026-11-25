@@ -823,7 +823,7 @@ class PH_Licenses {
 
 		$data = $this->get_data_for_license_check();
 
-		$request = wp_remote_post( 'http://license.wp-property-hive.com/check-license.php', array(
+		$request = wp_remote_post( 'https://license.wp-property-hive.com/check-license.php', array(
 			'method'      => 'POST',
 			'timeout'     => 20,
 			'redirection' => 1,
