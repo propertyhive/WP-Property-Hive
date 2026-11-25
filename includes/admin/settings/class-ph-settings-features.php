@@ -52,6 +52,7 @@ class PH_Settings_Features extends PH_Settings_Page {
     public function pro_features_setting()
     {
         $features = get_ph_pro_features();
+        $features = is_array( $features ) ? $features : array();
 
         echo '<div class="pro-feature-settings">';
 
@@ -208,11 +209,8 @@ class PH_Settings_Features extends PH_Settings_Page {
                 $pro = true;
             }
 
-            $can_use = true;
-            if ( $pro && $feature_status == 'active' && apply_filters( 'propertyhive_add_on_can_be_used', true, $slug ) === FALSE )
-            {
-                $can_use = false;
-            }
+            $entitlement = PH()->license->get_add_on_entitlement( $slug );
+            $can_use = 'active' !== $feature_status || false !== apply_filters( 'propertyhive_add_on_can_be_used', true, $slug );
 
             echo '">
                 <div class="inner"' . ( !$can_use ? ' style="border:1px solid #900"' : '' ) . '>
@@ -259,9 +257,10 @@ class PH_Settings_Features extends PH_Settings_Page {
 
                 echo '<div class="loading"><img src="' . esc_url(PH()->plugin_url() . '/assets/images/admin/loading.gif') . '" alt=""></div>';
 
-                if ( !$can_use )
-                {
-                    echo '<div style="color:#900; font-size:0.9; margin-top:10px;">Disabled due to <a href="' . esc_url(admin_url('admin.php?page=ph-settings&tab=licensekey')) . '" style="color:inherit">invalid license</a></div>';
+                if ( ! $can_use ) {
+                    $access_message = $entitlement['can_use']
+                        ? __( 'Restricted by another site integration.', 'propertyhive' ) : $entitlement['message'];
+                    echo '<div class="propertyhive-feature-access" style="color:#900;margin-top:10px;">' . esc_html( $access_message ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=ph-settings&tab=licensekey' ) ) . '">' . esc_html__( 'License settings', 'propertyhive' ) . '</a></div>';
                 }
 
                 echo '</div>';

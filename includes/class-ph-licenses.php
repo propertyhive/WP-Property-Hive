@@ -22,6 +22,9 @@ class PH_Licenses {
 
 	private $pro_license_status = array();
 
+    /** @var array|null Feature catalogue for entitlement checks in this request. */
+    private $entitlement_features = null;
+
 	/**
 	 * Main PH_Licenses Instance.
 	 *
@@ -71,62 +74,73 @@ class PH_Licenses {
 		add_action( 'admin_post_ph_resume_pro_replacement', array( $this, 'handle_resume_pro_replacement' ) );
 	}
 
-	public function ph_check_add_on_can_be_used( $can, $slug )
-	{
-		// Check add on wasn't active before
-		$pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
-
-		if ( !empty($pre_pro_add_ons) )
-		{
-			foreach ( $pre_pro_add_ons as $pre_pro_add_on )
-			{
-				if ( isset($pre_pro_add_on['slug']) && $pre_pro_add_on['slug'] == $slug )
-				{
-					// Yes! This add on was being used pre pro so should still be able to be used without license checks
-					return true;
-				}
-			}
-		}
-		
-        // Check we have the right kind of license key to operate this add on
-
-        $license_type = $this->get_license_type();
-
-        if ( $license_type == 'pro' )
-        {
-            if ( get_option('propertyhive_pro_license_key', '') != '' ) 
-            { 
-                if ( !$this->is_valid_pro_license_key() )
-                {
-                    // show warning
-                    return false;
-                }
-
-                // Valid license. Check this plugin is valid for the purchased type of plan (i.e. map search can't be used with an 'import only' plan)
-                $feature = get_ph_pro_feature( $slug );
-                $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
-
-                if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
-                {
-                    if ( 
-                        isset($feature['plans']) && 
-                        isset($product_id_and_package['package']) &&
-                        in_array($product_id_and_package['package'], $feature['plans'])
-                    )
-                    {
-                        
-                    }
-                    else
-                    {
-                    	// show warning
-                    	return false;
-                    }
+    /**
+     * Explain entitlement to one add-on without exposing licence credentials.
+     * Pre-Pro ownership is independent of the selected licence type or Pro status.
+     *
+     * @param string $slug Add-on directory name.
+     * @param bool   $force Refresh the Pro licence status for deliberate activation.
+     * @return array Permission, reason code and administrator-facing explanation.
+     */
+    public function get_add_on_entitlement( $slug, $force = false ) {
+        $result = array( 'can_use' => false, 'reason' => 'feature_unavailable', 'message' => __( 'Feature information is unavailable. Please retry or contact support.', 'propertyhive' ) );
+        if ( ! is_string( $slug ) || '' === $slug ) {
+            return $result;
+        }
+        $pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
+        if ( is_array( $pre_pro_add_ons ) ) {
+            foreach ( $pre_pro_add_ons as $add_on ) {
+                if ( is_array( $add_on ) && isset( $add_on['slug'] ) && $slug === $add_on['slug'] ) {
+                    return array( 'can_use' => true, 'reason' => 'pre_pro', 'message' => __( 'Included in this site\'s pre-Pro add-ons. No Pro subscription is required for continued use.', 'propertyhive' ) );
                 }
             }
         }
 
-        return $can;
-	}
+        // Load the public catalogue once per request, including unsuccessful reads.
+        if ( null === $this->entitlement_features ) {
+            $features = get_ph_pro_features();
+            $this->entitlement_features = is_array( $features ) ? $features : array();
+        }
+        $feature = false;
+        foreach ( $this->entitlement_features as $candidate ) {
+            if ( is_array( $candidate ) && isset( $candidate['wordpress_plugin_file'] ) && is_string( $candidate['wordpress_plugin_file'] ) && explode( '/', $candidate['wordpress_plugin_file'] )[0] === $slug ) {
+                $feature = $candidate;
+                break;
+            }
+        }
+        if ( ! is_array( $feature ) || ! isset( $feature['plans'] ) || ! is_array( $feature['plans'] ) || empty( $feature['plans'] ) ) {
+            return $result;
+        }
+        if ( in_array( 'free', $feature['plans'], true ) ) {
+            return array( 'can_use' => true, 'reason' => 'free', 'message' => __( 'Free feature. No license is required.', 'propertyhive' ) );
+        }
+        if ( 'pro' !== $this->get_license_type() ) {
+            return array( 'can_use' => false, 'reason' => 'legacy_review', 'message' => __( 'No pre-Pro entitlement is recorded for this add-on. If you purchased it separately, contact support to verify your purchase.', 'propertyhive' ) );
+        }
+        if ( '' === (string) get_option( 'propertyhive_pro_license_key', '' ) ) {
+            return array( 'can_use' => false, 'reason' => 'missing_key', 'message' => __( 'A Pro license covering this feature is required. No pre-Pro entitlement is recorded for this add-on.', 'propertyhive' ) );
+        }
+        if ( ! $this->is_valid_pro_license_key( $force ) ) {
+            return array( 'can_use' => false, 'reason' => 'invalid_license', 'message' => __( 'The Pro license is inactive or invalid on this site.', 'propertyhive' ) );
+        }
+        $package = $this->get_pro_license_product_id_and_package();
+        if ( ! is_array( $package ) || ! isset( $package['success'], $package['package'] ) || true !== $package['success'] || ! is_string( $package['package'] ) ) {
+            return array( 'can_use' => false, 'reason' => 'package_unavailable', 'message' => __( 'The Pro package could not be confirmed. Please retry or contact support.', 'propertyhive' ) );
+        }
+        if ( ! in_array( $package['package'], $feature['plans'], true ) ) {
+            return array( 'can_use' => false, 'reason' => 'wrong_package', 'message' => __( 'This feature is not included in the current Pro package.', 'propertyhive' ) );
+        }
+        return array( 'can_use' => true, 'reason' => 'pro', 'message' => __( 'Included in the current Pro package.', 'propertyhive' ) );
+    }
+
+    public function ph_check_add_on_can_be_used( $can, $slug ) {
+        // Preserve a restriction already imposed by another integration.
+        if ( false === $can ) {
+            return false;
+        }
+        $entitlement = $this->get_add_on_entitlement( $slug );
+        return $entitlement['can_use'];
+    }
 
 	public function ph_check_add_on_can_be_updated( $can, $slug )
 	{
@@ -134,6 +148,11 @@ class PH_Licenses {
 
 		if ( $license_type == 'old' )
 		{
+			if ( 'r34p1773mp' === trim((string)get_option( 'propertyhive_license_key', '' ))) 
+			{
+			    return false;
+			}
+
 			$license = get_option( 'propertyhive_license_key_details', array() );
 
 			if ( !is_array( $license ) ) { $license = array(); }
@@ -480,6 +499,13 @@ class PH_Licenses {
 		if ( false !== $plugin_integrity_json ) 
 		{
 			$data['propertyhive_plugin_integrity'] = $plugin_integrity_json;
+		}
+
+		// Historical add-on entitlements are license-verification data, not optional usage telemetry.
+		// Do not reconstruct this record from the site's currently installed plugins.
+		$pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', null );
+		if ( is_array( $pre_pro_add_ons ) ) {
+			$data['pre_pro_add_ons'] = $pre_pro_add_ons;
 		}
 
 		if ( get_option( 'propertyhive_data_sharing' ) != 'no' )

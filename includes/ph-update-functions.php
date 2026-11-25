@@ -62,12 +62,28 @@ function propertyhive_update_1468_on_market_change_dates() {
  */
 function propertyhive_update_200_pre_pro_record_installed_plugins() 
 {
+    // Preserve historical evidence, including an intentionally empty snapshot.
+    if ( null !== get_option( 'propertyhive_pre_pro_add_ons', null ) ) {
+        return;
+    }
+    // Only a genuine upgrade from pre-Pro may create this record. Fresh installs
+    // and modern sites with a missing record must not grandfather current plugins.
+    $previous_version = get_option( 'propertyhive_db_version', '' );
+    if ( ! is_string( $previous_version ) || '' === $previous_version || ! version_compare( $previous_version, '2.0.0', '<' ) ) {
+        return;
+    }
     $installed_plugins = array();
 
     $features = get_ph_pro_features();
+    if ( ! is_array( $features ) || empty( $features ) ) {
+        return;
+    }
 
     foreach ( $features as $feature )
     {
+        if ( ! is_array( $feature ) || ! isset( $feature['wordpress_plugin_file'] ) || ! is_string( $feature['wordpress_plugin_file'] ) ) {
+            continue;
+        }
         $slug = explode("/", $feature['wordpress_plugin_file']);
         $slug = $slug[0];
 
@@ -80,7 +96,7 @@ function propertyhive_update_200_pre_pro_record_installed_plugins()
         }
     }
 
-    update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
+    add_option( 'propertyhive_pre_pro_add_ons', $installed_plugins, '', false );
 }
 
 /**

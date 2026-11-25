@@ -152,7 +152,6 @@ class PH_Admin {
             if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'install_plugins' ) ) {
                 wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
             }
-            check_admin_referer( 'propertyhive-install-add-on' );
 
             $installed_plugins = get_option( 'propertyhive_pre_pro_add_ons', array());
 

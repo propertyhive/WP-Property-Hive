@@ -8412,78 +8412,20 @@ class PH_AJAX {
         }
 
         $pro = false;
-        $plans = (isset($feature['plans']) & is_array($feature['plans'])) ? $feature['plans'] : array();
-        if ( !in_array('free', $plans) )
+        $plans = (isset($feature['plans']) && is_array($feature['plans'])) ? $feature['plans'] : array();
+        if ( !in_array('free', $plans, true) )
         {
             $pro = true;
         }
 
-        // check it's not a pro feature if they don't have pro enabled
-        if ( $pro )
-        {
-            $valid_license_key = false;
-
-            // check it's not a plugin that was installed pre version 2
-            $pre_pro_add_ons = get_option( 'propertyhive_pre_pro_add_ons', array() );
-            if ( empty($pre_pro_add_ons) ) { $pre_pro_add_ons = array(); }
-            foreach ($pre_pro_add_ons as $pre_pro_add_on)
-            {
-                if ( $pre_pro_add_on['slug'] == $slug )
-                {
-                    // Yep. It was installed already and should be allowed to be activated
-                    $valid_license_key = true;
-                }
-            }
-
-            if ( $valid_license_key === false )
-            {
-                // check pro license key valid
-                if ( PH()->license->is_valid_pro_license_key(true) )
-                {
-                    $product_id_and_package = PH()->license->get_pro_license_product_id_and_package();
-
-                    if ( isset($product_id_and_package['success']) && $product_id_and_package['success'] === true )
-                    {
-                        if ( 
-                            isset($feature['plans']) && 
-                            isset($product_id_and_package['package']) &&
-                            in_array($product_id_and_package['package'], $feature['plans'])
-                        )
-                        {
-                            $valid_license_key = true;
-                        }
-                        else
-                        {
-                            $return = array(
-                                'errorMessage' => 'Trying to activate a feature that\'s not on your chosen plan'
-                            );
-                            wp_send_json_error($return);
-                        }
-                    }
-                    else
-                    {
-                        $return = array(
-                            'errorMessage' => 'License key valid but failed to get package'
-                        );
-                        wp_send_json_error($return);
-                    }
-                }
-                else
-                {
-                    $return = array(
-                        'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
-                    );
-                    wp_send_json_error($return);
-                }
-            }
-
-            if ( $valid_license_key === false )
-            {
-                $return = array(
-                    'errorMessage' => 'Trying to activate a PRO feature but no valid PRO license key entered'
-                );
-                wp_send_json_error($return);
-            }
+        // Refresh deliberate activation checks, then use the same filter as runtime.
+        $entitlement = PH()->license->get_add_on_entitlement( $slug, true );
+        if ( false === apply_filters( 'propertyhive_add_on_can_be_used', true, $slug ) ) {
+            wp_send_json_error( array(
+                'errorMessage' => $entitlement['can_use']
+                    ? __( 'This feature is restricted by another site integration.', 'propertyhive' )
+                    : $entitlement['message'],
+            ) );
         }
 
         if ( !is_dir(WP_PLUGIN_DIR . '/' . $slug) && strpos($feature['download_url'], 'wordpress.org') === false )
