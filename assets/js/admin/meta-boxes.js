@@ -408,6 +408,7 @@ jQuery( function($){
         $.post( propertyhive_admin_meta_boxes.ajax_url, data, function(response) {
             var data = {
                 action:  'propertyhive_get_management_dates_grid',
+                security: propertyhive_admin.ajax_nonces.get_management_dates_grid,
                 post_id: propertyhive_admin_meta_boxes.post_id,
             };
 
@@ -430,6 +431,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_management_dates_grid',
+            security: propertyhive_admin.ajax_nonces.get_management_dates_grid,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_type_id: $('#_type_id_filter').val(),
             selected_status:  $('#_date_status_filter').val(),
@@ -463,6 +465,7 @@ jQuery( function($){
 
             var data = {
                 action: 'propertyhive_get_key_dates_quick_edit_row',
+                security: propertyhive_admin.ajax_nonces.get_key_dates_quick_edit_row,
                 post_id: propertyhive_admin_meta_boxes.post_id,
                 date_post_id: post_id,
                 description: $('.post-' + post_id + ' .description .cell-main-content').text(),
@@ -509,6 +512,7 @@ jQuery( function($){
             {
                 var data = {
                     action:  'propertyhive_get_management_dates_grid',
+                    security: propertyhive_admin.ajax_nonces.get_management_dates_grid,
                     post_id: propertyhive_admin_meta_boxes.post_id,
                 };
 
@@ -608,6 +612,7 @@ jQuery( function($){
         {
             var data = {
                 action:           'propertyhive_get_management_dates_grid',
+                security: propertyhive_admin.ajax_nonces.get_management_dates_grid,
                 post_id:          propertyhive_admin_meta_boxes.post_id,
                 selected_type_id: $('#_type_id_filter').val(),
                 selected_status:  $('#_date_status_filter').val(),
@@ -636,6 +641,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_property_tenancies_grid',
+            security: propertyhive_admin.ajax_nonces.get_property_tenancies_grid,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_tenancy_status_filter').val(),
         };
@@ -657,6 +663,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_property_viewings_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_property_viewings_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_viewing_status_filter').val(),
         };
@@ -678,6 +685,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_contact_tenancies_grid',
+            security: propertyhive_admin.ajax_nonces.get_contact_tenancies_grid,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_tenancy_status_filter').val(),
         };
@@ -699,6 +707,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_contact_viewings_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_contact_viewings_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_viewing_status_filter').val(),
         };
@@ -720,6 +729,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_property_offers_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_property_offers_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_offer_status_filter').val(),
         };
@@ -741,6 +751,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_contact_offers_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_contact_offers_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_offer_status_filter').val(),
         };
@@ -762,6 +773,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_property_sales_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_property_sales_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_sale_status_filter').val(),
         };
@@ -783,6 +795,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_contact_sales_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_contact_sales_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_sale_status_filter').val(),
         };
@@ -804,6 +817,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_property_enquiries_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_property_enquiries_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_enquiry_status_filter').val(),
         };
@@ -825,6 +839,7 @@ jQuery( function($){
 
         var data = {
             action:           'propertyhive_get_contact_enquiries_meta_box',
+            security: propertyhive_admin.ajax_nonces.get_contact_enquiries_meta_box,
             post_id:          propertyhive_admin_meta_boxes.post_id,
             selected_status:  $('#_enquiry_status_filter').val(),
         };
@@ -969,7 +984,7 @@ function ph_open_details_lightbox(post_id, section)
     jQuery.fancybox.close();
 
     jQuery.fancybox.open({
-        src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + ph_lightbox_post_id,
+        src  : ajaxurl + '?action=propertyhive_get_' + section + '_lightbox&post_id=' + encodeURIComponent(ph_lightbox_post_id) + '&security=' + encodeURIComponent(propertyhive_admin.ajax_nonces['get_' + section + '_lightbox'] || ''),
         type : 'ajax',
         beforeLoad: function()
         {

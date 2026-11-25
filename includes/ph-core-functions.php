@@ -546,3 +546,45 @@ function propertyhive_can_view_off_market_property( $property_id ) {
         || 'yes' === get_post_meta( $property_id, '_on_market', true )
         || current_user_can( 'edit_post', $property_id );
 }
+
+/**
+ * Nonce requirements for administrative AJAX actions with central verification.
+ *
+ * Loaded on both admin pages and AJAX requests so token generation and checks
+ * use the same action names. Other callbacks keep their existing nonce checks.
+ * Public AJAX actions are deliberately excluded.
+ *
+ * @return array Event names mapped to WordPress nonce actions.
+ */
+function propertyhive_get_admin_ajax_nonce_actions() {
+    return array(
+        'dismiss_notice_leave_review' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_retired_template_assistant' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_demo_data' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_epl' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_missing_search_results' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_missing_google_maps_api_key' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_invalid_expired_license_key' => 'propertyhive-dismiss-notice',
+        'dismiss_notice_email_cron_not_running' => 'propertyhive-dismiss-notice',
+        'load_existing_features' => 'load-existing-features',
+        'get_news' => 'get-news',
+        'get_viewings_awaiting_applicant_feedback' => 'get-viewings-awaiting-applicant-feedback',
+        'get_my_upcoming_appointments' => 'get-my-upcoming-appointments',
+        'get_upcoming_overdue_key_dates' => 'get_upcoming_overdue_key_dates',
+        'get_viewing_lightbox' => 'get_viewing_lightbox',
+        'get_property_viewings_meta_box' => 'get_property_viewings_meta_box',
+        'get_contact_viewings_meta_box' => 'get_contact_viewings_meta_box',
+        'get_property_offers_meta_box' => 'get_property_offers_meta_box',
+        'get_contact_offers_meta_box' => 'get_contact_offers_meta_box',
+        'get_property_sales_meta_box' => 'get_property_sales_meta_box',
+        'get_contact_sales_meta_box' => 'get_contact_sales_meta_box',
+        'get_property_enquiries_meta_box' => 'get_property_enquiries_meta_box',
+        'get_contact_enquiries_meta_box' => 'get_contact_enquiries_meta_box',
+        'get_management_dates_grid' => 'get_management_dates_grid',
+        'get_key_dates_quick_edit_row' => 'get_key_dates_quick_edit_row',
+        'check_key_date_recurrence' => 'check_key_date_recurrence',
+        'get_property_tenancies_grid' => 'get_property_tenancies_grid',
+        'get_contact_tenancies_grid' => 'get_contact_tenancies_grid',
+        'get_contact_solicitor' => 'get_contact_solicitor',
+    );
+}

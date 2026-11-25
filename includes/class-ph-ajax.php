@@ -172,21 +172,30 @@ class PH_AJAX {
 		}
 	}
 
-    /**
-     * Require CRM access before dispatching an administrative AJAX action.
-     * Individual callbacks still enforce their nonces and record permissions.
-     */
+    /** Require CRM access and enforce the registered nonce before dispatch. */
     public function authorize_admin_ajax()
     {
         if ( ! current_user_can( 'manage_propertyhive' ) ) {
             wp_send_json_error( esc_html__( 'Insufficient permissions', 'propertyhive' ), 403 );
+        }
+
+        // Bind verification to the hook being dispatched, never a client-supplied nonce action.
+        $event = substr( current_filter(), strlen( 'wp_ajax_propertyhive_' ) );
+        $nonce_actions = propertyhive_get_admin_ajax_nonce_actions();
+        if ( isset( $nonce_actions[$event] ) ) {
+            // Reject malformed tokens before WordPress attempts to verify them.
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- The nonce is validated immediately below; REQUEST supports the viewing lightbox's GET request as well as POST callers.
+            if ( ! isset( $_REQUEST['security'] ) || ! is_string( $_REQUEST['security'] ) ) {
+                wp_send_json_error( esc_html__( 'Invalid security token. Please reload the page and try again.', 'propertyhive' ), 403 );
+            }
+            check_ajax_referer( $nonce_actions[$event], 'security' );
         }
     }
 
     /** Validate a CRM action's target before rendering or changing a record. */
     private function get_authorized_record_id( $field, $post_type )
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shared record guard: mutating callers verify their own action nonce; read-only callers are CRM-only through authorize_admin_ajax. This helper performs no writes.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Shared record guard: mutating callers verify their own action nonce; read-only callers are capability- and nonce-checked through authorize_admin_ajax. This helper performs no writes.
         $post_id = isset( $_POST[$field] ) && is_scalar( $_POST[$field] ) ? absint( $_POST[$field] ) : 0;
         if ( !is_array($post_type) ) { $post_type = array($post_type); }
         if ( 
@@ -5244,7 +5253,7 @@ class PH_AJAX {
     {
         global $post;
         
-        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- get_viewing_lightbox is an admin-only event (event map false), so authorize_admin_ajax enforces manage_propertyhive before this callback. The callback loads a viewing and includes a lightbox template; it performs no write. A local nonce is a defense-in-depth recommendation for this read-only GET, not an independent mutation vulnerability.
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- get_viewing_lightbox is an admin-only event (event map false), so authorize_admin_ajax enforces manage_propertyhive before this callback. The callback loads a viewing and includes a lightbox template; it performs no write. authorize_admin_ajax also verifies the registered action nonce before this read-only GET runs.
         $post_id = isset( $_GET['post_id'] ) && is_scalar( $_GET['post_id'] ) ? absint( $_GET['post_id'] ) : 0;
         if ( $post_id < 1 || 'viewing' !== get_post_type( $post_id ) || ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'edit_post', $post_id ) ) {
             wp_send_json_error( __( 'Invalid record or insufficient permissions.', 'propertyhive' ), 403 );
@@ -7058,10 +7067,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7078,10 +7087,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7689,10 +7698,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7709,10 +7718,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7953,10 +7962,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7973,10 +7982,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -7993,10 +8002,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -8013,10 +8022,10 @@ class PH_AJAX {
         $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
         $selected_status = '';
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -8083,20 +8092,20 @@ class PH_AJAX {
 
     public function get_management_dates_grid()
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         $post_id = $this->get_authorized_record_id( 'post_id', array( 'property', 'tenancy' ) );
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
         if ( isset( $_POST['selected_type_id'] ) && is_scalar( $_POST['selected_type_id'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
             $selected_type_id = (int)$_POST['selected_type_id'];
         }
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events guarded by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- get_management_dates_grid and get_key_dates_quick_edit_row render management-date HTML; check_key_date_recurrence computes and echoes a next date. These callbacks are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes. The current add_key_date/save_key_date/delete_key_date mutations are separate methods with local nonce/capability checks.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -8108,7 +8117,7 @@ class PH_AJAX {
 
     public function get_key_dates_quick_edit_row()
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         $post_id = $this->get_authorized_record_id( 'post_id', array( 'tenancy', 'property' ) );
 
         include( PH()->plugin_path() . '/includes/admin/views/html-key-dates-quick-edit.php' );
@@ -8119,7 +8128,7 @@ class PH_AJAX {
 
     public function check_key_date_recurrence()
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         $post_id = $this->get_authorized_record_id( 'post_id', 'key_date' );
 
         $next_key_date = '';
@@ -8276,10 +8285,10 @@ class PH_AJAX {
     {
         $post_id = $this->get_authorized_record_id( 'post_id', 'property' );
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -8293,10 +8302,10 @@ class PH_AJAX {
     {
         $post_id = $this->get_authorized_record_id( 'post_id', 'contact' );
 
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
         if ( isset( $_POST['selected_status'] ) && is_string( $_POST['selected_status'] ) )
         {
-            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive before dispatch, and mutations have separate nonce-protected callbacks.
+            // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Read-only CRM renderer/calculation; authorize_admin_ajax checks manage_propertyhive and the registered action nonce before dispatch.
             $selected_status = ph_clean( wp_unslash( $_POST['selected_status'] ) );
         }
 
@@ -8308,19 +8317,19 @@ class PH_AJAX {
 
     public function get_contact_solicitor()
     {
-        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+        // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes.
         $post_id = $this->get_authorized_record_id( 'post_id', array( 'contact', 'property' ) );
         switch( get_post_type( $post_id ) )
         {
             case 'contact':
             {
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes.
                 $contact_post_ids = array( $post_id );
                 break;
             }
             case 'property':
             {
-                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events guarded by authorize_admin_ajax and contain no writes.
+                // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Tenancy grids and get_contact_solicitor only read identifiers/meta and include/echo results. They are false events capability- and nonce-checked by authorize_admin_ajax and contain no writes.
                 $owner_contact_ids = get_post_meta($post_id, '_owner_contact_id', TRUE);
                 if ( !empty( $owner_contact_ids ) )
                 {

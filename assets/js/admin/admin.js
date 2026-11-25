@@ -18,7 +18,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 		
 		var data = {
-			'action': 'propertyhive_dismiss_notice_retired_template_assistant'
+			'action': 'propertyhive_dismiss_notice_retired_template_assistant',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_retired_template_assistant
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -31,7 +32,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 		
 		var data = {
-			'action': 'propertyhive_dismiss_notice_leave_review'
+			'action': 'propertyhive_dismiss_notice_leave_review',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_leave_review
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -44,7 +46,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_epl'
+			'action': 'propertyhive_dismiss_notice_epl',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_epl
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -57,7 +60,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_demo_data'
+			'action': 'propertyhive_dismiss_notice_demo_data',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_demo_data
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -70,7 +74,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_missing_search_results'
+			'action': 'propertyhive_dismiss_notice_missing_search_results',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_missing_search_results
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -83,7 +88,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_missing_google_maps_api_key'
+			'action': 'propertyhive_dismiss_notice_missing_google_maps_api_key',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_missing_google_maps_api_key
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -96,7 +102,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_invalid_expired_license_key'
+			'action': 'propertyhive_dismiss_notice_invalid_expired_license_key',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_invalid_expired_license_key
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -109,7 +116,8 @@ jQuery( function ( $ ) {
 		e.preventDefault();
 
 		var data = {
-			'action': 'propertyhive_dismiss_notice_email_cron_not_running'
+			'action': 'propertyhive_dismiss_notice_email_cron_not_running',
+            security: propertyhive_admin.ajax_nonces.dismiss_notice_email_cron_not_running
 		};
 
 		$.post( ajaxurl, data, function(response) {
@@ -134,7 +142,7 @@ jQuery( function ( $ ) {
                 var data = {
                     action: 'propertyhive_' + ajax_action[0],
                     post_id: propertyhive_admin.post_id,
-                    security: ajax_action[1]
+                    security: ajax_action[1] || propertyhive_admin.ajax_nonces[ajax_action[0]]
                 }
 
                 jQuery.ajax({

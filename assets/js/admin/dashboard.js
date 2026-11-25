@@ -3,7 +3,7 @@ jQuery(window).on('load', function()
 	// Load news
 	var data = {
 		action: 'propertyhive_get_news',
-		security: 'get-news'
+		security: propertyhive_admin.ajax_nonces.get_news
 	};
 
 	jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)
@@ -27,7 +27,7 @@ jQuery(window).on('load', function()
 	{
 		var data = {
 			action: 'propertyhive_get_viewings_awaiting_applicant_feedback',
-			security: 'get-viewings-awaiting-applicant-feedback'
+			security: propertyhive_admin.ajax_nonces.get_viewings_awaiting_applicant_feedback
 		};
 
 		jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)
@@ -58,7 +58,7 @@ jQuery(window).on('load', function()
 	{
 		var data = {
 			action: 'propertyhive_get_my_upcoming_appointments',
-			security: 'get-my-upcoming-appointments'
+			security: propertyhive_admin.ajax_nonces.get_my_upcoming_appointments
 		};
 
 		jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)
@@ -83,7 +83,7 @@ jQuery(window).on('load', function()
 	{
 		var data = {
 			action: 'propertyhive_get_upcoming_overdue_key_dates',
-			security: 'get_upcoming_overdue_key_dates'
+			security: propertyhive_admin.ajax_nonces.get_upcoming_overdue_key_dates
 		};
 
 		jQuery.post(propertyhive_dashboard.ajax_url, data, function(response)

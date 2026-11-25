@@ -131,13 +131,13 @@ class PH_Admin_Assets {
         $suffix       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
         // Register scripts
-        wp_register_script( 'propertyhive_dashboard', PH()->plugin_url() . '/assets/js/admin/dashboard' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
+        wp_register_script( 'propertyhive_dashboard', PH()->plugin_url() . '/assets/js/admin/dashboard' . /*$suffix .*/ '.js', array( 'propertyhive_admin', 'jquery' ), PH_VERSION, true );
 
         wp_register_script( 'propertyhive_admin', PH()->plugin_url() . '/assets/js/admin/admin' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-tiptip' ), PH_VERSION, true );
 
         wp_register_script( 'jquery-tiptip', PH()->plugin_url() . '/assets/js/jquery-tiptip/jquery.tipTip' . /*$suffix .*/ '.js', array( 'jquery' ), PH_VERSION, true );
 
-        wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION, true );
+        wp_register_script( 'propertyhive_admin_meta_boxes', PH()->plugin_url() . '/assets/js/admin/meta-boxes' . /*$suffix .*/ '.js', array( 'propertyhive_admin', 'jquery', 'jquery-ui-datepicker', 'jquery-ui-sortable' ), PH_VERSION, true );
 
         wp_register_script( 'propertyhive_admin_settings', PH()->plugin_url() . '/assets/js/admin/settings' . /*$suffix .*/ '.js', array( 'jquery', 'wp-color-picker' ), PH_VERSION, true );
 
@@ -195,6 +195,13 @@ class PH_Admin_Assets {
             }
         }
         
+        // Add after the Gutenberg params assignment so it cannot discard the nonce map.
+        $params['ajax_nonces'] = array();
+        if ( current_user_can( 'manage_propertyhive' ) ) {
+            foreach ( propertyhive_get_admin_ajax_nonce_actions() as $event => $nonce_action ) {
+                $params['ajax_nonces'][$event] = wp_create_nonce( $nonce_action );
+            }
+        }
         wp_localize_script( 'propertyhive_admin', 'propertyhive_admin', $params );
 
         $recently_viewed = get_user_meta( get_current_user_id(), '_propertyhive_recently_viewed', TRUE );
@@ -238,7 +245,7 @@ class PH_Admin_Assets {
 
 	    if ( in_array( $screen->id, array( 'edit-key_date' ) ) )
 	    {
-		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array('jquery'), PH_VERSION, true );
+		    wp_enqueue_script( 'inline-edit-key_date.js', PH()->plugin_url() . '/assets/js/admin/inline-edit-key_date.js', array( 'propertyhive_admin', 'jquery'), PH_VERSION, true );
 	    }
 
         if ( 

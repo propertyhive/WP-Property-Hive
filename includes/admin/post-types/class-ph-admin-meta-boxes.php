@@ -2657,7 +2657,7 @@ class PH_Admin_Meta_Boxes {
                                         var data = {
                                             action: \'propertyhive_\' + ajax_action[0],
                                             post_id: ' . (int)$post->ID . ',
-                                            security: ajax_action[1]
+                                            security: ajax_action[1] || propertyhive_admin.ajax_nonces[ajax_action[0]]
                                         }
 
                                         jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) 
@@ -2712,7 +2712,7 @@ class PH_Admin_Meta_Boxes {
                                         var data = {
                                             action: \'propertyhive_\' + ajax_action[0],
                                             post_id: ' . (int)$post->ID . ',
-                                            security: ajax_action[1]
+                                            security: ajax_action[1] || propertyhive_admin.ajax_nonces[ajax_action[0]]
                                         }
 
                                         jQuery.post( \'' . esc_url(admin_url('admin-ajax.php')) . '\', data, function(response) 

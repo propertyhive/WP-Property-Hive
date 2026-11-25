@@ -294,6 +294,7 @@ class PH_Meta_Box_Offer_Applicant {
                     // Check if the selected applicant has a solicitor assigned to them and select them as applicant solicitor if so
                     var data = {
                         action: 'propertyhive_get_contact_solicitor',
+                        security: propertyhive_admin.ajax_nonces.get_contact_solicitor,
                         post_id: $(this).attr('href'),
                     };
                     $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response)

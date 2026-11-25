@@ -186,6 +186,7 @@ jQuery(document).ready(function($)
             // Find the first solicitor assigned to any of the property owners and assign them as Owner Solicitor if found
             var data = {
                 action: 'propertyhive_get_contact_solicitor',
+                security: propertyhive_admin.ajax_nonces.get_contact_solicitor,
                 post_id: $(this).attr('href'),
             };
             $.post( '<?php echo esc_url(admin_url('admin-ajax.php')); ?>', data, function(response)

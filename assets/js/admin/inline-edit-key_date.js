@@ -14,6 +14,7 @@ jQuery(function($) {
 
             var data = {
                 action: 'propertyhive_check_key_date_recurrence',
+                security: propertyhive_admin.ajax_nonces.check_key_date_recurrence,
                 post_id: id,
             };
 
