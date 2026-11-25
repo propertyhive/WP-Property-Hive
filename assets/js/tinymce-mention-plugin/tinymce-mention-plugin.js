@@ -231,12 +231,19 @@
               return beginswith.concat(caseSensitive, caseInsensitive);
           },
   
+          // Feed values are text. Only the highlighting markup is generated as HTML.
           highlighter: function (text) {
-              return text.replace(new RegExp('(' + this.query.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1') + ')', 'ig'), function ($1, match) {
-                  return '<strong>' + match + '</strong>';
-              });
+              var query = this.query;
+              if (!query) {
+                  return $('<span>').text(text).html();
+              }
+              var expression = new RegExp('(' + query.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1') + ')', 'ig');
+              return text.split(expression).map(function (part, index) {
+                  var escaped = $('<span>').text(part).html();
+                  return index % 2 ? '<strong>' + escaped + '</strong>' : escaped;
+              }).join('');
           },
-  
+
           show: function () {
               var offset = this.editor.inline ? this.offsetInline() : this.offset();
   
@@ -265,7 +272,10 @@
               $.each(items, function (i, item) {
                   var $element = $(_this.render(item, i));
   
-                  $element.html($element.html().replace($element.text(), _this.highlighter($element.text())));
+                  // Highlight text nodes separately, preserving the fixed icons and line breaks.
+                  $element.find('.mention-name, .mention-detail').each(function () {
+                      $(this).html(_this.highlighter($(this).text()));
+                  });
   
                   $.each(items[i], function (key, val) {
                       $element.attr('data-' + key, val);
@@ -296,8 +306,13 @@
               {
                 icon = '<span class="dashicons dashicons-admin-home" style="font-size:16px; vertical-align:middle"></span> ';
               }
+              var name = $('<span class="mention-name">').text(item[this.options.queryBy]).prop('outerHTML');
+              // The endpoint uses <br> between detail lines; all other feed content stays text.
+              var details = String(item.details || '').split(/<br\s*\/?\s*>/i).map(function (line) {
+                  return $('<span class="mention-detail">').text(line).prop('outerHTML');
+              }).join('<br>');
               return '<li class="dropdown-item">' +
-                          '<a href="javascript:;"><span>' + icon + item[this.options.queryBy] + '</span><br><span class="details" style="font-size:11px;">' + item.details + '</span></a>' +
+                          '<a href="javascript:;"><span>' + icon + name + '</span><br><span class="details" style="font-size:11px;">' + details + '</span></a>' +
                       '</li>';
           },
   
@@ -333,7 +348,12 @@
           },
   
           insert: function (item) {
-              return '<span contenteditable="false" style="'+ this.options.mentioned_style +'" data-post-id="' + item.id + '">' + item[this.options.insertFrom] + '</span>&nbsp;';
+              // TinyMCE expects HTML here; serialize a text-only span to escape the mention.
+              return $('<span>').attr({
+                  contenteditable: 'false',
+                  style: this.options.mentioned_style,
+                  'data-post-id': item.id
+              }).text(item[this.options.insertFrom]).prop('outerHTML') + '&nbsp;';
           },
   
           cleanUp: function (rollback) {

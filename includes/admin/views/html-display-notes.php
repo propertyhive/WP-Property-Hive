@@ -90,7 +90,7 @@ if ( !empty($notes) )
 						if ($section == 'property')
 						{
 							// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
-							$note_body .= 'Included in ' . $email_status . ' email mailout to ' . get_the_title($email_log->contact_id) . '. ' . $note_suffix;
+							$note_body .= 'Included in ' . $email_status . ' email mailout to ' . esc_html(get_the_title($email_log->contact_id)) . '. ' . $note_suffix;
 						}
 						elseif ($section == 'contact')
 						{
@@ -202,7 +202,7 @@ if ( !empty($notes) )
 						else
 						{
 							// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound -- Template-local variable in an admin view; PHPCS analyzes the view file standalone even though WordPress includes it inside a method/function scope.
-							$note_body = '<a href="' . get_edit_post_link($comment_content['contact_id']) . '">' . get_the_title($comment_content['contact_id']) . '</a> removed from tenancy';
+							$note_body = '<a href="' . esc_url(get_edit_post_link($comment_content['contact_id'])) . '">' . esc_html(get_the_title($comment_content['contact_id'])) . '</a> removed from tenancy';
 						}
 						break;
 					}

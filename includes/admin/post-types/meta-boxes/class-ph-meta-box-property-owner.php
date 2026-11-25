@@ -256,12 +256,12 @@ class PH_Meta_Box_Property_Owner {
                                             
                                             if (response.length > 0)
                                             {
-                                                var new_html = \'\';
+                                                var results = jQuery(\'#search_propertyhive_contacts_results\').empty();
                                                 for (var i in response)
                                                 {
-                                                    new_html += \'<a href="#" id="search-contact-result-\' + response[i].ID + \'">\' + response[i].post_title + \'</a><br>\';
+                                                    var link = jQuery(\'<a href="#"></a>\').attr(\'id\', \'search-contact-result-\' + response[i].ID).text(response[i].post_title);
+                                                    results.append(link).append(\'<br>\');
                                                 }
-                                                jQuery(\'#search_propertyhive_contacts_results\').html(new_html);
                                             }
                                             else
                                             {

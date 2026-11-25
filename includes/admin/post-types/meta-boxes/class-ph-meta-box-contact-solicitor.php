@@ -136,14 +136,31 @@ jQuery(document).ready(function($)
         {
             if (response == '' || response.length == 0)
             {
-                $('#search_contact_solicitor_results').html('<div style="padding:10px;"><?php echo esc_html__( 'No results found for', 'propertyhive' ); ?> \'' + keyword + '\'</div>');
+                $('#search_contact_solicitor_results').empty().append($('<div style="padding:10px;"></div>').text(<?php echo wp_json_encode( __( 'No results found for', 'propertyhive' ), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); ?> + " '" + keyword + "'"));
             }
             else
             {
                 $('#search_contact_solicitor_results').html('<ul style="margin:0; padding:0;"></ul>');
                 for ( var i in response )
                 {
-                    $('#search_contact_solicitor_results ul').append('<li style="margin:0; padding:0;"><a href="' + response[i].ID + '" style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;" data-contact-solicitor-name="' + response[i].post_title + '"><strong>' + response[i].post_title + '</strong><small style="color:#999; padding-top:1px; display:block; line-height:1.5em">' + ( response[i].address_full_formatted != '' ? response[i].address_full_formatted + '<br>' : '' ) + ( response[i].telephone_number != '' ? response[i].telephone_number + '<br>' : '' ) + ( response[i].email_address != '' ? response[i].email_address : '' ) + '</small></a></li>');
+                    // Contact names and details are plain JSON data, never HTML.
+                    var result = response[i];
+                    var resultLink = $('<a style="color:#666; display:block; padding:7px 10px; background:#FFF; border-bottom:1px solid #DDD; text-decoration:none;"></a>')
+                        .attr('href', String(result.ID))
+                        .attr('data-contact-solicitor-name', result.post_title);
+                    resultLink.append($('<strong></strong>').text(result.post_title));
+                    var details = $('<small style="color:#999; padding-top:1px; display:block; line-height:1.5em"></small>');
+                    if (result.address_full_formatted) {
+                        details.append(document.createTextNode(result.address_full_formatted)).append('<br>');
+                    }
+                    if (result.telephone_number) {
+                        details.append(document.createTextNode(result.telephone_number)).append('<br>');
+                    }
+                    if (result.email_address) {
+                        details.append(document.createTextNode(result.email_address));
+                    }
+                    resultLink.append(details);
+                    $('#search_contact_solicitor_results ul').append($('<li style="margin:0; padding:0;"></li>').append(resultLink));
                 }
             }
             $('#search_contact_solicitor_results').show();
@@ -185,7 +202,8 @@ function update_selected_contact_solicitors()
         jQuery('#selected_contact_solicitors').html('<ul></ul>');
         for ( var i in selected_contact_solicitors )
         {
-            jQuery('#selected_contact_solicitors ul').append('<li><a href="' + i + '" class="remove-contact-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a> ' + selected_contact_solicitors[i].post_title + '</li>');
+            var removeLink = jQuery('<a class="remove-contact-solicitor" style="color:inherit; text-decoration:none;"><span class="dashicons dashicons-no-alt"></span></a>').attr('href', String(i));
+            jQuery('#selected_contact_solicitors ul').append(jQuery('<li></li>').append(removeLink).append(document.createTextNode(' ' + selected_contact_solicitors[i].post_title)));
 
             jQuery('#_contact_solicitor_contact_id').val(i);
         }

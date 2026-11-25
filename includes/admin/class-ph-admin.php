@@ -524,7 +524,7 @@ class PH_Admin {
                 'id' => $recent_post_id,
                 'title' => $title,
                 'post_type' => get_post_type( $recent_post_id ),
-                'edit_link' => get_edit_post_link( $recent_post_id ),
+                'edit_link' => get_edit_post_link( $recent_post_id, 'raw' ),
             )) + $recently_viewed;
 
             $recently_viewed = array_slice($recently_viewed, 0, 10, TRUE);

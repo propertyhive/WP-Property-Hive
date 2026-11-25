@@ -64,7 +64,7 @@ class PH_Admin_Merge_Contacts {
                 $contact = new PH_Contact( (int)$contact_id );
 
                 // Initialise array to hold information about each contact
-                $contact_parts = array( '<h3 style="margin:0">' . ( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</h3>' ) ;
+                $contact_parts = array( '<h3 style="margin:0">' . esc_html( trim($contact->post_title) != '' ? $contact->post_title : '(' . __('Unnamed Contact', 'propertyhive' ) . ')' ) . '</h3>' ) ;
 
                 $date_posted = get_the_date( '', $contact->id );
                 $contact_parts[] = 'Added on ' . $date_posted;
