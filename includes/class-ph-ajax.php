@@ -40,6 +40,7 @@ class PH_AJAX {
 			'make_property_enquiry' => true,
             'create_contact_from_enquiry' => false,
             'merge_contact_records' => false,
+			'generate_applicant_list_batch' => false,
 
             // Dashboard components
             'get_news' => false,
@@ -3268,6 +3269,38 @@ class PH_AJAX {
         echo json_encode( array('success' => true) );
         die();
     }
+	
+	
+	public function generate_applicant_list_batch()
+	{
+		check_ajax_referer(
+			'ph_applicant_export',
+			'ph_applicant_export_nonce'
+		);
+
+		if ( ! current_user_can( 'manage_propertyhive' ) )
+		{
+			wp_send_json_error(
+				array(
+					'message' => __(
+						'Insufficient permissions',
+						'propertyhive'
+					),
+				),
+				403
+			);
+		}
+
+		include_once(
+			PH()->plugin_path() .
+			'/includes/admin/class-ph-admin-applicant-list.php'
+		);
+
+		$ph_admin_applicant_list = new PH_Admin_Applicant_List();
+
+		$ph_admin_applicant_list->ajax_generate_results_batch();
+	}
+
 
     // Dashboard related functions
     public function get_news()
