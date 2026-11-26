@@ -7,7 +7,9 @@ jQuery( function($){
     {
         if ( !is_submitting )
         {
+            is_submitting = true;
             form_obj = jQuery(this);
+            form_obj.removeClass('is-success').addClass('is-submitting').attr('aria-busy', 'true');
 
             if ( propertyhive_make_property_enquiry_params.captcha_service == 'recaptcha-v3' && typeof grecaptcha !== 'undefined' )
             {
@@ -15,6 +17,10 @@ jQuery( function($){
                 {
                     jQuery('#g-recaptcha-response').val(token);
                     ph_submit_property_enquiry(); // Submit form after getting the new token
+                }).catch(function() {
+                    is_submitting = false;
+                    form_obj.removeClass('is-submitting').attr('aria-busy', 'false');
+                    form_obj.find('#enquiryError').fadeIn();
                 });
             }
             else
@@ -30,8 +36,6 @@ jQuery( function($){
 
 function ph_submit_property_enquiry()
 {
-    is_submitting = true;
-
     var data = form_obj.serialize() + '&' + jQuery.param({ 'action': 'propertyhive_make_property_enquiry' });
 
     form_obj.find('#enquirySuccess').hide();
@@ -48,6 +52,7 @@ function ph_submit_property_enquiry()
             }
             else
             {
+                form_obj.addClass('is-success');
                 form_obj.find('#enquirySuccess').fadeIn();
                 form_obj.trigger('ph:success');
 
@@ -79,7 +84,11 @@ function ph_submit_property_enquiry()
             }
         }
 
+    }).fail(function() {
+        form_obj.find('#enquiryError').fadeIn();
+    }).always(function() {
         is_submitting = false;
+        form_obj.removeClass('is-submitting').attr('aria-busy', 'false');
 
         if ( propertyhive_make_property_enquiry_params.captcha_service == 'recaptcha' )
         {
