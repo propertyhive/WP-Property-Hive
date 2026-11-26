@@ -31,7 +31,19 @@ function get_ph_pro_features()
             {
                 $features = $add_ons;
                 set_transient( 'propertyhive_features', $features, DAY_IN_SECONDS );
+
+                update_option( 'propertyhive_last_known_features', $features, false );
             }
+        }
+    }
+
+    if ( !is_array( $features ) || empty($features) )
+    {
+        $last_known_features = get_option( 'propertyhive_last_known_features', array() );
+        if ( is_array( $last_known_features ) && !empty($last_known_features) )
+        {
+            $features = $last_known_features;
+            set_transient( 'propertyhive_features', $features, DAY_IN_SECONDS );
         }
     }
 
