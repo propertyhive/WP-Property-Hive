@@ -39,7 +39,6 @@ class PH_Admin {
         add_action( 'admin_init', array( $this, 'export_applicant_list' ) );
         add_action( 'admin_init', array( $this, 'export_sub_grid' ) );
         add_action( 'admin_init', array( $this, 'check_hide_demo_data_tab' ) );
-        add_action( 'admin_init', array( $this, 'check_install_add_on' ) );
         add_filter( 'propertyhive_screen_ids', array( $this, 'crm_only_mode_screen_id' ) );
     }
 
@@ -138,44 +137,6 @@ class PH_Admin {
         }
         
         return $screen_ids;
-    }
-
-    public function check_install_add_on()
-    {
-        $request_get = wp_unslash( $_GET );
-        $ph_action = isset( $request_get['ph_action'] ) && is_string( $request_get['ph_action'] ) ? sanitize_key( $request_get['ph_action'] ) : '';
-        $encoded_slug = isset( $request_get['ph_add_on_slug'] ) && is_string( $request_get['ph_add_on_slug'] ) ? sanitize_text_field( $request_get['ph_add_on_slug'] ) : '';
-        $encoded_plugin = isset( $request_get['ph_add_on_plugin'] ) && is_string( $request_get['ph_add_on_plugin'] ) ? sanitize_text_field( $request_get['ph_add_on_plugin'] ) : '';
-
-        if ( 'install_add_on' === $ph_action && '' !== $encoded_slug && '' !== $encoded_plugin )
-        {
-            if ( ! current_user_can( 'manage_propertyhive' ) || ! current_user_can( 'install_plugins' ) ) {
-                wp_die( esc_html__( 'Insufficient permissions', 'propertyhive' ), '', array( 'response' => 403 ) );
-            }
-
-            $installed_plugins = get_option( 'propertyhive_pre_pro_add_ons', array());
-
-            if ( empty($installed_plugins) )
-            {
-                $installed_plugins = array();
-            }
-
-            $decoded_slug = base64_decode( $encoded_slug, true );
-            $decoded_plugin = base64_decode( $encoded_plugin, true );
-            if ( false === $decoded_slug || false === $decoded_plugin ) {
-                wp_die( esc_html__( 'Invalid add-on request.', 'propertyhive' ), '', array( 'response' => 400 ) );
-            }
-
-            $installed_plugins[] = array(
-                'slug' => ph_clean( $decoded_slug ),
-                'plugin' => ph_clean( $decoded_plugin )
-            );
-
-            update_option( 'propertyhive_pre_pro_add_ons', $installed_plugins );
-
-            wp_safe_redirect( admin_url('admin.php?page=ph-settings&tab=features') );
-            die();
-        }
     }
 
     public function check_hide_demo_data_tab()
