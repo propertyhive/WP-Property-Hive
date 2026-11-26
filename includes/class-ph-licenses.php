@@ -80,10 +80,11 @@ class PH_Licenses {
      *
      * @param string $slug Add-on directory name.
      * @param bool   $force Refresh the Pro licence status for deliberate activation.
+     * @param bool   $include_message Include a translated explanation; disable for checks before init.
      * @return array Permission, reason code and administrator-facing explanation.
      */
-    public function get_add_on_entitlement( $slug, $force = false ) {
-        $result = array( 'can_use' => false, 'reason' => 'feature_unavailable', 'message' => __( 'Feature information is unavailable. Please retry or contact support.', 'propertyhive' ) );
+    public function get_add_on_entitlement( $slug, $force = false, $include_message = true ) {
+        $result = array( 'can_use' => false, 'reason' => 'feature_unavailable', 'message' => ( $include_message ? __( 'Feature information is unavailable. Please retry or contact support.', 'propertyhive' ) : '' ) );
         if ( ! is_string( $slug ) || '' === $slug ) {
             return $result;
         }
@@ -91,7 +92,7 @@ class PH_Licenses {
         if ( is_array( $pre_pro_add_ons ) ) {
             foreach ( $pre_pro_add_ons as $add_on ) {
                 if ( is_array( $add_on ) && isset( $add_on['slug'] ) && $slug === $add_on['slug'] ) {
-                    return array( 'can_use' => true, 'reason' => 'pre_pro', 'message' => __( 'Included in this site\'s pre-Pro add-ons. No Pro subscription is required for continued use.', 'propertyhive' ) );
+                    return array( 'can_use' => true, 'reason' => 'pre_pro', 'message' => ( $include_message ? __( 'Included in this site\'s pre-Pro add-ons. No Pro subscription is required for continued use.', 'propertyhive' ) : '' ) );
                 }
             }
         }
@@ -112,25 +113,25 @@ class PH_Licenses {
             return $result;
         }
         if ( in_array( 'free', $feature['plans'], true ) ) {
-            return array( 'can_use' => true, 'reason' => 'free', 'message' => __( 'Free feature. No license is required.', 'propertyhive' ) );
+            return array( 'can_use' => true, 'reason' => 'free', 'message' => ( $include_message ? __( 'Free feature. No license is required.', 'propertyhive' ) : '' ) );
         }
         if ( 'pro' !== $this->get_license_type() ) {
-            return array( 'can_use' => false, 'reason' => 'legacy_review', 'message' => __( 'No pre-Pro entitlement is recorded for this add-on. If you purchased it separately, contact support to verify your purchase.', 'propertyhive' ) );
+            return array( 'can_use' => false, 'reason' => 'legacy_review', 'message' => ( $include_message ? __( 'No pre-Pro entitlement is recorded for this add-on. If you purchased it separately, contact support to verify your purchase.', 'propertyhive' ) : '' ) );
         }
         if ( '' === (string) get_option( 'propertyhive_pro_license_key', '' ) ) {
-            return array( 'can_use' => false, 'reason' => 'missing_key', 'message' => __( 'A Pro license covering this feature is required. No pre-Pro entitlement is recorded for this add-on.', 'propertyhive' ) );
+            return array( 'can_use' => false, 'reason' => 'missing_key', 'message' => ( $include_message ? __( 'A Pro license covering this feature is required. No pre-Pro entitlement is recorded for this add-on.', 'propertyhive' ) : '' ) );
         }
         if ( ! $this->is_valid_pro_license_key( $force ) ) {
-            return array( 'can_use' => false, 'reason' => 'invalid_license', 'message' => __( 'The Pro license is inactive or invalid on this site.', 'propertyhive' ) );
+            return array( 'can_use' => false, 'reason' => 'invalid_license', 'message' => ( $include_message ? __( 'The Pro license is inactive or invalid on this site.', 'propertyhive' ) : '' ) );
         }
         $package = $this->get_pro_license_product_id_and_package();
         if ( ! is_array( $package ) || ! isset( $package['success'], $package['package'] ) || true !== $package['success'] || ! is_string( $package['package'] ) ) {
-            return array( 'can_use' => false, 'reason' => 'package_unavailable', 'message' => __( 'The Pro package could not be confirmed. Please retry or contact support.', 'propertyhive' ) );
+            return array( 'can_use' => false, 'reason' => 'package_unavailable', 'message' => ( $include_message ? __( 'The Pro package could not be confirmed. Please retry or contact support.', 'propertyhive' ) : '' ) );
         }
         if ( ! in_array( $package['package'], $feature['plans'], true ) ) {
-            return array( 'can_use' => false, 'reason' => 'wrong_package', 'message' => __( 'This feature is not included in the current Pro package.', 'propertyhive' ) );
+            return array( 'can_use' => false, 'reason' => 'wrong_package', 'message' => ( $include_message ? __( 'This feature is not included in the current Pro package.', 'propertyhive' ) : '' ) );
         }
-        return array( 'can_use' => true, 'reason' => 'pro', 'message' => __( 'Included in the current Pro package.', 'propertyhive' ) );
+        return array( 'can_use' => true, 'reason' => 'pro', 'message' => ( $include_message ? __( 'Included in the current Pro package.', 'propertyhive' ) : '' ) );
     }
 
     public function ph_check_add_on_can_be_used( $can, $slug ) {
@@ -138,7 +139,8 @@ class PH_Licenses {
         if ( false === $can ) {
             return false;
         }
-        $entitlement = $this->get_add_on_entitlement( $slug );
+        // Add-ons check permission during plugins_loaded, before translations are ready.
+        $entitlement = $this->get_add_on_entitlement( $slug, false, false );
         return $entitlement['can_use'];
     }
 
@@ -994,20 +996,20 @@ class PH_Licenses {
 	    		update_option('propertyhive_pro_instance_id', $instance_id );
 	    	}
 
-	    	$data = array();
-
-			// found API key. It's product ID will be stored in product_id
-			$url = 'https://wp-property-hive.com/?';
-	    	$url .= 'wc-api=wc-am-api&';
-	    	$url .= 'wc_am_action=activate&';
-	    	$url .= 'instance=' . $instance_id . '&';
-            $url .= 'object=' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '&';
-	    	$url .= 'product_id=' . $license['product_id'] . '&';
-	    	$url .= 'api_key=' . $license_key;
+            // Keep credentials and installation details out of URL access logs.
+            $url = 'https://wp-property-hive.com/?wc-api=wc-am-api';
+            $data = array(
+                'wc_am_action' => 'activate',
+                'instance'     => $instance_id,
+                'object'       => wp_parse_url( get_site_url(), PHP_URL_HOST ),
+                'product_id'   => $license['product_id'],
+                'api_key'      => $license_key,
+            );
 
 	    	$response = wp_remote_post( $url, array(
-	    		'body' => $data,
-	    	) );
+                'redirection' => 0,
+                'body'        => $data,
+            ) );
 
 	    	if ( is_wp_error($response) )
 	    	{
@@ -1103,20 +1105,20 @@ class PH_Licenses {
 	    		update_option('propertyhive_pro_instance_id', $instance_id );
 	    	}
 
-	    	$data = array();
-
-			// found API key. It's product ID will be stored in product_id
-			$url = 'https://wp-property-hive.com/?';
-	    	$url .= 'wc-api=wc-am-api&';
-	    	$url .= 'wc_am_action=deactivate&';
-	    	$url .= 'instance=' . $instance_id . '&';
-            $url .= 'object=' . wp_parse_url( get_site_url(), PHP_URL_HOST ) . '&';
-	    	$url .= 'product_id=' . $license['product_id'] . '&';
-	    	$url .= 'api_key=' . $license_key;
+            // Keep credentials and installation details out of URL access logs.
+            $url = 'https://wp-property-hive.com/?wc-api=wc-am-api';
+            $data = array(
+                'wc_am_action' => 'deactivate',
+                'instance'     => $instance_id,
+                'object'       => wp_parse_url( get_site_url(), PHP_URL_HOST ),
+                'product_id'   => $license['product_id'],
+                'api_key'      => $license_key,
+            );
 
 	    	$response = wp_remote_post( $url, array(
-	    		'body' => $data,
-	    	) );
+                'redirection' => 0,
+                'body'        => $data,
+            ) );
 
 	    	if ( is_wp_error($response) )
 	    	{
@@ -1245,15 +1247,18 @@ class PH_Licenses {
 
         $data = $this->get_data_for_license_check();
 
-        $url = 'https://wp-property-hive.com/?';
-    	$url .= 'wc-api=wc-am-api&';
-    	$url .= 'wc_am_action=product_list&';
-    	$url .= 'instance=' . $instance_id . '&';
-    	$url .= 'api_key=' . $license_key;
+        // Preserve verification/usage data while moving API parameters into the body.
+        $url = 'https://wp-property-hive.com/?wc-api=wc-am-api';
+        $data = array_merge( $data, array(
+                'wc_am_action' => 'product_list',
+                'instance'     => $instance_id,
+                'api_key'      => $license_key,
+        ) );
 
     	$response = wp_remote_post( $url, array(
-    		'body' => $data,
-    	) );
+                'redirection' => 0,
+                'body'        => $data,
+            ) );
     	
     	if ( is_wp_error($response) )
     	{
@@ -1452,16 +1457,19 @@ class PH_Licenses {
 
         $data = $this->get_data_for_license_check();
 
-        $url = 'https://wp-property-hive.com/?';
-    	$url .= 'wc-api=wc-am-api&';
-    	$url .= 'wc_am_action=status&';
-    	$url .= 'product_id=' . $product_id_and_package['product_id'] . '&';
-    	$url .= 'instance=' . $instance_id . '&';
-    	$url .= 'api_key=' . $license_key;
+        // Preserve verification/usage data while moving API parameters into the body.
+        $url = 'https://wp-property-hive.com/?wc-api=wc-am-api';
+        $data = array_merge( $data, array(
+                'wc_am_action' => 'status',
+                'product_id'   => $product_id_and_package['product_id'],
+                'instance'     => $instance_id,
+                'api_key'      => $license_key,
+        ) );
 
     	$response = wp_remote_post( $url, array(
-    		'body' => $data,
-    	) );
+                'redirection' => 0,
+                'body'        => $data,
+            ) );
     	
     	if ( is_wp_error($response) )
     	{
@@ -1920,25 +1928,19 @@ class PH_Licenses {
 	        throw new RuntimeException( 'Invalid license action.' );
 	    }
 
-	    // Matches the request format used by the existing licensing methods.
-	    $url = add_query_arg(
-	        array_merge(
-	            $parameters,
-	            array(
-	                'wc-api'       => 'wc-am-api',
-	                'wc_am_action' => $action,
-	            )
-	        ),
-	        'https://wp-property-hive.com/'
-	    );
+        // Keep the routing parameter in the URL; send all API parameters as form data.
+        $url = 'https://wp-property-hive.com/?wc-api=wc-am-api';
+        $data = array_merge( $parameters, array( 'wc_am_action' => $action ) );
+        unset( $data['wc-api'] );
 
-	    $response = wp_remote_post(
-	        $url,
-	        array(
-	            'timeout'     => 20,
-	            'redirection' => 0,
-	        )
-	    );
+        $response = wp_remote_post(
+            $url,
+            array(
+                'timeout'     => 20,
+                'redirection' => 0,
+                'body'        => $data,
+            )
+        );
 
 	    if ( is_wp_error( $response ) ) {
 	        throw new RuntimeException(
