@@ -374,6 +374,13 @@ class PH_Rest_Api {
 	    	}
 	    }
 
+	    // validate custom fields
+	    $custom_fields = $this->prepare_enquiry_custom_fields( isset($params['custom_fields']) ? $params['custom_fields'] : null, $request );
+	    if ( is_wp_error($custom_fields) )
+	    {
+	    	return $custom_fields;
+	    }
+
 	    $title = ( isset($params['title']) && !empty($params['title']) ? $params['title'] : '' );
 	    if (empty($title))
 	    {
@@ -499,7 +506,134 @@ class PH_Rest_Api {
 		    }
 	    }
 
+	    // Custom fields
+	    foreach ( $custom_fields as $key => $value )
+	    {
+	    	update_post_meta( $post_id, $key, $value );
+	    }
+	    if ( !empty($custom_fields) )
+	    {
+	    	// Record which meta keys are custom fields, so they can be identified later from the enquiry alone
+	    	update_post_meta( $post_id, '_custom_field_keys', array_keys($custom_fields) );
+	    }
+
+	    // Record request options needed by the notification email, so it can be built from the enquiry alone
+	    if ( rest_sanitize_boolean( $request->get_param('send_email') ) )
+	    {
+	    	update_post_meta( $post_id, '_send_email', 'yes' );
+	    }
+	    if ( isset($params['office_id']) && !empty($params['office_id']) && is_numeric($params['office_id']) )
+	    {
+	    	update_post_meta( $post_id, '_office_id_requested', 'yes' );
+	    }
+
+	    do_action( 'propertyhive_rest_api_enquiry_created', $post_id, $request, $custom_fields );
+
 	    return new WP_REST_Response(array('ID' => $post_id), 201);
+	}
+
+	/**
+	 * Validate and sanitize the optional 'custom_fields' parameter passed when creating an enquiry.
+	 *
+	 * Expects an object of key => value pairs. Each pair is stored as enquiry post meta so it
+	 * appears alongside the standard fields on the enquiry details screen and in the 'details'
+	 * field returned by the REST API.
+	 *
+	 * @return array|WP_Error Sanitized key => value pairs, or WP_Error on invalid input.
+	 */
+	private function prepare_enquiry_custom_fields( $custom_fields, $request )
+	{
+		if ( $custom_fields === null || $custom_fields === '' || $custom_fields === array() )
+		{
+			return array();
+		}
+
+		$invalid_fields_error = new WP_Error('rest_enquiry_error', __( 'Invalid custom_fields passed. Should be an object of key/value pairs', 'propertyhive' ), array('status' => 400));
+
+		// Allow custom fields to be sent as a JSON string (e.g. in form-encoded requests)
+		if ( is_string($custom_fields) )
+		{
+			$custom_fields = json_decode( $custom_fields, true );
+		}
+
+		if ( !is_array($custom_fields) )
+		{
+			return $invalid_fields_error;
+		}
+
+		// Keys used by the standard enquiry fields that custom fields must not overwrite
+		$reserved_keys = apply_filters( 'propertyhive_rest_api_enquiry_reserved_custom_field_keys', array(
+			'name',
+			'email_address',
+			'telephone_number',
+			'message',
+			'property_id',
+			'title',
+			'status',
+			'source',
+			'office_id',
+			'negotiator_id',
+			'contact_id',
+			'action',
+		) );
+
+		$invalid_value_message = __( 'Invalid custom field value passed. Values should be a string, number, boolean or list of these', 'propertyhive' );
+
+		$prepared = array();
+
+		foreach ( $custom_fields as $key => $value )
+		{
+			$key = (string)$key;
+
+			if ( $key === '' || is_numeric($key) || sanitize_key($key) !== $key )
+			{
+				return new WP_Error('rest_enquiry_error', __( 'Invalid custom field key passed. Keys should contain only lowercase letters, numbers, dashes and underscores', 'propertyhive' ) . ' (' . sanitize_text_field($key) . ')', array('status' => 400));
+			}
+
+			if ( substr( $key, 0, 1 ) == '_' || in_array( $key, $reserved_keys, true ) )
+			{
+				return new WP_Error('rest_enquiry_error', __( 'Custom field key is reserved and cannot be used', 'propertyhive' ) . ' (' . $key . ')', array('status' => 400));
+			}
+
+			if ( is_bool($value) )
+			{
+				$value = $value ? __( 'Yes', 'propertyhive' ) : __( 'No', 'propertyhive' );
+			}
+			elseif ( is_array($value) )
+			{
+				// Allow simple lists of values (e.g. checkbox selections), stored as a comma separated string
+				$list = array();
+				foreach ( $value as $sub_value )
+				{
+					if ( is_bool($sub_value) )
+					{
+						$sub_value = $sub_value ? __( 'Yes', 'propertyhive' ) : __( 'No', 'propertyhive' );
+					}
+					if ( $sub_value === null || $sub_value === '' )
+					{
+						continue;
+					}
+					if ( !is_scalar($sub_value) )
+					{
+						return new WP_Error('rest_enquiry_error', $invalid_value_message . ' (' . $key . ')', array('status' => 400));
+					}
+					$list[] = (string)$sub_value;
+				}
+				$value = implode( ', ', $list );
+			}
+			elseif ( $value === null )
+			{
+				$value = '';
+			}
+			elseif ( !is_scalar($value) )
+			{
+				return new WP_Error('rest_enquiry_error', $invalid_value_message . ' (' . $key . ')', array('status' => 400));
+			}
+
+			$prepared[$key] = sanitize_textarea_field( (string)$value );
+		}
+
+		return apply_filters( 'propertyhive_rest_api_enquiry_custom_fields', $prepared, $custom_fields, $request );
 	}
 
 	public function ensure_key_property_fields_set( $post, $request, $creating )
