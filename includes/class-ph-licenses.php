@@ -510,7 +510,71 @@ class PH_Licenses {
 			$data['pre_pro_add_ons'] = $pre_pro_add_ons;
 		}
 
-		if ( get_option( 'propertyhive_data_sharing' ) != 'no' )
+		$data['ph_version'] = PH_VERSION;
+
+		if ( !function_exists( 'get_plugins' ) ) {
+			include ABSPATH . '/wp-admin/includes/plugin.php';
+		}
+
+		// Locrating
+		if ( is_plugin_active( 'propertyhive-locrating/propertyhive-locrating.php' ) )
+		{
+			$locrating_settings = get_option( 'propertyhive_locrating', array() );
+			if ( !empty($locrating_settings) && isset($locrating_settings['enabled']) )
+			{
+				$data['locrating_enabled'] = ( $locrating_settings['enabled'] == 1 ? $locrating_settings['enabled'] : 0 );
+			}
+		}
+
+		// Visi homes
+		if ( is_plugin_active( 'propertyhive-visihomes/propertyhive-visihomes.php' ) )
+		{
+			$visihomes_settings = get_option( 'propertyhive_visihomes', array() );
+			if ( 
+				!empty($visihomes_settings) && 
+				isset( $visihomes_settings['embed_code'] ) &&
+            	!empty($visihomes_settings['embed_code']) 
+			)
+			{
+				$data['visihomes_enabled'] = 1;
+			}
+		}
+
+		$share_usage_data = get_option( 'propertyhive_data_sharing' ) != 'no';
+
+		$plugins        = get_plugins(); // Fetch all plugins with details
+		$active_plugins = get_option('active_plugins', array());
+
+		$active_plugins_data = [];
+		$inactive_plugins_data = [];
+
+		// Loop through plugins to separate active and inactive along with version
+		foreach ($plugins as $plugin_path => $plugin_data) 
+		{
+		    $plugin_slug = explode( '/', wp_normalize_path( $plugin_path ) )[0];
+		    if ( ! $share_usage_data && 'propertyhive' !== $plugin_slug && 0 !== strpos( $plugin_slug, 'propertyhive-' ) ) {
+		        continue;
+		    }
+
+		    $plugin_info = [
+		        'name'    => isset($plugin_data['Name']) ? $plugin_data['Name'] : '',
+		        'version' => isset($plugin_data['Version']) ? $plugin_data['Version'] : '',
+		        'path'    => $plugin_path,
+		    ];
+
+		    if (in_array($plugin_path, $active_plugins)) 
+		    {
+		        $active_plugins_data[] = $plugin_info;
+		    }
+		    else
+		    {
+		        $inactive_plugins_data[] = $plugin_info;
+		    }
+		}
+
+		$data['active_plugins']   = $active_plugins_data;
+
+		if ( $share_usage_data )
 		{
 			// Not opted-out
 
@@ -519,7 +583,6 @@ class PH_Licenses {
 			$theme      = $theme_data->Name . ' ' . $theme_data->Version;
 
 			$data['php_version'] = phpversion();
-			$data['ph_version'] = PH_VERSION;
 			$data['wp_version']  = get_bloginfo( 'version' );
 			$data['server']      = isset( $_SERVER['SERVER_SOFTWARE'] ) && is_string( $_SERVER['SERVER_SOFTWARE'] ) ? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) ) : '';
 
@@ -533,37 +596,6 @@ class PH_Licenses {
 			$data['theme']       = $theme;
 			$data['email']       = get_bloginfo( 'admin_email' );
 
-			// Retrieve current plugin information
-			if ( !function_exists( 'get_plugins' ) ) {
-				include ABSPATH . '/wp-admin/includes/plugin.php';
-			}
-
-			$plugins        = get_plugins(); // Fetch all plugins with details
-			$active_plugins = get_option('active_plugins', array());
-
-			$active_plugins_data = [];
-			$inactive_plugins_data = [];
-
-			// Loop through plugins to separate active and inactive along with version
-			foreach ($plugins as $plugin_path => $plugin_data) 
-			{
-			    $plugin_info = [
-			        'name'    => isset($plugin_data['Name']) ? $plugin_data['Name'] : '',
-			        'version' => isset($plugin_data['Version']) ? $plugin_data['Version'] : '',
-			        'path'    => $plugin_path,
-			    ];
-
-			    if (in_array($plugin_path, $active_plugins)) 
-			    {
-			        $active_plugins_data[] = $plugin_info;
-			    }
-			    else
-			    {
-			        $inactive_plugins_data[] = $plugin_info;
-			    }
-			}
-
-			$data['active_plugins']   = $active_plugins_data;
 			$data['inactive_plugins'] = $inactive_plugins_data;
 
 			$data['locale']           = get_locale();
@@ -578,17 +610,17 @@ class PH_Licenses {
 			$reapit_customer_codes = array();
             foreach ( $property_import as $import_id => $options )
             {
-            	if ( $options['running'] == '1' )
+            	if ( is_array($options) && isset($options['running']) && $options['running'] == '1' )
             	{
-            		if ( $options['format'] == 'xml' )
+            		if ( isset($options['format']) && $options['format'] == 'xml' )
             		{
-            			$options['format'] .= ' (' . esc_url($options['xml_url']) . ')';
+            			$options['format'] .= ' (' . esc_url( isset($options['xml_url']) && is_string($options['xml_url']) ? $options['xml_url'] : '' ) . ')';
             		}
-            		elseif ( $options['format'] == 'csv' )
+            		elseif ( isset($options['format']) && $options['format'] == 'csv' )
             		{
-            			$options['format'] .= ' (' . esc_url($options['csv_url']) . ')';
+            			$options['format'] .= ' (' . esc_url( isset($options['csv_url']) && is_string($options['csv_url']) ? $options['csv_url'] : '' ) . ')';
             		}
-            		elseif ( $options['format'] == 'json_reapit_foundations' )
+            		elseif ( isset($options['format']) && $options['format'] == 'json_reapit_foundations' )
 					{
 					    if ( isset( $options['customer_id'] ) && is_string( $options['customer_id'] ) )
 					    {
@@ -601,6 +633,7 @@ class PH_Licenses {
 					    }
 					}
             		elseif ( 
+            			isset($options['format']) && 
             			$options['format'] == 'rtdf' &&
             			get_option( 'propertyhive_rtdf_crm', '' )  != ''
             		)
@@ -675,30 +708,6 @@ class PH_Licenses {
 			}
 
 			$data['property_export_formats'] = $formats;
-
-			// Locrating
-			if ( is_plugin_active( 'propertyhive-locrating/propertyhive-locrating.php' ) )
-			{
-				$locrating_settings = get_option( 'propertyhive_locrating', array() );
-				if ( !empty($locrating_settings) && isset($locrating_settings['enabled']) )
-				{
-					$data['locrating_enabled'] = ( $locrating_settings['enabled'] == 1 ? $locrating_settings['enabled'] : 0 );
-				}
-			}
-
-			// Visi homes
-			if ( is_plugin_active( 'propertyhive-visihomes/propertyhive-visihomes.php' ) )
-			{
-				$visihomes_settings = get_option( 'propertyhive_visihomes', array() );
-				if ( 
-					!empty($visihomes_settings) && 
-					isset( $visihomes_settings['embed_code'] ) &&
-	            	!empty($visihomes_settings['embed_code']) 
-				)
-				{
-					$data['visihomes_enabled'] = 1;
-				}
-			}
 
 			// Search analytics
 
