@@ -3,7 +3,7 @@ Contributors: PropertyHive,BIOSTALL
 Tags: property, real estate, estate agents, property import, crm
 Requires at least: 5.6
 Tested up to: 7.1
-Stable tag: 2.4.0
+Stable tag: 2.5.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -125,7 +125,7 @@ Don't just take our word for it. Have a look at what other Property Hive users h
 
 Services depend on enabled features and configuration:
 
-* Property Hive: periodic license checks send the key and site URL. Unless Usage Data Sharing is disabled, they also send environment details, configured import/export destinations, usage totals and published-record counts. Pro requests send the Pro key and site/instance identifiers. Admin screens fetch add-on details, news and update notices. An optional deactivation survey sends your reason/comments and, unless anonymous is selected, site/diagnostic details. [Privacy](https://wp-property-hive.com/privacy-policy/) | [Terms](https://wp-property-hive.com/terms-of-service/).
+* Property Hive: periodic license checks send the key, site URL, active Property Hive plugins and file checksums. Unless Usage Data Sharing is disabled, they also send environment details, all active and inactive plugins, configured import/export destinations, usage totals and published-record counts. Pro requests send the Pro key and site/instance identifiers. Admin screens fetch add-on details, news and update notices. An optional deactivation survey sends your reason/comments and, unless anonymous is selected, site/diagnostic details. [Privacy](https://wp-property-hive.com/privacy-policy/) | [Terms](https://wp-property-hive.com/terms-of-service/).
 * Currency rates: the daily currency task retrieves GBP exchange rates from the [exchange API](https://github.com/fawazahmed0/exchange-api) via jsDelivr, sending normal server request metadata. [Privacy](https://www.jsdelivr.com/terms/privacy-policy) | [Terms](https://www.jsdelivr.com/terms/terms-of-use).
 * Maps/geocoding: configured map services receive property coordinates, typed/stored addresses or search keywords, API keys/tokens and request metadata when maps display or addresses are looked up. Google: [Privacy](https://policies.google.com/privacy), [Terms](https://cloud.google.com/maps-platform/terms). Mapbox: [Privacy](https://www.mapbox.com/legal/privacy), [Terms](https://www.mapbox.com/legal/tos). OpenStreetMap: [Privacy](https://osmfoundation.org/wiki/Privacy_Policy), [Tile policy](https://operations.osmfoundation.org/policies/tiles/), [Nominatim policy](https://operations.osmfoundation.org/policies/nominatim/). Nominatim limits requests to one per second and prohibits submitting personal/confidential data.
 * CAPTCHA: when configured on a form, the provider's browser script processes visitor/device and interaction data to detect abuse. Form submissions send the resulting token and configured secret to the provider for verification. Google reCAPTCHA: [Privacy](https://policies.google.com/privacy), [Terms](https://cloud.google.com/terms/service-terms). hCaptcha: [Privacy](https://www.hcaptcha.com/privacy), [Terms](https://www.hcaptcha.com/terms). Cloudflare Turnstile: [Privacy](https://www.cloudflare.com/turnstile-privacy-policy/), [Terms](https://www.cloudflare.com/website-terms/).
@@ -225,6 +225,46 @@ The free core plugin contains the foundations that you need to create a property
 16. Not using a CRM? Property Hive comes with a free CRM to manage applicants, email matching properties to them, record viewings and more
 
 == Changelog ==
+
+= 2.5.0 - 2026-11-26 =
+* Added progress updates when generating applicant lists, with results appearing as they are processed.
+* Added a 'Remove' option for files uploaded through admin additional fields of type 'File'
+* Added fallback exchange-rate services to improve reliability when updating property currency conversions.
+* Added a developer filter to completely disable property enquiries.
+* Added accessible labels across property search, enquiry, registration, login and account forms.
+* Added accessible labels for search results, sorting, pagination, account navigation and viewing tables.
+* Added descriptive alternative text for property photos, floorplans, EPCs and brochures across page-builder integrations.
+* Added descriptive titles for map, Street View and virtual-tour embeds.
+* Added screen-reader announcements for form messages, required dropdowns, selected account sections and links that open dialogs.
+* Added accessible labels for admin brochure, EPC and floorplan controls.
+* Added CSV formula-injection protection to applicant-list exports.
+* Updated applicant list generation to process contacts in batches, reducing memory usage on websites with large applicant databases.
+* Updated applicant CSV exports to process results in batches.
+* Updated property and applicant matching to reduce unnecessary queries, object creation and checks.
+* Updated matching to use published properties and contacts, with earlier filtering of applicants who have opted to receive matching properties.
+* Updated automatic matching emails to avoid unnecessary price and market-status checks for properties that no longer match an applicant's requirements.
+* Updated license settings to mask saved keys and prevent full keys appearing in page fields or error messages.
+* Updated administrative AJAX requests with additional security-token verification.
+* Updated property enquiry processing to validate permitted fields, required values, email addresses, choices, dates, numbers and submission sizes before sending or saving enquiries.
+* Updated room and description names with additional sanitization.
+* Updated output escaping across admin screens, notes, solicitor details and media previews.
+* Updated polygon-based address searches with stricter coordinate validation and safer database queries.
+* Updated property search forms, form-field labels, radio groups and account tables with improved accessibility markup.
+* Updated password recovery to focus the email field automatically when the form opens.
+* Updated decorative required-field asterisks to be hidden from screen readers.
+* Updated Mapbox documentation and settings guidance to clarify account, access-token and licensing requirements.
+* Removed the "Restart setup wizard" prompt from settings that showed sometimes on development sites.
+* Removed dialog announcements from Elementor image links configured to open without a gallery dialog.
+* Removed unnecessary object creation and repeated checks from property and applicant matching.
+* Corrected Elementor property-result counts across paginated results.
+* Corrected search result field customizations not being applied during AJAX requests, including infinite scrolling.
+* Corrected search form settings fields becoming unexpandable after dragging them between lists.
+* Corrected direct REST API access to off-market properties when the website is configured to redirect visitors away from them.
+* Corrected deprecated-property warnings when working with contacts.
+* Corrected input labels referencing the wrong field IDs.
+* Corrected duplicate IDs and label associations in cascading taxonomy dropdowns.
+* Corrected missing accessible labels on dynamically populated cascading taxonomy dropdowns.
+* Corrected duplicate email-field IDs in the password recovery form.
 
 = 2.4.0 - 2026-09-23 =
 * Added new onboarding wizard when people activate the plugin for the first time
