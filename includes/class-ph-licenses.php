@@ -80,6 +80,82 @@ class PH_Licenses {
      * @return array Permission, reason code and administrator-facing explanation.
      */
     public function get_add_on_entitlement( $slug, $force = false, $include_message = true ) {
+        $result = $this->get_standard_add_on_entitlement( $slug, $force, $include_message );
+        if ( ! empty( $result['can_use'] ) || ! is_string( $slug ) || 1 !== preg_match( '/^propertyhive-[a-z0-9_-]+$/D', $slug ) ) {
+            return $result;
+        }
+
+        $whitelist = $this->get_site_whitelist( $force );
+        if ( true === $whitelist['allowed'] && ( ! array_key_exists( 'add_ons', $whitelist ) || in_array( $slug, $whitelist['add_ons'], true ) ) ) {
+            return array(
+                'can_use' => true,
+                'reason' => 'whitelisted',
+                'message' => $include_message ? __( 'This site has been manually approved to use this add-on.', 'propertyhive' ) : '',
+            );
+        }
+        return $result;
+    }
+
+    /**
+     * Fetch site-wide permissions once per cache period, shared by every add-on.
+     * Domain and wildcard matching is performed by the whitelist endpoint.
+     */
+    private function get_site_whitelist( $force = false ) {
+        $site_url = home_url();
+        $cache_key = 'ph_site_whitelist_' . md5( $site_url );
+        if ( ! $force ) {
+            $cached = $this->validate_site_whitelist( get_transient( $cache_key ) );
+            if ( null !== $cached ) {
+                return $cached;
+            }
+        }
+
+        $whitelist = array( 'allowed' => false );
+        $response = wp_remote_post(
+            'https://license.wp-property-hive.com/whitelist.php',
+            array(
+                'timeout' => 5,
+                'redirection' => 0,
+                'sslverify' => true,
+                'limit_response_size' => 65536,
+                'headers' => array( 'Accept' => 'application/json' ),
+                'body' => array( 'url' => $site_url ),
+            )
+        );
+        if ( ! is_wp_error( $response ) && 200 === wp_remote_retrieve_response_code( $response ) ) {
+            $validated = $this->validate_site_whitelist( json_decode( wp_remote_retrieve_body( $response ), true ) );
+            if ( null !== $validated ) {
+                $whitelist = $validated;
+            }
+        }
+
+        // Cache refusals and failures too, avoiding a request for each active add-on.
+        set_transient( $cache_key, $whitelist, $whitelist['allowed'] ? 24 * HOUR_IN_SECONDS : 15 * MINUTE_IN_SECONDS );
+        return $whitelist;
+    }
+
+    /** Validate remote and cached permissions. Omitted add_ons means all add-ons. */
+    private function validate_site_whitelist( $data ) {
+        if ( ! is_array( $data ) || ! isset( $data['allowed'] ) || ! is_bool( $data['allowed'] ) ) {
+            return null;
+        }
+        $result = array( 'allowed' => $data['allowed'] );
+        if ( array_key_exists( 'add_ons', $data ) ) {
+            if ( ! is_array( $data['add_ons'] ) ) {
+                return null;
+            }
+            foreach ( $data['add_ons'] as $slug ) {
+                if ( ! is_string( $slug ) || 1 !== preg_match( '/^propertyhive-[a-z0-9_-]+$/D', $slug ) ) {
+                    return null;
+                }
+            }
+            $result['add_ons'] = array_values( array_unique( $data['add_ons'] ) );
+        }
+        return $result;
+    }
+
+    /** Standard pre-Pro, free-feature and Pro-license entitlement rules. */
+    private function get_standard_add_on_entitlement( $slug, $force = false, $include_message = true ) {
         $result = array( 'can_use' => false, 'reason' => 'feature_unavailable', 'message' => ( $include_message ? __( 'Feature information is unavailable. Please retry or contact support.', 'propertyhive' ) : '' ) );
         if ( ! is_string( $slug ) || '' === $slug ) {
             return $result;
